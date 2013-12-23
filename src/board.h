@@ -10,7 +10,7 @@
  * Written In: Peking University, beijing, China
  */
 
-#include <libsoul>
+#include <libsoul/libsoul.h>
 
 //棋子状态
 typedef uchar color;

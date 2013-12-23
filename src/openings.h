@@ -10,7 +10,6 @@
  * Written In: Peking University, beijing, China 
  */
 
-#include <libsoul>
 
 //开局库
 
