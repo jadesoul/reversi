@@ -15,6 +15,7 @@
 //棋子状态
 typedef uchar color;
 const static color EMPTY=0;
+const static color DRAW=0;//平局
 const static color WHITE=1;
 const static color BLACK=2;
 const static color ACTIVE=3;
@@ -40,7 +41,7 @@ const static int INC_Y[8]={0, -1, -1, -1, 0, 1, 1, 1};
 class Board {
 public:
 	color map[8][8];//存放64个棋子状态
-	uchar total[4];//存放4种颜色棋子的个数并动态跟新，其中ACTIVE的个数与EMPTY个数重叠
+	uchar total[4];//存放4种颜色棋子的个数并动态更新，其中ACTIVE的个数与EMPTY个数重叠
 	color turn;//当前轮到哪方下子
 	
 	Board() {

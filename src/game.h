@@ -12,15 +12,13 @@
 
 #include "player.h"
 
-#define DRAW 0//平局
-
 //代表一盘棋结束时的比分
 class Score {
 public:
 	uchar black;//黑方棋子数
 	uchar white;//白方棋子数
 	uchar empty;//未下棋子数
-	uchar winner;//胜利方，取值为BLACK, WHITE, DRAW平局
+	color winner;//胜利方，取值为 BLACK, WHITE, DRAW 平局
 	
 	Score(Board& board) {//游戏结束时，将board传入构造对象
 		black=board.total[BLACK];
@@ -35,16 +33,16 @@ public:
 		return (int)black-(int)white;
 	}
 	
-	void dump(ostream& o=cout) {
+	ostream& dump(ostream& o=cout) {
 		o<<"BLACK:"<<(uint)black<<" WHITE:"<<(uint)white<<" EMPTY:"<<(uint)empty<<" ";
 		if (winner==BLACK) o<<"BLACK WIN";
 		else if (winner==WHITE) o<<"WHITE WIN";
 		else o<<"DRAW GAME";
+		return o;
 	}
 	
 	friend inline ostream& operator<<(ostream& o, Score& s) {
-		s.dump(o);
-		return o;
+		return s.dump(o);
 	}
 };
 
