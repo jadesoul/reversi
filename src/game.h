@@ -76,8 +76,8 @@ public:
 				board.pass();
 				pass_cnt+=1;
 			} else {
-				player.play(board);
 				pass_cnt=0;
+				player.play(board);
 			}
 		}
 		log_status("Game Over!!");
@@ -113,10 +113,8 @@ public:
 			s[2]=0;
 			return s;
 		}
-		
 	}
 };
-
 
 #endif /* GAME_H_1371896260_1 */
 
