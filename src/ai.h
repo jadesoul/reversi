@@ -195,7 +195,7 @@ public:
 					predict[move]=0;
 					
 					//利用蒙特卡罗思想，开始随机下棋若干次
-					for_n(i, 2000) {
+					for_n(i, 20) {
 						Game game(player, player, think);//举办一场比赛
 						Score score=game.start();
 						int diff=score.diff();//黑子数减去白子数之差
