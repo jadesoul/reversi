@@ -43,14 +43,14 @@ public:
 		MonteCarloAIPlayer black;
 		// MonteCarloAIPlayer white;
 		
-		uint total=100;
+		uint total=10;
 		log_warn("start "<<total<<" games ...")
 		uint win[3]={0, 0, 0};
 		int total_diff=0;
 		//比赛，多比几盘
 		for_n(i, total) {
-			if (i%10==0)
-				log_warn("progress: "<<i<<"/"<<total);
+			// if (i%2==0)
+			log_warn("progress: "<<i<<"/"<<total);
 			Game game(black, white);
 			Score score=game.start();
 			win[score.winner]+=1;
