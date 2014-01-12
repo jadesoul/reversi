@@ -12,7 +12,7 @@
 #include "board_test.h"
 #include "game_test.h"
 
-extern uint verbose=40;
+extern uint verbose=10;
 
 int main () {
 	// delete new BoardTest;
