@@ -212,19 +212,19 @@ public:
 		list<uchar> keys=predict.keys();
 		
 		//for debug
-		log_warn("---------- predict.size()="<<predict.size());
-		for_iter(it, list<uchar>, keys) {
-			uchar move=(uchar)*it;
-			uint x=move>>4, y=move&0x0F;
-			log_warn("move="<<x<<","<<y<<" predict="<<predict[*it]);
-		}
+		// log_warn("---------- predict.size()="<<predict.size());
+		// for_iter(it, list<uchar>, keys) {
+			// uchar move=(uchar)*it;
+			// uint x=move>>4, y=move&0x0F;
+			// log_warn("move="<<x<<","<<y<<" predict="<<predict[*it]);
+		// }
 		
 		//在所有走法中找出赢子数最大的走法
 		uchar best_move=-1;
 		int max_diff=min_sint4;
 		for_iter(it, list<uchar>, keys) {
 			uchar move=(uchar)*it;
-			int diff=predict[*it];
+			int diff=predict[move];
 			if (max_diff<diff) {
 				max_diff=diff;
 				best_move=move;
