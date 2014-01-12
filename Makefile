@@ -13,4 +13,4 @@ clean:
 	@rm -rf build lib bin
 	
 test: all
-	reversi
+	reversi 
