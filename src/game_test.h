@@ -37,10 +37,10 @@ public:
 		// Look2AIPlayer black;
 		// Look2AIPlayer white;
 		
-		RandomAIPlayer black;
+		// RandomAIPlayer black;
 		// RandomAIPlayer white;
 		
-		// MonteCarloAIPlayer black;
+		MonteCarloAIPlayer black;
 		// MonteCarloAIPlayer white;
 		
 		
