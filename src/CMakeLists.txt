@@ -21,7 +21,7 @@ set(app reversi)
 add_executable(${app} ${app}.cpp)
 install(TARGETS ${app} DESTINATION ${BIN_INSTALL_DIR})
 target_link_libraries(${app} soul)
-	
+
 set(app engine)
 add_executable(${app} ${app}.cpp)
 install(TARGETS ${app} DESTINATION ${CGI_INSTALL_DIR})
