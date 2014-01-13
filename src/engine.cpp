@@ -34,9 +34,9 @@ int main(int argc, char * argv[]) {
 	if (argc!=2 || !check(argv[1])) return -1;
 	
 	// EasyAIPlayer player;
-	// Look2AIPlayer player;
+	Look2AIPlayer player;
 	// RandomAIPlayer player;
-	MonteCarloAIPlayer player;
+	// MonteCarloAIPlayer player;
 	
 	Player& black=player;
 	Player& white=player;
