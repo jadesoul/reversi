@@ -57,7 +57,7 @@ public:
 	
 	inline bool game_over() {//无子可下，或者连续两次PASS
 		uchar& empty_cnt=board.total[EMPTY];
-		return empty_cnt==0 OR pass_cnt>=2;
+		return empty_cnt==0 or pass_cnt>=2;
 	}
 	
 	Game(Player& black, Player& white):

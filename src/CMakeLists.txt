@@ -17,12 +17,14 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-g -O2 -DNDEBUG")
 include_directories(${INC_INSTALL_DIR})
 link_directories(${LIB_INSTALL_DIR})
 
+set(SRCS datetime.cpp logging.cpp random.cpp types.cpp)
+
 set(app reversi)
-add_executable(${app} ${app}.cpp)
+add_executable(${app} ${app}.cpp ${SRCS})
 install(TARGETS ${app} DESTINATION ${BIN_INSTALL_DIR})
 target_link_libraries(${app} soul)
 
 set(app engine)
-add_executable(${app} ${app}.cpp)
+add_executable(${app} ${app}.cpp ${SRCS})
 install(TARGETS ${app} DESTINATION ${CGI_INSTALL_DIR})
 target_link_libraries(${app} libsoul.a)

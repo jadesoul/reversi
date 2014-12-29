@@ -10,7 +10,8 @@
  * Written In: Peking University, beijing, China
  */
 
-#include <libsoul/libsoul.h>
+#include "bootstrap.h"
+#include "logging.h"
 
 //棋子状态
 typedef uchar color;
@@ -113,13 +114,13 @@ public:
 					uint x=i, y=j;
 					uint cnt=0;//该方向上能吃几个子
 					SET_NEXT(x, y, d);
-					while (x<8 AND y<8 AND map[x][y]==o) {//注意x, y都是uint，一定非负
+					while (x<8 and y<8 and map[x][y]==o) {//注意x, y都是uint，一定非负
 						cnt+=1;//累加吃子数
 						SET_NEXT(x, y, d);//探测下一个位置
 					}
-					if (x<8 AND y<8) {
+					if (x<8 and y<8) {
 						//没碰墙，要么是自己的子，要么是空子，或者已经是ACTIVE
-						if (map[x][y]==EMPTY AND cnt>0) {//如果是空子且能吃子，则激活
+						if (map[x][y]==EMPTY and cnt>0) {//如果是空子且能吃子，则激活
 							map[x][y]=ACTIVE;
 							mobility+=1;//新增一个行动力
 						} else {
@@ -220,12 +221,12 @@ public:
 			uint x=i, y=j;
 			uint cnt=0;//该方向上能吃几个子
 			SET_NEXT(x, y, d);
-			while (x<8 AND y<8 AND map[x][y]==o) {//注意x, y都是uint，一定非负
+			while (x<8 and y<8 and map[x][y]==o) {//注意x, y都是uint，一定非负
 				cnt+=1;//累加吃子数
 				SET_NEXT(x, y, d);//探测下一个位置
 			}
-			if (x<8 AND y<8) {//没碰墙
-				if (map[x][y]==s AND cnt>0) {//如果是自己的子且可吃子，则吃子
+			if (x<8 and y<8) {//没碰墙
+				if (map[x][y]==s and cnt>0) {//如果是自己的子且可吃子，则吃子
 					uint d_inverse=(d+4)%8;//向相反的方向顺序扫描并吃子
 					SET_NEXT(x, y, d_inverse);
 					while (map[x][y]==o) {//一定不会越界，直到遇到下子点才结束

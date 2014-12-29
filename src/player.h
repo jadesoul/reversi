@@ -35,7 +35,7 @@ public:
 			cout<<endl;
 			log_info("(x, y)=("<<x<<", "<<y<<")");
 			
-		} while (x<8 AND y<8 AND b.play(x, y)==0);
+		} while (x<8 and y<8 and b.play(x, y)==0);
 		return (x<<4)+y;
 	}
 };
