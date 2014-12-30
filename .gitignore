@@ -13,3 +13,5 @@
 *.a
 
 build
+/bin/
+/cgi-bin/
