@@ -1,4 +1,4 @@
-all: update prepare install
+all: prepare install
 
 update:
 	@git pull ; git merge origin/desktop

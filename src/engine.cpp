@@ -16,7 +16,7 @@
 
 extern uint verbose=50;
 
-bool check(char* s) {
+bool check1(const char* s) {
 	int n=strlen(s);
 	if (n!=65) return false;
 	for (int i=0; i<64; ++i) {
@@ -29,9 +29,9 @@ bool check(char* s) {
 }
 
 //以CGI的形式作为服务器端游戏引擎，供web界面以Ajax形式调用
-int main(int argc, char * argv[]) {
+int main(int argc, const char** argv) {
 	cout<<"Content-Type: text/plain; charset=utf8\n\n";
-	if (argc!=2 || !check(argv[1])) return -1;
+	if (argc!=2 || !check1(argv[1])) return -1;
 	
 	// EasyAIPlayer player;
 	Look2AIPlayer player;
