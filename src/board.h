@@ -12,6 +12,7 @@
 
 #include "bootstrap.h"
 #include "logging.h"
+#include "random.h"
 
 //棋子状态
 typedef uchar color;

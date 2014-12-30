@@ -17,7 +17,7 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-g -O2 -DNDEBUG")
 include_directories(${INC_INSTALL_DIR})
 link_directories(${LIB_INSTALL_DIR})
 
-set(SRCS datetime.cpp logging.cpp random.cpp types.cpp)
+set(SRCS logging.cpp random.cpp types.cpp)
 
 set(app reversi)
 add_executable(${app} ${app}.cpp ${SRCS})

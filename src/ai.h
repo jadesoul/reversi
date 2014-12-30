@@ -182,7 +182,7 @@ public:
 		
 		
 		RandomAIPlayer player;//用于推演时随机下棋
-		dict<uchar, int> predict;//统计每个下子位置最终的总赢子数
+		map<uchar, int> predict;//统计每个下子位置最终的总赢子数
 		
 		for_n(x, 8) {
 			for_n(y, 8) {
@@ -209,8 +209,6 @@ public:
 			}
 		}
 
-		list<uchar> keys=predict.keys();
-		
 		//for debug
 		// log_warn("---------- predict.size()="<<predict.size());
 		// for_iter(it, list<uchar>, keys) {
@@ -221,10 +219,11 @@ public:
 		
 		//在所有走法中找出赢子数最大的走法
 		uchar best_move=-1;
-		int max_diff=min_sint4;
-		for_iter(it, list<uchar>, keys) {
-			uchar move=(uchar)*it;
-			int diff=predict[move];
+		int max_diff=INT32_MIN;
+		typedef map<uchar, int> predict_t;
+		for_iter(it, predict_t, predict) {
+			uchar move=it->first;
+			int diff=it->second;
 			if (max_diff<diff) {
 				max_diff=diff;
 				best_move=move;
