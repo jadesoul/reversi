@@ -237,7 +237,7 @@ Player.ComputerPlayer=function(name, color) {
 	this.oppo=(this.color==GridState.BLACK?GridState.WHITE:GridState.BLACK);
 	
 	this.AI={
-		url:'/cgi-bin/reversi-web-engine',
+		url:'/reversi',
 		version:1.0
 	}
 	
