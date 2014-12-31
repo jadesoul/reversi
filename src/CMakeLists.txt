@@ -5,8 +5,6 @@ set(CMAKE_BUILD_TYPE Release)
 
 set(PREFIX ${CMAKE_CURRENT_LIST_DIR}/..)
 set(BINDIR "${PREFIX}/bin")
-set(CGIDIR "${PREFIX}/cgi-bin")
-set(LIBDIR "${PREFIX}/lib")
 set(INCDIR "${PREFIX}/include")
 
 set(CMAKE_CXX_FLAGS "-fPIC -Wall -D_GNU_SOURCE -std=c++0x")

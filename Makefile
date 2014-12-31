@@ -8,6 +8,7 @@ prepare:
 	
 install:
 	@cd build ; make -sj install
+	@cd src; python setup.py build_ext --inplace
 
 clean:
 	@rm -rf build lib bin cgi-bin

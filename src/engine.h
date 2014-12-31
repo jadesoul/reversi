@@ -16,35 +16,36 @@
 #include "game.h"
 #include "ai.h"
 
-extern uint verbose=50;
+extern uint verbose = 50;
 
 bool check1(const char* s) {
-	int n=strlen(s);
-	if (n!=65) return false;
-	for (int i=0; i<64; ++i) {
-		if (!(s[i]=='0' || s[i]=='1' || s[i]=='2'))
+	int n = strlen(s);
+	if (n != 65)
+		return false;
+	for (int i = 0; i < 64; ++i) {
+		if (!(s[i] == '0' || s[i] == '1' || s[i] == '2'))
 			return false;
 	}
-	if (!(s[64]=='1' || s[64]=='2'))
+	if (!(s[64] == '1' || s[64] == '2'))
 		return false;
 	return true;
 }
 
 const char* server(const char* s) {
-	if (!check1(s)) return -1;
+	if (!check1(s))
+		return NULL;
 
 	// EasyAIPlayer player;
 	Look2AIPlayer player;
 	// RandomAIPlayer player;
 	// MonteCarloAIPlayer player;
 
-	Player& black=player;
-	Player& white=player;
+	Player& black = player;
+	Player& white = player;
 	Game game(black, white);
 
-	string query=s;
+	string query = s;
 	return game.deal(query).c_str();
 }
-
 
 #endif /* ENGINE_H_1420019316_93 */
