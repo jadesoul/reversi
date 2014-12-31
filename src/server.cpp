@@ -11,6 +11,8 @@
 #include <boost/asio.hpp>
 
 using boost::asio::ip::tcp;
+using namespace std;
+
 
 std::string make_daytime_string() {
 	using namespace std;
@@ -23,20 +25,31 @@ int main() {
 	try {
 		boost::asio::io_service io_service;
 
-		tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v4(), 13));
+		tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v4(), 8888));
 
 		for (;;) {
 			tcp::socket socket(io_service);
 			acceptor.accept(socket);
 
-			std::string message = make_daytime_string();
+			string content="as";
+
+			ostringstream oss;
+			oss<<"HTTP/1.1 200 OK"<<endl
+				<<"Server: asio/1.0"<<endl
+				<<"Content-Type: text/plain; charset=utf8"<<endl
+				<<"Content-Length: "<<content.size()<<endl
+				<<"Accept-Ranges: bytes"<<endl
+				<<endl
+				<<content<<endl;
+
+			string message = oss.str();
 
 			boost::system::error_code ignored_error;
 			boost::asio::write(socket, boost::asio::buffer(message), ignored_error);
 		}
 
-	} catch (std::exception& e) {
-		std::cerr << e.what() << std::endl;
+	} catch (exception& e) {
+		cerr << e.what() << endl;
 	}
 
 	return 0;
