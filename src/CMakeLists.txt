@@ -16,3 +16,6 @@ include_directories(${INCDIR})
 
 add_executable(reversi reversi.cpp)
 install(TARGETS reversi DESTINATION ${BINDIR})
+
+
+

@@ -560,6 +560,7 @@ static PyObject *__pyx_codeobj__2;
  * 
  * def reversi(x):             # <<<<<<<<<<<<<<
  *     return reversi(x)
+ * 
  */
 
 /* Python wrapper */
@@ -592,6 +593,8 @@ static PyObject *__pyx_pf_6engine_reversi(CYTHON_UNUSED PyObject *__pyx_self, Py
  * 
  * def reversi(x):
  *     return reversi(x)             # <<<<<<<<<<<<<<
+ * 
+ * 
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_reversi); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 6; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -630,6 +633,7 @@ static PyObject *__pyx_pf_6engine_reversi(CYTHON_UNUSED PyObject *__pyx_self, Py
  * 
  * def reversi(x):             # <<<<<<<<<<<<<<
  *     return reversi(x)
+ * 
  */
 
   /* function exit code */
@@ -690,6 +694,7 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  * def reversi(x):             # <<<<<<<<<<<<<<
  *     return reversi(x)
+ * 
  */
   __pyx_tuple_ = PyTuple_Pack(1, __pyx_n_s_x); if (unlikely(!__pyx_tuple_)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 5; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple_);
@@ -799,6 +804,7 @@ PyMODINIT_FUNC PyInit_engine(void)
  * 
  * def reversi(x):             # <<<<<<<<<<<<<<
  *     return reversi(x)
+ * 
  */
   __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6engine_1reversi, NULL, __pyx_n_s_engine); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 5; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
