@@ -1,8 +1,7 @@
-
 cdef extern from "engine.h":
-    str server(str)
+    const char* server(const char*)
 
-def reversi(x):
-    return reversi(x)
+cpdef reversi(x):
+    return server(x)
 
 

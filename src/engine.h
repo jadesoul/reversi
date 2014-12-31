@@ -33,7 +33,7 @@ bool check1(const char* s) {
 
 const char* server(const char* s) {
 	if (!check1(s))
-		return NULL;
+		return "";
 
 	// EasyAIPlayer player;
 	Look2AIPlayer player;
@@ -45,6 +45,9 @@ const char* server(const char* s) {
 	Game game(black, white);
 
 	string query = s;
+//	const char* ret=strdup(game.deal(query).c_str());
+//	return ret;
+
 	return game.deal(query).c_str();
 }
 

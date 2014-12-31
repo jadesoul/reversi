@@ -92,7 +92,7 @@ public:
 	
 	//用于游戏引擎，给定字符串（64字符的游戏局面和1个字符的turn）
 	//返回下子的位置坐标 (2个字符)，下标均是从1开始计算
-	string deal(string& query) {
+	string deal(const string& query) {
 		pass_cnt=0;
 		board.init_from_str(query);
 		color& turn=board.turn;
