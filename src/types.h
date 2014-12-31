@@ -85,4 +85,13 @@ const	sint8		max_sint8		=	0x7FFFFFFFFFFFFFFFLL;
 const	uint8		min_uint8		=	0x0000000000000000LL;
 const	uint8		max_uint8		=	0xFFFFFFFFFFFFFFFFLL;
 */
+
+#ifdef OS_WIN32
+const char* fmtstr_ulong="%I64d";
+#elif defined(OS_LINUX)
+const char* fmtstr_ulong="%lld";
+#elif defined(OS_OSX)
+const char* fmtstr_ulong="%lld";
+#endif
+
 #endif /* TYPES_H_1324964318_12 */

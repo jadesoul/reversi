@@ -44,6 +44,8 @@ public:
 	}
 };
 
+uint Random::instance_cnt=0;
+
 // static Random rand;//全局随机对象
 
 // class RandomTest {

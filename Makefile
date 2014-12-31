@@ -10,7 +10,7 @@ install:
 	@cd build ; make -sj install
 
 clean:
-	@rm -rf build lib bin
+	@rm -rf build lib bin cgi-bin
 	
 test: all
 	reversi
