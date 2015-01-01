@@ -14,4 +14,4 @@ clean:
 	@rm -rf build lib bin cgi-bin
 	
 test: all
-	reversi
+	bin/reversi

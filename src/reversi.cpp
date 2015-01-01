@@ -15,11 +15,10 @@
 extern uint verbose=40;
 
 int main () {
-	// delete new BoardTest;
-	delete new GameTest;
+	 delete new BoardTest;
+//	delete new GameTest;
 	// delete new RandamTest;
 	
 	// system("pause");
 	return 0;
 }
-
