@@ -13,6 +13,10 @@
 #include "bootstrap.h"
 #include "logging.h"
 #include "random.h"
+#include "thread.h"
+
+#include <boost/timer.hpp>
+using boost::timer;
 
 //棋子状态
 typedef uchar color;

@@ -326,7 +326,7 @@ public:
 			assert(best_move!=PASS);
 		} else {
 			uint total_searched_nodes=0;
-//			datetime previous;
+			timer previous;
 			double max_score=-1e100;
 			
 			//找出下子之后使得对方行动力最低的一步走法
@@ -351,8 +351,7 @@ public:
 							++total_searched_nodes;
 							
 							if (total_searched_nodes%100000==0) {
-//								double gap=datetime()-previous;
-								double gap=1;
+								double gap=previous.elapsed();
 								log_status("total="<<total_nodes_for_each_game<<" searched="<<total_searched_nodes<<" time="<<gap<<" depth="<<history.size()<<" speed="<<(0.001*total_searched_nodes/gap)<<"kn/s endgame="<<total_end_game<<" meetdepth="<<total_meet_depth);
 							}
 							
@@ -424,7 +423,7 @@ public:
 		uint max_nodes_for_each_choice=max_nodes/total_choice;
 		
 		uint total_searched_notes=0;
-//		datetime previous;
+		timer previous;
 		
 		//两步棋后当前下子方的平均行动力
 		//即两步棋后当前下子方的总行动力，除以一步棋后对手的总下法数（行动力）
@@ -472,10 +471,9 @@ public:
 						State& current=history.front();
 						
 						if ((b.empty_cnt()>32 && searched_nodes_for_each_choice%100000==0) || (b.empty_cnt()<=32 && searched_nodes_for_each_choice%10000==0)) {
-//							datetime now;
-//							double gap=now-previous;
-//							previous=now;
-							double gap=1;
+							double gap=previous.elapsed();
+							previous.restart();
+
 							log_status("total="<<total_nodes_for_each_game<<" searched="<<total_searched_notes<<" choice="<<searched_nodes_for_each_choice<<" queue="<<history.size()<<" meetlimit="<<total_meet_limit<<" speed="<<(1000/gap)<<"kn/s endgame="<<total_end_game);
 						}
 						

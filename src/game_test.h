@@ -51,18 +51,18 @@ void AI_vs_AI() {
 	uint win[3]={0, 0, 0};
 	int total_diff=0;
 	//比赛，多比几盘
-	datetime begin;
+	timer begin;
 	for_n(i, total) {
 		if (i%1==0)
 			log_warn("progress: "<<i<<"/"<<total<<" in "<<i<<" games: black:white="<<win[BLACK]<<":"<<win[WHITE]
-				<<" draw="<<win[DRAW]<<" diff="<<total_diff<<" avg="<<float(total_diff)/(i+1)<<" time="<<begin.elapse()<<" speed="<< i/begin.elapse());
+				<<" draw="<<win[DRAW]<<" diff="<<total_diff<<" avg="<<float(total_diff)/(i+1)<<" time="<<begin.elapsed()<<" speed="<< i/begin.elapsed());
 		Game game(black, white);
 		Score score=game.start();
 		win[score.winner]+=1;
 		total_diff+=score.diff();
 	}
 	log_warn("in "<<total<<" games: black:white="<<win[BLACK]<<":"<<win[WHITE]
-		<<" draw="<<win[DRAW]<<" diff="<<total_diff<<" avg="<<float(total_diff)/total<<" time="<<begin.elapse()<<" speed="<< total/begin.elapse());
+		<<" draw="<<win[DRAW]<<" diff="<<total_diff<<" avg="<<float(total_diff)/total<<" time="<<begin.elapsed()<<" speed="<< total/begin.elapsed());
 }
 
 class GameTestThread : public thread {
@@ -82,7 +82,7 @@ public:
 
 	void multithread_test() {
 		list<uint> job_ids;
-		for_n(i, 8) job_ids.append(i);
+		for_n(i, 8) job_ids.push_back(i);
 		parallel<GameTestThread>(job_ids, 8, LOG_LEVEL_INFO);
 	}
 };
