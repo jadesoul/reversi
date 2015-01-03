@@ -76,8 +76,8 @@ public:
 	GameTest() {
 		// human_vs_human();
 		// human_vs_AI();
-		AI_vs_AI();
-		// multithread_test();
+//		AI_vs_AI();
+		 multithread_test();
 	}
 
 	void multithread_test() {
