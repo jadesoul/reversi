@@ -16,7 +16,7 @@
 #include "game.h"
 #include "ai.h"
 
-extern uint verbose = 50;
+extern uint verbose = 6;
 
 bool check1(const char* s) {
 	int n = strlen(s);
