@@ -11,7 +11,7 @@ install:
 	@cd src; python setup.py build_ext --inplace
 
 clean:
-	@rm -rf build lib bin cgi-bin
+	@rm -rf build lib bin cgi-bin src/engine.so src/engine.cpp
 	
 test: all
 	bin/reversi

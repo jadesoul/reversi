@@ -313,7 +313,7 @@ public:
 	
 	uchar play_dfs(Board& b) {//深度优先搜索
 		uchar self=b.turn;
-		log_status(b);
+//		log_status(b);
 		
 		uchar best_move=-1;
 		uchar depth=3; //最多的搜索层数

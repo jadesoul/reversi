@@ -84,8 +84,8 @@ public:
 		}
 		log_status("Game Over!!");
 		
-		// log_debug(board);
-		log_status(board);
+		log_debug(board);
+//		log_status(board);
 
 		Score score(board);
 		log_status(score);
