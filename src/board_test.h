@@ -15,7 +15,7 @@
 class BoardTest {
 public:
 	BoardTest() {
-		//cout<<"sizeof(Board)="<<sizeof(Board)<<endl;
+		cout<<"sizeof(Board)="<<sizeof(Board)<<endl;
 		// set();
 		play();
 	}
@@ -33,7 +33,7 @@ public:
 		cout<<"b.play(0, 0)="<<b.play(0, 0)<<endl;
 		b.dump();
 	}
- 
+
 	void set() {
 		Board b;
 		b.dump();

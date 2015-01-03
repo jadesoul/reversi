@@ -3,5 +3,3 @@ cdef extern from "engine.h":
 
 cpdef reversi(x):
     return server(x)
-
-

@@ -18,6 +18,7 @@ public:
 	//下子的抽象接口，返回一个字节共8bit，(前4bit, 后4bit)代表下子位置(x, y)
 	//调用此函数前，需确保有子可下
 	virtual uchar play(Board& b)=0;
+	virtual void reset() {};
 };
 
 class HumanPlayer : public Player {

@@ -40,19 +40,28 @@ const static int INC_Y[8]={0, -1, -1, -1, 0, 1, 1, 1};
 //获取对手的颜色
 #define OPPO(x) (ACTIVE-x)
 
+//放弃下子的move表示方法
+#define PASS 0xFF
+
 class Board {
 public:
-	color map[8][8];//存放64个棋子状态
-	uchar total[4];//存放4种颜色棋子的个数并动态更新，其中ACTIVE的个数与EMPTY个数重叠
-	color turn;//当前轮到哪方下子
+	color 	map[8][8];	//存放64个棋子状态
+	uchar 	total[4];		//存放4种颜色棋子的个数并动态更新，其中ACTIVE的个数与EMPTY个数重叠
+	color 	turn;			//当前轮到哪方下子
+	uchar 	pass_cnt;		//PASS次数
 	
 	Board() {
 		init_board_map();
 		turn=BLACK;//黑子先下
+		clear_pass_cnt();
 		update_possible_moves(turn);
 	}
 	
-	inline uchar mobility() { return total[ACTIVE]; }
+	inline void clear_pass_cnt() { pass_cnt=0; }
+	inline uchar mobility() const { return total[ACTIVE]; }
+	inline uchar empty_cnt() const { return total[EMPTY]; }
+	inline uchar black_cnt() const { return total[BLACK]; }
+	inline uchar white_cnt() const { return total[WHITE]; }
 	
 	//从包含65字节的字符串初始化, 棋盘(64字节)，下子方(1字节)
 	//为游戏引擎提供此接口
@@ -78,6 +87,7 @@ public:
 			}
 		}
 		turn=(query[64]=='1')?BLACK:WHITE;
+		clear_pass_cnt();
 		update_possible_moves(turn);
 	}
 	
@@ -90,6 +100,10 @@ public:
 		total[BLACK]=total[WHITE]=2;
 		total[EMPTY]=60;
 		total[ACTIVE]=0;
+	}
+
+	inline bool game_over() { //无子可下，或者连续两次PASS
+		return empty_cnt()==0 or pass_cnt>=2;
 	}
 
 	//清除局面上所有的ACTIVE状态
@@ -157,10 +171,11 @@ public:
 			o<<endl;
 		}
 		o<<"BLACK="<<(uint)total[BLACK]<<" WHITE="<<(uint)total[WHITE];
-		o<<" EMPTY="<<(uint)total[EMPTY]<<" ACTIVE="<<(uint)total[ACTIVE]<<endl;
-		o<<"turn=";
+		o<<" EMPTY="<<(uint)total[EMPTY]<<" ACTIVE="<<(uint)total[ACTIVE];
+		o<<" turn=";
 		if (turn==BLACK) o<<"BLACK";
 		else o<<"WHITE";
+		o<<" PASS="<<(int)pass_cnt;
 		o<<endl;
 		o<<"--------------------------------------------"<<endl;
 	}
@@ -172,7 +187,7 @@ public:
 	
 	//设置指定位置的棋子颜色，本函数仅用于布局
 	inline void set(uint i, uint j, color c) {
-		assert(c==BLACK OR c==WHITE OR c==EMPTY);
+		assert(c==BLACK or c==WHITE or c==EMPTY);
 		
 		color orig=map[i][j];
 		if (orig==c) return;
@@ -190,6 +205,7 @@ public:
 		assert(total[ACTIVE]==0);
 		log_info("pass ...");
 		swap_turn();//交换下子方
+		++pass_cnt;
 		update_possible_moves(turn);
 	}
 	
@@ -199,6 +215,23 @@ public:
 		turn=OPPO(turn);
 	}
 	
+	inline uint play(uchar move) {
+		uint x=move>>4, y=move&0x0F;
+		return play(x, y);
+	}
+
+	uchar get_first_move() {
+		for_n(x, 8) {
+			for_n(y, 8) {
+				if (map[x][y]==ACTIVE) {
+					uchar move=(x<<4)+y;
+					return move;
+				}
+			}
+		}
+		return PASS;
+	}
+
 	//在指定的位置放置指定颜色的棋子，检查是否合法
 	//若不合法则返回0，否则返回吃子数，吃子数一定不是0
 	uint play(uint i, uint j) {
@@ -250,6 +283,7 @@ public:
 		total[s]+=all_cnt;
 		
 		swap_turn();//交换下子方
+		clear_pass_cnt();
 		update_possible_moves(turn);
 		log_info("flip stones="<<all_cnt);
 		

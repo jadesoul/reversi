@@ -15,9 +15,8 @@
 extern uint verbose=40;
 
 int main () {
-	 delete new BoardTest;
-//	delete new GameTest;
-	// delete new RandamTest;
+//	 delete new BoardTest;
+	delete new GameTest;
 	
 	// system("pause");
 	return 0;

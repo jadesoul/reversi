@@ -33,6 +33,11 @@ public:
 		return (int)black-(int)white;
 	}
 	
+	inline int win(color turn) {
+		if (turn==BLACK) return diff();
+		else return -diff();
+	}
+
 	ostream& dump(ostream& o=cout) {
 		o<<"BLACK:"<<(uint)black<<" WHITE:"<<(uint)white<<" EMPTY:"<<(uint)empty<<" ";
 		if (winner==BLACK) o<<"BLACK WIN";
@@ -53,20 +58,19 @@ public:
 	Player& black;
 	Player& white;
 	
-	uint pass_cnt;//PASS次数
-	
-	inline bool game_over() {//无子可下，或者连续两次PASS
-		uchar& empty_cnt=board.total[EMPTY];
-		return empty_cnt==0 or pass_cnt>=2;
+	inline bool game_over() { //无子可下，或者连续两次PASS
+		return board.game_over();
 	}
 	
 	Game(Player& black, Player& white):
-		black(black), white(white), pass_cnt(0) {}
+		black(black), white(white) {}
 	Game(Player& black, Player& white, Board& board):
-		black(black), white(white), board(board), pass_cnt(0) {}
+		black(black), white(white), board(board) {}
 	
 	Score start() {
 		log_status("Game Start!!");
+		black.reset();
+		white.reset();
 		while (!game_over()) {
 			color& turn=board.turn;
 			Player& player=(turn==BLACK)?black:white;
@@ -74,16 +78,15 @@ public:
 			
 			if (mobility==0) {
 				board.pass();
-				pass_cnt+=1;
 			} else {
-				pass_cnt=0;
 				player.play(board);
 			}
 		}
 		log_status("Game Over!!");
 		
-		log_debug(board);
-		
+		// log_debug(board);
+		log_status(board);
+
 		Score score(board);
 		log_status(score);
 		
@@ -93,20 +96,17 @@ public:
 	//用于游戏引擎，给定字符串（64字符的游戏局面和1个字符的turn）
 	//返回下子的位置坐标 (2个字符)，下标均是从1开始计算
 	string deal(const string& query) {
-		pass_cnt=0;
 		board.init_from_str(query);
 		color& turn=board.turn;
 		Player& player=(turn==BLACK)?black:white;
 		uchar& mobility=board.total[ACTIVE];
 		
 		if (mobility==0) {
-			pass_cnt+=1;
 			return "00";//表示PASS
 		} else {
-			pass_cnt=0;
 			uchar byte=player.play(board);
 			uchar x=byte>>4, y=byte&0x0F;
-			assert(x<8 AND y<8);
+			assert(x<8 and y<8);
 			char s[3];
 			s[0]='1'+x;//从1开始编号
 			s[1]='1'+y;
