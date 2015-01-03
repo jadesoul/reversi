@@ -17,3 +17,4 @@ build
 /bin/
 /cgi-bin/
 src/engine.cpp
+.DS_Store
