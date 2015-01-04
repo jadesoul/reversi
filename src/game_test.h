@@ -30,44 +30,46 @@ void human_vs_AI() {
 }
 
 void AI_vs_AI() {
-	// EasyAIPlayer black;
+	 EasyAIPlayer black;
 	// EasyAIPlayer white;
 
-	// Look1AIPlayer black;
-//	 Look1AIPlayer white;
+//	Look1AIPlayer black;
+	Look1AIPlayer white;
 
 	// Look2AIPlayer black;
 	// Look2AIPlayer white;
 
 //	RandomAIPlayer black;
-	 RandomAIPlayer white;
+//	RandomAIPlayer white;
 
-	// MonteCarloAIPlayer black;
+//	MonteCarloAIPlayer black;
 //	 MonteCarloAIPlayer white;
 
-	 LookNAIPlayer black;
+//	 LookNAIPlayer black;
 //	LookNAIPlayer white;
 
-	uint total=10000 / TOTAL_THREADS;
+	uint total = 10000 / TOTAL_THREADS;
 	log_warn("start "<<total<<" games ...");
-	uint win[3]={0, 0, 0};
-	int total_diff=0;
+	uint win[3] = { 0, 0, 0 };
+	int total_diff = 0;
 	//比赛，多比几盘
 	timer begin;
-	for_n(i, total) {
+	for_n(i, total)
+	{
 //		if (i%10==0)
 //			log_warn("progress: "<<i<<"/"<<total<<" in "<<i<<" games: black:white="<<win[BLACK]<<":"<<win[WHITE]
 //				<<" draw="<<win[DRAW]<<" diff="<<total_diff<<" avg="<<float(total_diff)/(i+1)<<" time="<<begin.elapsed()<<" speed="<< i/begin.elapsed());
 		Game game(black, white);
-		Score score=game.start();
-		win[score.winner]+=1;
-		total_diff+=score.diff();
+		Score score = game.start();
+		win[score.winner] += 1;
+		total_diff += score.diff();
 	}
-	log_warn("in "<<total<<" games: black:white="<<win[BLACK]<<":"<<win[WHITE]
-		<<" draw="<<win[DRAW]<<" diff="<<total_diff<<" avg="<<float(total_diff)/total<<" time="<<begin.elapsed()<<" speed="<< total/begin.elapsed());
+	log_warn(
+			"in "<<total<<" games: black:white="<<win[BLACK]<<":"<<win[WHITE] <<" draw="<<win[DRAW]<<" diff="<<total_diff<<" avg="<<float(total_diff)/total<<" time="<<begin.elapsed()<<" speed="<< total/begin.elapsed());
 }
 
-class GameTestThread : public thread {
+class GameTestThread: public thread {
+public:
 	void run() {
 		AI_vs_AI();
 	}
@@ -84,7 +86,8 @@ public:
 
 	void multithread_test() {
 		list<uint> job_ids;
-		for_n(i, TOTAL_THREADS) job_ids.push_back(i);
+		for_n(i, TOTAL_THREADS)
+			job_ids.push_back(i);
 		parallel<GameTestThread>(job_ids, TOTAL_THREADS, LOG_LEVEL_INFO);
 	}
 };

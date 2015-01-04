@@ -27,19 +27,25 @@ const static color BLACK=2;
 const static color ACTIVE=3;
 
 //8个方向
-const static uint RIGHT=0;
-const static uint RIGHT_DOWN=1;
-const static uint DOWN=2;
-const static uint LEFT_DOWN=3;
-const static uint LEFT=4;
-const static uint LEFT_UP=5;
-const static uint UP=6;
-const static uint RIGHT_UP=7;
+typedef uchar byte;
+const static byte RIGHT=0;
+const static byte RIGHT_DOWN=1;
+const static byte DOWN=2;
+const static byte LEFT_DOWN=3;
+const static byte LEFT=4;
+const static byte LEFT_UP=5;
+const static byte UP=6;
+const static byte RIGHT_UP=7;
 
 //在各个方向上根据当前坐标计算下一个坐标，根据横纵坐标增量表计算
 const static int INC_X[8]={1, 1, 0, -1, -1, -1, 0, 1};
 const static int INC_Y[8]={0, -1, -1, -1, 0, 1, 1, 1};
 #define SET_NEXT(x, y, d) (x)+=INC_X[(d)]; (y)+=INC_Y[(d)];
+
+//用于计算一个方向的反方向
+const static byte INV_D[8]={LEFT, LEFT_UP, UP, RIGHT_UP, RIGHT, RIGHT_DOWN, DOWN, LEFT_DOWN};
+#define INVERSE_DIRECTION(d) ((d+4) % 8)//faster, why ?
+//#define INVERSE_DIRECTION(d) INV_D[d]//slower
 
 //获取对手的颜色
 #define OPPO(x) (ACTIVE-x)
@@ -260,12 +266,12 @@ public:
 			uint cnt=0;//该方向上能吃几个子
 			SET_NEXT(x, y, d);
 			while (x<8 and y<8 and map[x][y]==o) {//注意x, y都是uint，一定非负
-				cnt+=1;//累加吃子数
+				++cnt;//累加吃子数
 				SET_NEXT(x, y, d);//探测下一个位置
 			}
 			if (x<8 and y<8) {//没碰墙
 				if (map[x][y]==s and cnt>0) {//如果是自己的子且可吃子，则吃子
-					uint d_inverse=(d+4)%8;//向相反的方向顺序扫描并吃子
+					uint d_inverse=INVERSE_DIRECTION(d);//向相反的方向顺序扫描并吃子
 					SET_NEXT(x, y, d_inverse);
 					while (map[x][y]==o) {//一定不会越界，直到遇到下子点才结束
 						map[x][y]=s;

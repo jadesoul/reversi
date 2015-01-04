@@ -14,7 +14,10 @@
 #include "game.h"
 
 //所有AI的基类
-class AIPlayer : public Player {};
+//class AIPlayer : public Player {};
+
+//optimized here:
+typedef Player AIPlayer;
 
 //最简单的AI，选择第一个可下子的位置下子
 class EasyAIPlayer : public AIPlayer {
@@ -50,7 +53,12 @@ public:
 		
 		int mobility=b.mobility();
 		assert(mobility>=1);
-		uint index=random.randint(1, mobility);
+
+		//uint index=random.randint(1, mobility);
+
+		//optimize here:
+		uint index=1+random.randuint(mobility);
+
 		for_n(x, 8) {
 			for_n(y, 8) {
 				if (b.map[x][y]==ACTIVE) {
