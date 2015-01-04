@@ -68,7 +68,7 @@ public:
 		black(black), white(white), board(board) {}
 	
 	Score start() {
-		log_status("Game Start!!");
+		log_info("Game Start!!");
 		black.reset();
 		white.reset();
 		while (!game_over()) {
@@ -82,13 +82,13 @@ public:
 				player.play(board);
 			}
 		}
-		log_status("Game Over!!");
+		log_info("Game Over!!");
 		
 		log_debug(board);
 //		log_status(board);
 
 		Score score(board);
-		log_status(score);
+		log_info(score);
 		
 		return score;
 	}
