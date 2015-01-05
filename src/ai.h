@@ -142,6 +142,7 @@ public:
 						best_move=move1;
 					}
 
+
 					if (mobility == 1) {//如果自己仅有1步棋可下，也不用推导了（TODO: 这个机制应该有game来支持）
 						best_move=move1;
 						goto play;
@@ -155,6 +156,11 @@ public:
 						best_move=move1;
 						goto play;
 					}
+
+					if (IS_BAD_MOVE(move1)) {//TODO: BUG
+						continue;
+					}
+
 					total_mobility1=mobility1;
 					total_mobility2=0;
 					
@@ -182,7 +188,7 @@ public:
 play:
 		assert(best_move!=-1);
 		uint x=best_move>>4, y=best_move&0x0F;
-		log_info(((self==BLACK)?"BLACK":"WHITE")<<" AIPlayer, play at ("<<x<<", "<<y<<")");
+		log_warn(((self==BLACK)?"BLACK":"WHITE")<<" AIPlayer, play at ("<<x<<", "<<y<<")");
 		b.play(x, y);
 		return best_move;
 	}

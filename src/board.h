@@ -46,10 +46,10 @@ const static byte INV_D[8]={LEFT, LEFT_UP, UP, RIGHT_UP, RIGHT, RIGHT_DOWN, DOWN
 
 //用于判断是否是与四个角相邻的坏手位置上
 #define IS_BAD_POS(x, y) (((x)==1 and (y)==1) or ((x)==6 and (y)==6) or ((x)==1 and (y)==6) or ((x)==6 and (y)==1))
-const static byte BAD_LU=1<<4+1;
-const static byte BAD_RU=6<<4+1;
-const static byte BAD_LD=1<<4+6;
-const static byte BAD_RD=6<<4+6;
+#define BAD_LU 0x11
+#define BAD_RU 0x61
+#define BAD_LD 0x16
+#define BAD_RD 0x66
 #define IS_BAD_MOVE(m) ((m)==BAD_LU or (m)==BAD_RU or (m)==BAD_LD or (m)==BAD_RD)
 #define NOT_BAD_MOVE(m) ((m)!=BAD_LU and (m)!=BAD_RU and (m)!=BAD_LD and (m)!=BAD_RD)
 
