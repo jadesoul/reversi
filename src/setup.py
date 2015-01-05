@@ -4,7 +4,7 @@ from distutils.extension import Extension
 
 setup(
     ext_modules=cythonize(
-        [Extension("engine", ['engine.pyx'], language='c++')]
+        [Extension("engine", ['engine.pyx'], language='c++', include_dirs=['.'])]
     )
 )
 
