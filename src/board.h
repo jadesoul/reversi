@@ -15,9 +15,6 @@
 #include "random.h"
 #include "thread.h"
 
-#include <boost/timer.hpp>
-using boost::timer;
-
 //棋子状态
 typedef uchar color;
 const static color EMPTY=0;
@@ -46,6 +43,15 @@ const static int INC_Y[8]={0, -1, -1, -1, 0, 1, 1, 1};
 const static byte INV_D[8]={LEFT, LEFT_UP, UP, RIGHT_UP, RIGHT, RIGHT_DOWN, DOWN, LEFT_DOWN};
 #define INVERSE_DIRECTION(d) ((d+4) % 8)//faster, why ?
 //#define INVERSE_DIRECTION(d) INV_D[d]//slower
+
+//用于判断是否是与四个角相邻的坏手位置上
+#define IS_BAD_POS(x, y) (((x)==1 and (y)==1) or ((x)==6 and (y)==6) or ((x)==1 and (y)==6) or ((x)==6 and (y)==1))
+const static byte BAD_LU=1<<4+1;
+const static byte BAD_RU=6<<4+1;
+const static byte BAD_LD=1<<4+6;
+const static byte BAD_RD=6<<4+6;
+#define IS_BAD_MOVE(m) ((m)==BAD_LU or (m)==BAD_RU or (m)==BAD_LD or (m)==BAD_RD)
+#define NOT_BAD_MOVE(m) ((m)!=BAD_LU and (m)!=BAD_RU and (m)!=BAD_LD and (m)!=BAD_RD)
 
 //获取对手的颜色
 #define OPPO(x) (ACTIVE-x)

@@ -237,4 +237,8 @@ typedef std::vector<char> vec_char;
 typedef vec_char vecchar;
 typedef std::vector<string> vecstring;
 
+// for boost tools
+#include <boost/timer.hpp>
+using boost::timer;
+
 #endif /* BOOTSTRAP_H_1356496850_52 */

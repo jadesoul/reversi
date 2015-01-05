@@ -30,25 +30,25 @@ void human_vs_AI() {
 }
 
 void AI_vs_AI() {
-	 EasyAIPlayer black;
-	// EasyAIPlayer white;
+//	EasyAIPlayer black;
+//	EasyAIPlayer white;
 
 //	Look1AIPlayer black;
-	Look1AIPlayer white;
+//	Look1AIPlayer white;
 
-	// Look2AIPlayer black;
-	// Look2AIPlayer white;
+//	Look2AIPlayer black;
+	Look2AIPlayer white;
 
-//	RandomAIPlayer black;
+	RandomAIPlayer black;
 //	RandomAIPlayer white;
 
 //	MonteCarloAIPlayer black;
-//	 MonteCarloAIPlayer white;
+//	MonteCarloAIPlayer white;
 
-//	 LookNAIPlayer black;
+//	LookNAIPlayer black;
 //	LookNAIPlayer white;
 
-	uint total = 10000 / TOTAL_THREADS;
+	uint total = 1000 / TOTAL_THREADS;
 	log_warn("start "<<total<<" games ...");
 	uint win[3] = { 0, 0, 0 };
 	int total_diff = 0;
@@ -56,9 +56,9 @@ void AI_vs_AI() {
 	timer begin;
 	for_n(i, total)
 	{
-//		if (i%10==0)
-//			log_warn("progress: "<<i<<"/"<<total<<" in "<<i<<" games: black:white="<<win[BLACK]<<":"<<win[WHITE]
-//				<<" draw="<<win[DRAW]<<" diff="<<total_diff<<" avg="<<float(total_diff)/(i+1)<<" time="<<begin.elapsed()<<" speed="<< i/begin.elapsed());
+		if (i%10==0)
+			log_warn("progress: "<<i<<"/"<<total<<" in "<<i<<" games: black:white="<<win[BLACK]<<":"<<win[WHITE]
+				<<" draw="<<win[DRAW]<<" diff="<<total_diff<<" avg="<<float(total_diff)/(i+1)<<" time="<<begin.elapsed()<<" speed="<< i/begin.elapsed());
 		Game game(black, white);
 		Score score = game.start();
 		win[score.winner] += 1;

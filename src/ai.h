@@ -129,14 +129,25 @@ public:
 		uint total_mobility1;//一步棋后对手的总下法数（行动力）
 		uint total_mobility2;//两步棋后当前下子方的总行动力
 		
-		
 		//找出下子之后使得对方行动力最低的一步走法
-		
+		uchar mobility=b.mobility();
+
 		for_n(x1, 8) {
 			for_n(y1, 8) {
 				if (b.map[x1][y1]==ACTIVE) {
-					Board think1=b;
 					uchar move1=(x1<<4)+y1;//自己走法
+
+					//默认下法
+					if (best_move==-1) {
+						best_move=move1;
+					}
+
+					if (mobility == 1) {//如果自己仅有1步棋可下，也不用推导了（TODO: 这个机制应该有game来支持）
+						best_move=move1;
+						goto play;
+					}
+
+					Board think1=b;
 					uchar eat1=think1.play(x1, y1);//自己吃子数
 					uchar mobility1=think1.mobility();//对手行动力
 					
@@ -160,6 +171,7 @@ public:
 					}
 					
 					float avg_mobility=float(total_mobility2)/total_mobility1;
+//					if (avg_mobility>max_avg_mobility and NOT_BAD_MOVE(move1)) {//TODO: 这里有BUG
 					if (avg_mobility>max_avg_mobility) {
 						max_avg_mobility=avg_mobility;
 						best_move=move1;
