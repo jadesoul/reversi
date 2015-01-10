@@ -80,6 +80,8 @@ const static byte INV_D[8]={LEFT, LEFT_UP, UP, RIGHT_UP, RIGHT, RIGHT_DOWN, DOWN
 //放弃下子的move表示方法
 #define PASS 0xFF
 
+#define COLOR(turn) (turn==BLACK?"BLACK":"WHITE")
+
 bool parse_move(const char* two_bytes, uchar& move, uchar& x, uchar& y, color& turn) {
 	char h=two_bytes[0];//水平方向
 	char v=two_bytes[1];//垂直方向
@@ -94,7 +96,8 @@ bool parse_move(const char* two_bytes, uchar& move, uchar& x, uchar& y, color& t
 		} else {
 			return false;
 		}
-		move=x<<4+y;
+		move=((uint)x<<4)+y;
+		log_debug("pased move "<<h<<v<<": x="<<(uint)x<<" y="<<(uint)y<<" move="<<(uint)move<<" turn="<<COLOR(turn));
 		return true;
 	} else {
 		return false;
@@ -161,6 +164,14 @@ public:
 		total[ACTIVE]=0;
 	}
 
+	bool operator <(const Board& another) const {
+		const Board* a=this;
+		const Board* b=&another;
+		if (a==b) return true;
+		int diff=memcmp(a, b, sizeof(Board));
+		return diff<0;
+	}
+
 	inline bool game_over() { //无子可下，或者连续两次PASS
 		return empty_cnt()==0 or pass_cnt>=2;
 	}
@@ -208,7 +219,7 @@ public:
 				}
 			}
 		}
-		log_info("mobility="<<mobility);
+		log_debug("mobility="<<mobility);
 		total[ACTIVE]=mobility;
 		return mobility;
 	}
@@ -271,7 +282,7 @@ public:
 	
 	//交换下子方
 	inline void swap_turn() {
-		log_info("swap turn ...");
+		log_debug("swap turn ...");
 		turn=OPPO(turn);
 	}
 	
@@ -345,7 +356,7 @@ public:
 		swap_turn();//交换下子方
 		clear_pass_cnt();
 		update_possible_moves(turn);
-		log_info("flip stones="<<all_cnt);
+		log_debug("flip stones="<<all_cnt);
 		
 		return all_cnt;
 	}

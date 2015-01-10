@@ -74,7 +74,7 @@ public:
 		while (!game_over()) {
 			color& turn=board.turn;
 			Player& player=(turn==BLACK)?black:white;
-			uchar& mobility=board.mobility();
+			uchar mobility=board.mobility();
 			
 			if (mobility==0) {
 				board.pass();
@@ -95,23 +95,24 @@ public:
 	}
 	
 	//用于加载开局库
-	void start_one_opening(const string& opening, unordered_map<Board, set<move_t> >& book) {
-		log_info("Game for Opening Start!!");
+	void start_one_opening(const string& opening, map<Board, set<move_t> >& book) {
+		log_debug("Game for Opening Start!!");
 		black.reset();
 		white.reset();
 		for (uint i=0; i<opening.size(); i+=2) {
 			color& board_turn=board.turn;
+			log_debug(board);
 
 			const char* two_bytes=opening.c_str()+i;
 			uchar move, x, y;
 			color turn;
 			bool ok = parse_move(two_bytes, move, x, y, turn);
 			if (!ok) die_error("illegal opening:"<<opening<<" two_bytes from:"<<two_bytes);
-			assert(turn==board_turn);
+//			assert(turn==board_turn);
 			assert(board.mobility()!=0);
 			assert(board.is_active(x, y));
 
-			unordered_map<Board, set<move_t> >::iterator it=book.find(board);
+			map<Board, set<move_t> >::iterator it=book.find(board);
 			if (it==book.end()) {
 				log_debug("add new book entry");
 				set<move_t> moves;
@@ -125,7 +126,7 @@ public:
 			uint eat=board.play(move);
 			assert(eat>0);
 		}
-		log_info("Game for Opening Stop!!");
+		log_debug("Game for Opening Stop!!");
 	}
 
 

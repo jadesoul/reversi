@@ -33,22 +33,30 @@
 
 class OpeningBook {
 public:
-	unordered_map<Board, set<move_t> > book;
+	map<Board, set<move_t> > book;
 
 	OpeningBook() {
-		load("../data/");
+		load("data/openingslarge.txt");
 	}
 
 	//从文件中加载开局库，根据字符串转换为棋局，自动做对称变换
 	void load(const char* fp) {
 		ifstream fin(fp);
+		log_info("loading opening book from: "<<fp);
 		string s;
+		uint cnt=0;
 		while (fin>>s) {
+			++cnt;
 			HumanPlayer black, white;
 			Game game(black, white);
 			game.start_one_opening(s, book);
 		}
-		log_info("loaded opening book: "<<book.size()<<" entries");
+
+		uint total_moves;
+		for (map<Board, set<move_t> >::iterator it=book.begin(); it!=book.end(); ++it) {
+			total_moves+=it->second.size();
+		}
+		log_info("loaded opening book: "<<cnt<<" openings, "<<book.size()<<" boards, "<<total_moves<<" moves");
 	}
 };
 
