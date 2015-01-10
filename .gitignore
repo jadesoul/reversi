@@ -18,3 +18,4 @@ build
 /cgi-bin/
 src/engine.cpp
 .DS_Store
+.buildpath
