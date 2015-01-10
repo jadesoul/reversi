@@ -32,12 +32,15 @@ bool check1(const char* s) {
 }
 
 const char* server(const char* s) {
-	if (!check1(s)) return "";
+	if (!check1(s))
+		return "";
 
-	// EasyAIPlayer player;
-	Look2AIPlayer player;
-	// RandomAIPlayer player;
-	// MonteCarloAIPlayer player;
+//	EasyAIPlayer player;
+//	Look1AIPlayer player;
+//	Look2AIPlayer player;
+//	RandomAIPlayer player;
+//	MonteCarloAIPlayer player;
+	LookNAIPlayer player;
 
 	Player& black = player;
 	Player& white = player;

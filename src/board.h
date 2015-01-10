@@ -34,6 +34,19 @@ const static byte LEFT_UP=5;
 const static byte UP=6;
 const static byte RIGHT_UP=7;
 
+typedef uchar move_t;
+
+class Move {
+public:
+	union {
+		uchar move;
+		struct {
+			uchar x:4;
+			uchar y:4;
+		} xy;
+	} data;
+};
+
 //在各个方向上根据当前坐标计算下一个坐标，根据横纵坐标增量表计算
 const static int INC_X[8]={1, 1, 0, -1, -1, -1, 0, 1};
 const static int INC_Y[8]={0, -1, -1, -1, 0, 1, 1, 1};
@@ -46,18 +59,47 @@ const static byte INV_D[8]={LEFT, LEFT_UP, UP, RIGHT_UP, RIGHT, RIGHT_DOWN, DOWN
 
 //用于判断是否是与四个角相邻的坏手位置上
 #define IS_BAD_POS(x, y) (((x)==1 and (y)==1) or ((x)==6 and (y)==6) or ((x)==1 and (y)==6) or ((x)==6 and (y)==1))
+//faster version
 #define BAD_LU 0x11
 #define BAD_RU 0x61
 #define BAD_LD 0x16
 #define BAD_RD 0x66
 #define IS_BAD_MOVE(m) ((m)==BAD_LU or (m)==BAD_RU or (m)==BAD_LD or (m)==BAD_RD)
-#define NOT_BAD_MOVE(m) ((m)!=BAD_LU and (m)!=BAD_RU and (m)!=BAD_LD and (m)!=BAD_RD)
+#define IS_BAD_POS2(x,y) (((x)==1 or (x)==6) and ((y)<=1 or (y)>=6)) or (((y)==1 or (y)==6) and ((x)<=1 or (x)>=6))
+
+//用于判断是否是四个角上的好手位置上
+#define GOOD_LU 0x00
+#define GOOD_RU 0x70
+#define GOOD_LD 0x07
+#define GOOD_RD 0x77
+#define IS_GOOD_MOVE(m) ((m)==GOOD_LU or (m)==GOOD_RU or (m)==GOOD_LD or (m)==GOOD_RD)
 
 //获取对手的颜色
 #define OPPO(x) (ACTIVE-x)
 
 //放弃下子的move表示方法
 #define PASS 0xFF
+
+bool parse_move(const char* two_bytes, uchar& move, uchar& x, uchar& y, color& turn) {
+	char h=two_bytes[0];//水平方向
+	char v=two_bytes[1];//垂直方向
+	if (v>='1' and v<='8') {
+		x=v-'1';
+		if (h>='a' and h<='h') {
+			y=h-'a';
+			turn=WHITE;
+		} else if (h>='A' and h<='H') {
+			y=h-'A';
+			turn=BLACK;
+		} else {
+			return false;
+		}
+		move=x<<4+y;
+		return true;
+	} else {
+		return false;
+	}
+}
 
 class Board {
 public:
@@ -78,6 +120,7 @@ public:
 	inline uchar empty_cnt() const { return total[EMPTY]; }
 	inline uchar black_cnt() const { return total[BLACK]; }
 	inline uchar white_cnt() const { return total[WHITE]; }
+	inline bool is_active(uchar x, uchar y) const { return map[x][y]==ACTIVE; }
 	
 	//从包含65字节的字符串初始化, 棋盘(64字节)，下子方(1字节)
 	//为游戏引擎提供此接口
@@ -171,11 +214,12 @@ public:
 	}
 
 	void dump(ostream& o=cout) {
+		char h = (turn==BLACK?'A':'a');
 		o<<endl<<'+'<<' ';
-		for_n(j, 8) o<<j<<' ';
+		for_n(j, 8) o<<(char)(h+j)<<' ';
 		o<<endl;
 		for_n(i, 8) {
-			o<<i<<' ';
+			o<<(i+1)<<' ';
 			for_n(j, 8) {
 				color& c=map[i][j];
 				if (c==EMPTY) o<<'.';
@@ -305,7 +349,7 @@ public:
 		
 		return all_cnt;
 	}
-};
 
+};
 
 #endif /* BOARD_H_1371483294_09 */

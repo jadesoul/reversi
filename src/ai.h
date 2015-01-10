@@ -12,12 +12,37 @@
 
 #include "player.h"
 #include "game.h"
+#include "openings.h"
+
+//class OpeningBookPlayer : public Player {
+//public:
+//	uchar play(Board& b) {
+//		uchar self=b.turn;
+//		uint x, y;
+//		do {
+//			log_debug(b);
+//			log_info(((self==BLACK)?"BLACK":"WHITE")<<" HumanPlayer, Please input point for play:");
+//			clog<<"x=";
+//			cin>>x;
+//			clog<<"y=";
+//			cin>>y;
+//			cout<<endl;
+//			log_info("(x, y)=("<<x<<", "<<y<<")");
+//
+//		} while (x<8 and y<8 and b.play(x, y)==0);
+//		return (x<<4)+y;
+//	}
+//};
+
+
 
 //所有AI的基类
 //class AIPlayer : public Player {};
 
 //optimized here:
 typedef Player AIPlayer;
+
+
 
 //最简单的AI，选择第一个可下子的位置下子
 class EasyAIPlayer : public AIPlayer {
@@ -82,29 +107,53 @@ public:
 		uchar self=b.turn;
 		log_debug(b);
 		
-		uchar best_move=-1;
+		uchar best_move=PASS;
 		uchar min_mobility=-1;
 		//找出下子之后使得对方行动力最低的一步走法
 		
+		uchar mobility=b.mobility();
+
 		for_n(x, 8) {
 			for_n(y, 8) {
 				if (b.map[x][y]==ACTIVE) {
 					Board think=b;
 					uchar move=(x<<4)+y;//走法
+
+					//默认下法
+					if (best_move==PASS) {
+						best_move=move;
+					}
+
+					if (mobility == 1) {//如果自己仅有1步棋可下，也不用推导了（TODO: 这个机制应该有game来支持）
+						best_move=move;
+						goto play1;
+					}
+
 					uchar eat=think.play(x, y);//吃子数
-					uchar mobility=think.mobility();//对手行动力
+					uchar mobility1=think.mobility();//对手行动力
 					
+
+					if (mobility1==0) {//如果下某步棋后对手不能下子，则直接下这步棋
+						best_move=move;
+						goto play1;
+					}
+
+					if (IS_BAD_POS2(x, y)) {
+						continue;
+					}
+
 					// mobility+=eat;//综合考虑行动力与吃子数，优先选择行动力小，吃子数少的下法
 					
-					if (mobility<min_mobility) {
-						min_mobility=mobility;
+					if (mobility1<min_mobility) {
+						min_mobility=mobility1;
 						best_move=move;
 					}
 					
 				}
 			}
 		}
-		assert(best_move!=-1);
+play1:
+		assert(best_move!=PASS);
 		uint x=best_move>>4, y=best_move&0x0F;
 		log_info(((self==BLACK)?"BLACK":"WHITE")<<" AIPlayer, play at ("<<x<<", "<<y<<")");
 		b.play(x, y);
@@ -119,7 +168,7 @@ public:
 		uchar self=b.turn;
 		log_debug(b);
 		
-		uchar best_move=-1;
+		uchar best_move=PASS;
 		
 		//两步棋后当前下子方的平均行动力
 		//即两步棋后当前下子方的总行动力，除以一步棋后对手的总下法数（行动力）
@@ -138,7 +187,7 @@ public:
 					uchar move1=(x1<<4)+y1;//自己走法
 
 					//默认下法
-					if (best_move==-1) {
+					if (best_move==PASS) {
 						best_move=move1;
 					}
 
@@ -157,27 +206,35 @@ public:
 						goto play;
 					}
 
-					if (IS_BAD_MOVE(move1)) {//TODO: BUG
+//					if (IS_BAD_MOVE(move1)) {
+					if (IS_BAD_POS2(x1, y1)) {
 						continue;
 					}
 
 					total_mobility1=mobility1;
 					total_mobility2=0;
 					
+					bool oppo_has_good_move=false;
 					for_n(x2, 8) {
 						for_n(y2, 8) {
 							if (think1.map[x2][y2]==ACTIVE) {
 								Board think2=think1;
 								uchar move2=(x2<<4)+y2;//对手走法
+								if (IS_GOOD_MOVE(move2)) {
+									oppo_has_good_move=true;
+								}
 								uchar eat2=think2.play(x2, y2);//对手吃子数
 								uchar mobility2=think2.mobility();//自己行动力
 								total_mobility2+=mobility2;	
 							}
 						}
 					}
-					
+
+					if (oppo_has_good_move) {
+						continue;
+					}
+
 					float avg_mobility=float(total_mobility2)/total_mobility1;
-//					if (avg_mobility>max_avg_mobility and NOT_BAD_MOVE(move1)) {//TODO: 这里有BUG
 					if (avg_mobility>max_avg_mobility) {
 						max_avg_mobility=avg_mobility;
 						best_move=move1;
@@ -186,9 +243,9 @@ public:
 			}
 		}
 play:
-		assert(best_move!=-1);
+		assert(best_move!=PASS);
 		uint x=best_move>>4, y=best_move&0x0F;
-		log_warn(((self==BLACK)?"BLACK":"WHITE")<<" AIPlayer, play at ("<<x<<", "<<y<<")");
+		log_info(((self==BLACK)?"BLACK":"WHITE")<<" AIPlayer, play at ("<<x<<", "<<y<<")");
 		b.play(x, y);
 		return best_move;
 	}
@@ -204,8 +261,6 @@ public:
 	uchar play(Board& board) {
 		uchar self=board.turn;
 		log_debug(board);
-		
-		
 		
 		RandomAIPlayer player;//用于推演时随机下棋
 		map<uchar, int> predict;//统计每个下子位置最终的总赢子数
@@ -223,7 +278,7 @@ public:
 					predict[move]=0;
 					
 					//利用蒙特卡罗思想，开始随机下棋若干次
-					for_n(i, 100) {
+					for_n(i, 1000) {
 						Game game(player, player, think);//举办一场比赛
 						Score score=game.start();
 						int diff=score.diff();//黑子数减去白子数之差
@@ -341,9 +396,9 @@ public:
 		uchar self=b.turn;
 //		log_status(b);
 		
-		uchar best_move=-1;
-		uchar depth=3; //最多的搜索层数
-		if (b.empty_cnt()<10) depth=16;
+		uchar best_move=PASS;
+		uchar depth=4; //最多的搜索层数
+		if (b.empty_cnt()<10) depth=16;//当游戏快结束时，多搜索几层
 		
 		uchar total_choice=b.mobility();
 		assert(total_choice>0);//在Game中会pass（TODO: 将处理pass的逻辑放到play函数中）
@@ -359,8 +414,19 @@ public:
 			for_n(x1, 8) {
 				for_n(y1, 8) {
 					if (b.map[x1][y1]==ACTIVE) {
-						Board think1=b;
 						uchar move1=(x1<<4)+y1;//自己走法
+
+						//默认下法
+						if (best_move == PASS) {
+							best_move = move1;
+						}
+
+						if (IS_BAD_POS2(x1, y1)) {
+							continue;
+						}
+
+						Board think1=b;
+
 						uchar eat1=think1.play(x1, y1);//自己吃子数
 						uchar mobility1=think1.mobility();//对手行动力
 						
@@ -429,7 +495,7 @@ public:
 			}
 		}
 		
-		assert(best_move!=-1);
+		assert(best_move!=PASS);
 		uint x=best_move>>4, y=best_move&0x0F;
 		log_info(((self==BLACK)?"BLACK":"WHITE")<<" AIPlayer, play at ("<<x<<", "<<y<<")");
 		b.play(x, y);

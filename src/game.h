@@ -74,7 +74,7 @@ public:
 		while (!game_over()) {
 			color& turn=board.turn;
 			Player& player=(turn==BLACK)?black:white;
-			uchar& mobility=board.total[ACTIVE];
+			uchar& mobility=board.mobility();
 			
 			if (mobility==0) {
 				board.pass();
@@ -82,6 +82,7 @@ public:
 				player.play(board);
 			}
 		}
+
 		log_info("Game Over!!");
 		
 		log_debug(board);
@@ -93,6 +94,41 @@ public:
 		return score;
 	}
 	
+	//用于加载开局库
+	void start_one_opening(const string& opening, unordered_map<Board, set<move_t> >& book) {
+		log_info("Game for Opening Start!!");
+		black.reset();
+		white.reset();
+		for (uint i=0; i<opening.size(); i+=2) {
+			color& board_turn=board.turn;
+
+			const char* two_bytes=opening.c_str()+i;
+			uchar move, x, y;
+			color turn;
+			bool ok = parse_move(two_bytes, move, x, y, turn);
+			if (!ok) die_error("illegal opening:"<<opening<<" two_bytes from:"<<two_bytes);
+			assert(turn==board_turn);
+			assert(board.mobility()!=0);
+			assert(board.is_active(x, y));
+
+			unordered_map<Board, set<move_t> >::iterator it=book.find(board);
+			if (it==book.end()) {
+				log_debug("add new book entry");
+				set<move_t> moves;
+				moves.insert(move);
+				book[board]=moves;
+			} else {
+				log_debug("expand exist book entry");
+				set<move_t>& moves=it->second;
+				moves.insert(move);
+			}
+			uint eat=board.play(move);
+			assert(eat>0);
+		}
+		log_info("Game for Opening Stop!!");
+	}
+
+
 	//用于游戏引擎，给定字符串（64字符的游戏局面和1个字符的turn）
 	//返回下子的位置坐标 (2个字符)，下标均是从1开始计算
 	string deal(const string& query) {

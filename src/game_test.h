@@ -37,7 +37,7 @@ void AI_vs_AI() {
 //	Look1AIPlayer white;
 
 //	Look2AIPlayer black;
-	Look2AIPlayer white;
+//	Look2AIPlayer white;
 
 	RandomAIPlayer black;
 //	RandomAIPlayer white;
@@ -46,9 +46,9 @@ void AI_vs_AI() {
 //	MonteCarloAIPlayer white;
 
 //	LookNAIPlayer black;
-//	LookNAIPlayer white;
+	LookNAIPlayer white;
 
-	uint total = 1000 / TOTAL_THREADS;
+	uint total = 1 / TOTAL_THREADS;
 	log_warn("start "<<total<<" games ...");
 	uint win[3] = { 0, 0, 0 };
 	int total_diff = 0;
@@ -56,16 +56,18 @@ void AI_vs_AI() {
 	timer begin;
 	for_n(i, total)
 	{
-		if (i%10==0)
-			log_warn("progress: "<<i<<"/"<<total<<" in "<<i<<" games: black:white="<<win[BLACK]<<":"<<win[WHITE]
-				<<" draw="<<win[DRAW]<<" diff="<<total_diff<<" avg="<<float(total_diff)/(i+1)<<" time="<<begin.elapsed()<<" speed="<< i/begin.elapsed());
+//		if (i%10==0)
+//			log_warn("progress: "<<i<<"/"<<total<<" in "<<i<<" games: black:white="<<win[BLACK]<<":"<<win[WHITE]
+//				<<" draw="<<win[DRAW]<<" diff="<<total_diff<<" avg="<<float(total_diff)/(i+1)<<" time="
+//				<<begin.elapsed()<<" speed="<< i/begin.elapsed());
 		Game game(black, white);
 		Score score = game.start();
 		win[score.winner] += 1;
 		total_diff += score.diff();
 	}
-	log_warn(
-			"in "<<total<<" games: black:white="<<win[BLACK]<<":"<<win[WHITE] <<" draw="<<win[DRAW]<<" diff="<<total_diff<<" avg="<<float(total_diff)/total<<" time="<<begin.elapsed()<<" speed="<< total/begin.elapsed());
+	log_warn("in "<<total<<" games: black:white="<<win[BLACK]<<":"<<win[WHITE]
+		<<" draw="<<win[DRAW]<<" diff="<<total_diff<<" avg="<<float(total_diff)/total
+		<<" time="<<begin.elapsed()<<" speed="<< total/begin.elapsed());
 }
 
 class GameTestThread: public thread {
@@ -78,9 +80,9 @@ public:
 class GameTest {
 public:
 	GameTest() {
-		// human_vs_human();
+		 human_vs_human();
 		// human_vs_AI();
-		AI_vs_AI();
+//		AI_vs_AI();
 //		 multithread_test();
 	}
 

@@ -13,11 +13,16 @@
 #include "game_test.h"
 
 extern uint verbose=4;
+OpeningBook* openings;
 
 int main () {
+	openings=new OpeningBook();
+
 //	 delete new BoardTest;
 	delete new GameTest;
 	
 	// system("pause");
+
+	delete openings;
 	return 0;
 }

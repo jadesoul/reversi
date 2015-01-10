@@ -15,3 +15,6 @@ clean:
 	
 test: all
 	bin/reversi
+
+server: all
+	cd src; bash start_server.sh
