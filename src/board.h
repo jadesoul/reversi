@@ -45,8 +45,15 @@ public:
 	uchar x :4;
 	uchar y :4;
 
-	Pos(uint x, uint y):x(x), y(y) {}
-	Pos(uchar move):x(move>>4), y(move & 0x0F) {}
+	Pos(uint x, uint y):x(x), y(y) {
+		assert (x>=0 and x<=8);
+		assert (y>=0 and y<=8);
+	}
+
+	Pos(uchar move):x(move>>4), y(move & 0x0F) {
+		assert (x>=0 and x<=8);
+		assert (y>=0 and y<=8);
+	}
 
 	ostream& dump(ostream& o=cout) const {
 		char h = 'A'+int(y);
@@ -54,6 +61,32 @@ public:
 		return o<<h<<v;
 	}
 	friend inline ostream& operator<<(ostream& o, const Pos& p) { return p.dump(o); }
+
+	//按照xy夹角对角线对称变换
+	void mirror_xy() {
+		uchar tmp=y;
+		y=x;
+		x=tmp;
+	}
+
+	//按照左下-右上 对角线对称变换
+	void mirror_ldru() {
+		uchar tmp=x;
+		x=7-(uint)y;
+		y=7-(uint)tmp;
+	}
+
+	//按照左下-右上 对角线对称变换，同时按照xy夹角对角线对称变换
+	void mirror_ldru_xy() {
+		mirror_xy();
+		mirror_ldru();
+	}
+
+	move_t tomove() {
+		move_t move=(x <<4) + y;
+//		log_warn("pos.tomove: x="<<(uint)x<<", y="<<(uint)y<<", move="<<std::hex<<(uint)move<<", pos="<<*this);
+		return move;
+	}
 };
 
 //轮谁下
@@ -148,7 +181,7 @@ bool parse_move(const char* two_bytes, uchar& move, uchar& x, uchar& y, color& t
 
 class Board {
 public:
-	color 	map[8][8];	//存放64个棋子状态
+	color 	map[8][8];		//存放64个棋子状态
 	uchar 	total[4];		//存放4种颜色棋子的个数并动态更新，其中ACTIVE的个数与EMPTY个数重叠
 	color 	turn;			//当前轮到哪方下子
 	uchar 	pass_cnt;		//PASS次数
@@ -166,7 +199,7 @@ public:
 	inline uchar black_cnt() const { return total[BLACK]; }
 	inline uchar white_cnt() const { return total[WHITE]; }
 	inline bool is_active(uchar x, uchar y) const { return map[x][y]==ACTIVE; }
-	inline bool is_active(move_t move) const { return is_active(move>>4, move&0x0F); }
+	inline bool is_active(move_t move) const { return is_active(move>>4, move & 0x0F); }
 	
 	//从包含65字节的字符串初始化, 棋盘(64字节)，下子方(1字节)
 	//为游戏引擎提供此接口
@@ -213,6 +246,36 @@ public:
 		if (a==b) return true;
 		int diff=memcmp(a, b, sizeof(Board));
 		return diff<0;
+	}
+
+	//将64个棋子的状态按照xy夹角对应的对角线镜像变换
+	void mirror_xy() {
+		for_n(x, 8) {
+			for_n(y, 8) {
+				if (x>=y) continue;
+				Pos pos(x, y);
+				pos.mirror_xy();//mirror_ldru_xy
+				swap(map[x][y], map[pos.x][pos.y]);
+			}
+		}
+	}
+
+	//将64个棋子的状态按照左下-右上对角线镜像变换
+	void mirror_ldru() {
+		for_n(x, 8) {
+			for_n(y, 8) {
+				if (x+y>=7) continue;
+				Pos pos(x, y);
+				pos.mirror_ldru();//mirror_ldru_xy
+				swap(map[x][y], map[pos.x][pos.y]);
+			}
+		}
+	}
+
+	//将64个棋子的状态按照左下-右上对角线镜像变换，同时按照xy夹角对应的对角线镜像变换
+	void mirror_ldru_xy() {
+		mirror_ldru();
+		mirror_xy();
 	}
 
 	inline bool game_over() { //无子可下，或者连续两次PASS

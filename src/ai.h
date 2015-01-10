@@ -14,26 +14,33 @@
 #include "game.h"
 #include "openings.h"
 
-//class OpeningBookPlayer : public Player {
-//public:
-//	uchar play(Board& b) {
-//		uchar self=b.turn;
-//		uint x, y;
-//		do {
-//			log_debug(b);
-//			log_info(((self==BLACK)?"BLACK":"WHITE")<<" HumanPlayer, Please input point for play:");
-//			clog<<"x=";
-//			cin>>x;
-//			clog<<"y=";
-//			cin>>y;
-//			cout<<endl;
-//			log_info("(x, y)=("<<x<<", "<<y<<")");
-//
-//		} while (x<8 and y<8 and b.play(x, y)==0);
-//		return (x<<4)+y;
-//	}
-//};
+class OpeningBookPlayer : public Player {
+public:
+	uchar play(Board& b) {
 
+		move_t opening_move=openings->lookup(b);
+		if (opening_move!=PASS) {
+			assert(b.is_active(opening_move));
+			b.play(opening_move);
+			return opening_move;
+		}
+
+		uchar self=b.turn;
+		uint x, y;
+		do {
+			log_debug(b);
+			log_info(((self==BLACK)?"BLACK":"WHITE")<<" HumanPlayer, Please input point for play:");
+			clog<<"x=";
+			cin>>x;
+			clog<<"y=";
+			cin>>y;
+			cout<<endl;
+			log_info("(x, y)=("<<x<<", "<<y<<")");
+
+		} while (x<8 and y<8 and b.play(x, y)==0);
+		return (x<<4)+y;
+	}
+};
 
 //所有AI的基类
 //class AIPlayer : public Player {};
@@ -180,6 +187,14 @@ public:
 		uchar self=b.turn;
 		log_debug(b);
 		
+		move_t opening_move=openings->lookup(b);
+		if (opening_move!=PASS) {
+			assert(b.is_active(opening_move));
+			b.play(opening_move);
+			return opening_move;
+		}
+
+
 		uchar best_move=PASS;
 		
 		//两步棋后当前下子方的平均行动力
@@ -274,6 +289,13 @@ public:
 		uchar self=board.turn;
 		log_debug(board);
 		
+		move_t opening_move=openings->lookup(board);
+		if (opening_move!=PASS) {
+			assert(board.is_active(opening_move));
+			board.play(opening_move);
+			return opening_move;
+		}
+
 		RandomAIPlayer player;//用于推演时随机下棋
 		map<uchar, int> predict;//统计每个下子位置最终的总赢子数
 		
@@ -294,6 +316,9 @@ public:
 						Game game(player, player, think);//举办一场比赛
 						Score score=game.start();
 						int diff=score.diff();//黑子数减去白子数之差
+
+						diff=diff>0?1:-1;//只记输赢次数，不记输赢程度
+
 						if (self==BLACK) {//如果下子方是黑子，累加diff
 							predict[move]+=diff;
 						} else {//否则，累减（黑棋赢子就是白棋输子）
@@ -400,6 +425,14 @@ public:
 	};
 	
 	uchar play(Board& b) {
+
+		move_t opening_move=openings->lookup(b);
+		if (opening_move!=PASS) {
+			assert(b.is_active(opening_move));
+			b.play(opening_move);
+			return opening_move;
+		}
+
 		return play_dfs(b);
 		// return play_bfs(b);
 	}

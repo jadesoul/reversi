@@ -39,7 +39,8 @@ public:
 	Random random;
 
 	OpeningBook() {
-		load("data/openingslarge.txt");
+		load("/Users/jadesoul/git/reversi/data/openingslarge.txt");
+		load("/Users/jadesoul/git/reversi/data/openings.txt");
 	}
 
 	//从文件中加载开局库，根据字符串转换为棋局，自动做对称变换
@@ -48,23 +49,25 @@ public:
 		log_status("loading opening book from: "<<fp);
 		string s;
 		uint cnt=0;
-		while (fin>>s) {
-			++cnt;
+		while (getline(fin, s)) {
 			HumanPlayer black, white;
 			Game game(black, white);
-			game.start_one_opening(s, book);
+			if (game.start_one_opening(s, book)) {
+				++cnt;
+			}
 		}
 
 		uint total_moves;
 		for (map<Board, set<move_t> >::iterator it=book.begin(); it!=book.end(); ++it) {
 			total_moves+=it->second.size();
 		}
-		log_status("loaded opening book: "<<cnt<<" openings, "<<book.size()<<" boards, "<<total_moves<<" moves");
+		log_status("loaded opening book: "<<cnt<<" openings, now "<<book.size()<<" boards, "<<total_moves<<" moves");
+		fin.close();
 	}
 
 	move_t lookup(const Board& board) const {
 		map<Board, set<move_t> >::const_iterator it=book.find(board);
-		log_info(board);
+		log_status(board);
 		if (it==book.end()) {
 			return PASS;
 		} else {
@@ -73,25 +76,27 @@ public:
 			uint n=moves.size();
 			assert(n>0);
 
-			move_t move=*(moves.begin());
+			uint cnt=0;
+			for (set<move_t>::const_iterator it2=moves.begin(); it2!=moves.end(); ++it2) {
+				++cnt;
+				log_status("found opening "<<cnt<<" : "<<Move(*it2, board.turn));
+			}
 
-//			for (set<move_t>::const_iterator it2=moves.begin(); it2!=moves.end(); ++it2) {
-//				log_info("found opening: "<<Move(*it2, board.turn));
-//			}
+			move_t move=PASS;
 
-			log_info("found "<<n<<" opening moves in opening book, choose move: "<<Move(move, board.turn));
+			if (n==1) {//只有1种方案
+				move= *(moves.begin());
+			} else {//多种方案，随机选择一个结果
+				uint index=random.randindex(n);
+				set<move_t>::const_iterator it3=moves.begin();
+				while (index-- > 0) {
+					++it3;
+				}
+				move= *it3;
+			}
 
+			log_status("found "<<n<<" opening moves in opening book, choose move: "<<Move(move, board.turn));
 			return move;
-//
-//			if (n==1) {//只有1种方案
-//				return *(moves.begin());
-//			} else {//多种方案，随机选择一个结果
-//				uint index=random.randindex(n);
-//				while (index) {
-//
-//				}
-//				return *(moves.begin()+index);
-//			}
 		}
 		return PASS;
 	}

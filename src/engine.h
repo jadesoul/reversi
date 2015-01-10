@@ -18,6 +18,8 @@
 
 extern uint verbose = 6;
 
+OpeningBook* openings = new OpeningBook();
+
 bool check1(const char* s) {
 	int n = strlen(s);
 	if (n != 65)
@@ -39,8 +41,8 @@ const char* server(const char* s) {
 //	Look1AIPlayer player;
 //	Look2AIPlayer player;
 //	RandomAIPlayer player;
-//	MonteCarloAIPlayer player;
-	LookNAIPlayer player;
+	MonteCarloAIPlayer player;
+//	LookNAIPlayer player;
 
 	Player& black = player;
 	Player& white = player;

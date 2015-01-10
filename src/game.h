@@ -95,38 +95,70 @@ public:
 	}
 	
 	//用于加载开局库
-	void start_one_opening(const string& opening, map<Board, set<move_t> >& book) {
+	bool start_one_opening(const string& opening, map<Board, set<move_t> >& book) {
 		log_debug("Game for Opening Start!!");
 		black.reset();
 		white.reset();
 		for (uint i=0; i<opening.size(); i+=2) {
 			color& board_turn=board.turn;
-			log_debug(board);
+//			log_warn(board);
 
 			const char* two_bytes=opening.c_str()+i;
 			uchar move, x, y;
 			color turn;
 			bool ok = parse_move(two_bytes, move, x, y, turn);
-			if (!ok) die_error("illegal opening:"<<opening<<" two_bytes from:"<<two_bytes);
+			if (!ok) {
+//				log_warn("illegal opening:"<<opening<<" two_bytes from:"<<two_bytes);
+				if (i!=0) return true;
+				else return false;
+			}
 //			assert(turn==board_turn);
 			assert(board.mobility()!=0);
 			assert(board.is_active(x, y));
+//			log_warn("move: "<<Move(move, turn));
 
-			map<Board, set<move_t> >::iterator it=book.find(board);
-			if (it==book.end()) {
-				log_debug("add new book entry");
-				set<move_t> moves;
-				moves.insert(move);
-				book[board]=moves;
-			} else {
-				log_debug("expand exist book entry");
-				set<move_t>& moves=it->second;
-				moves.insert(move);
+			vector<Board> mirror_boards(4, board);//拷贝4份
+			mirror_boards[1].mirror_xy();
+			mirror_boards[2].mirror_ldru();
+			mirror_boards[3].mirror_ldru_xy();
+
+			vector<Pos> mirror_moves(4, Pos(move));
+			mirror_moves[1].mirror_xy();
+			mirror_moves[2].mirror_ldru();
+			mirror_moves[3].mirror_ldru_xy();
+
+			//添加开局走法
+			for_n(j, 4) {
+				Board& the_board=mirror_boards[j];
+				move_t the_move=mirror_moves[j].tomove();
+
+//				log_warn(the_board);
+//				log_warn("j="<<j<<" the_move="<<Pos(the_move));
+
+				assert(the_board.mobility()!=0);
+				assert(the_board.is_active(the_move));
+
+//				map<Board, set<move_t> >::iterator it = book.find(the_board);
+//				if (it == book.end()) {
+//					log_debug("add new book entry");
+//					set<move_t> moves;
+//					moves.insert(the_move);
+//					book[the_board] = moves;
+//				} else {
+//					log_debug("expand exist book entry");
+//					set<move_t>& moves = it->second;
+//					moves.insert(the_move);
+//				}
+
+				book[the_board].insert(the_move);
 			}
+
 			uint eat=board.play(move);
 			assert(eat>0);
+
 		}
 		log_debug("Game for Opening Stop!!");
+		return true;
 	}
 
 

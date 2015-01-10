@@ -22,6 +22,12 @@ void human_vs_human() {
 	game.start();
 }
 
+void book_vs_book() {
+	OpeningBookPlayer black, white;
+	Game game(black, white);
+	game.start();
+}
+
 void human_vs_AI() {
 	EasyAIPlayer black;
 	HumanPlayer white;
@@ -33,22 +39,22 @@ void AI_vs_AI() {
 //	EasyAIPlayer black;
 //	EasyAIPlayer white;
 
-	Look1AIPlayer black;
-//	Look1AIPlayer white;
+//	Look1AIPlayer black;
+	Look1AIPlayer white;
 
 //	Look2AIPlayer black;
 //	Look2AIPlayer white;
 
 //	RandomAIPlayer black;
-	RandomAIPlayer white;
+//	RandomAIPlayer white;
 
-//	MonteCarloAIPlayer black;
+	MonteCarloAIPlayer black;
 //	MonteCarloAIPlayer white;
 
 //	LookNAIPlayer black;
 //	LookNAIPlayer white;
 
-	uint total = 1000 / TOTAL_THREADS;
+	uint total = 1 / TOTAL_THREADS;
 //	cin>>total;
 	log_warn("start "<<total<<" games ...");
 	uint win[3] = { 0, 0, 0 };
@@ -82,8 +88,9 @@ class GameTest {
 public:
 	GameTest() {
 //		 human_vs_human();
-		// human_vs_AI();
-		AI_vs_AI();
+		 book_vs_book();
+//		 human_vs_AI();
+//		 AI_vs_AI();
 //		 multithread_test();
 	}
 
