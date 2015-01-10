@@ -35,13 +35,11 @@
 //};
 
 
-
 //所有AI的基类
 //class AIPlayer : public Player {};
 
 //optimized here:
 typedef Player AIPlayer;
-
 
 
 //最简单的AI，选择第一个可下子的位置下子
@@ -52,6 +50,13 @@ public:
 		
 		log_debug(b);
 		
+		move_t opening_move=openings->lookup(b);
+		if (opening_move!=PASS) {
+			assert(b.is_active(opening_move));
+			b.play(opening_move);
+			return opening_move;
+		}
+
 		for_n(x, 8) {
 			for_n(y, 8) {
 				if (b.map[x][y]==ACTIVE) {
@@ -62,7 +67,7 @@ public:
 			}
 		}
 		assert(false);
-		return 0;
+		return PASS;
 	}
 };
 
@@ -76,13 +81,13 @@ public:
 		
 		log_debug(b);
 		
-		int mobility=b.mobility();
+		uint mobility=b.mobility();
 		assert(mobility>=1);
 
 		//uint index=random.randint(1, mobility);
 
 		//optimize here:
-		uint index=1+random.randuint(mobility);
+		uint index=1+random.randuint(mobility-1);
 
 		for_n(x, 8) {
 			for_n(y, 8) {
@@ -96,7 +101,7 @@ public:
 			}
 		}
 		assert(false);
-		return 0;
+		return PASS;
 	}
 };
 
@@ -107,6 +112,13 @@ public:
 		uchar self=b.turn;
 		log_debug(b);
 		
+		move_t opening_move = openings->lookup(b);
+		if (opening_move != PASS) {
+			assert(b.is_active(opening_move));
+			b.play(opening_move);
+			return opening_move;
+		}
+
 		uchar best_move=PASS;
 		uchar min_mobility=-1;
 		//找出下子之后使得对方行动力最低的一步走法

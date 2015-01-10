@@ -26,14 +26,20 @@ public:
 		instance_cnt += 1;
 	}
 
+	//返回区间[0, size)之间的随机数
+	uint randindex(uint size) const {
+		assert(size<=RAND_MAX); //支持的最大上界
+		return rand() % size;
+	}
+
 	//返回区间[0, max]之间的随机数
-	uint randuint(uint max) {
+	uint randuint(uint max) const {
 		assert(max<=RAND_MAX); //支持的最大上界
 		return rand() % (max + 1);
 	}
 
 	//返回区间[start, end]或[end, start]之间的随机数
-	int randint(int start, int end) {
+	int randint(int start, int end) const {
 		if (start == end)
 			return start;
 		if (start < end) {

@@ -74,8 +74,8 @@ void get_now(char out[]) {
 #define die_fatal(...) { LOG_BEGIN; std::cerr<<LOG_SINATURE<<LOG_MODE_FATAL<<" Code:"<<__FILE__<<":"<<__LINE__<<" Function:"<<__FUNCTION__<<" Message:"<< __VA_ARGS__ <<std::endl ; exit(-2); }
 
 //#define LOG_LEVEL LOG_LEVEL_DEBUG
-#define LOG_LEVEL LOG_LEVEL_INFO
-//#define LOG_LEVEL LOG_LEVEL_STATUS
+//#define LOG_LEVEL LOG_LEVEL_INFO
+#define LOG_LEVEL LOG_LEVEL_STATUS
 //#define LOG_LEVEL LOG_LEVEL_WARN
 //#define LOG_LEVEL LOG_LEVEL_ERROR
 //#define LOG_LEVEL LOG_LEVEL_FATAL

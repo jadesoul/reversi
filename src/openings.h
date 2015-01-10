@@ -26,7 +26,9 @@
 //a-z A-Z 水平方向 y
 //1-8 垂直方向 x
 
-//对称性：x-> 7-x  y-> 7-y
+//沿着两条对角线对称：1个开局可以对称出4个
+//对称性1：x-> 7-x  y-> 7-y
+//对称性2：x<-y y<-x
 
 #include "board.h"
 #include "player.h"
@@ -34,6 +36,7 @@
 class OpeningBook {
 public:
 	map<Board, set<move_t> > book;
+	Random random;
 
 	OpeningBook() {
 		load("data/openingslarge.txt");
@@ -42,7 +45,7 @@ public:
 	//从文件中加载开局库，根据字符串转换为棋局，自动做对称变换
 	void load(const char* fp) {
 		ifstream fin(fp);
-		log_info("loading opening book from: "<<fp);
+		log_status("loading opening book from: "<<fp);
 		string s;
 		uint cnt=0;
 		while (fin>>s) {
@@ -56,8 +59,44 @@ public:
 		for (map<Board, set<move_t> >::iterator it=book.begin(); it!=book.end(); ++it) {
 			total_moves+=it->second.size();
 		}
-		log_info("loaded opening book: "<<cnt<<" openings, "<<book.size()<<" boards, "<<total_moves<<" moves");
+		log_status("loaded opening book: "<<cnt<<" openings, "<<book.size()<<" boards, "<<total_moves<<" moves");
+	}
+
+	move_t lookup(const Board& board) const {
+		map<Board, set<move_t> >::const_iterator it=book.find(board);
+		log_info(board);
+		if (it==book.end()) {
+			return PASS;
+		} else {
+
+			const set<move_t>& moves=it->second;
+			uint n=moves.size();
+			assert(n>0);
+
+			move_t move=*(moves.begin());
+
+//			for (set<move_t>::const_iterator it2=moves.begin(); it2!=moves.end(); ++it2) {
+//				log_info("found opening: "<<Move(*it2, board.turn));
+//			}
+
+			log_info("found "<<n<<" opening moves in opening book, choose move: "<<Move(move, board.turn));
+
+			return move;
+//
+//			if (n==1) {//只有1种方案
+//				return *(moves.begin());
+//			} else {//多种方案，随机选择一个结果
+//				uint index=random.randindex(n);
+//				while (index) {
+//
+//				}
+//				return *(moves.begin()+index);
+//			}
+		}
+		return PASS;
 	}
 };
+
+extern OpeningBook* openings;
 
 #endif /* OPENINGS_H_1372388367_57 */

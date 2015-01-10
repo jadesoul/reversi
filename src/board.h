@@ -23,6 +23,9 @@ const static color WHITE=1;
 const static color BLACK=2;
 const static color ACTIVE=3;
 
+//获取对手的颜色
+#define OPPO(x) (ACTIVE-x)
+
 //8个方向
 typedef uchar byte;
 const static byte RIGHT=0;
@@ -36,15 +39,57 @@ const static byte RIGHT_UP=7;
 
 typedef uchar move_t;
 
-class Move {
+//落子的位置
+struct Pos {
 public:
-	union {
-		uchar move;
-		struct {
-			uchar x:4;
-			uchar y:4;
-		} xy;
-	} data;
+	uchar x :4;
+	uchar y :4;
+
+	Pos(uint x, uint y):x(x), y(y) {}
+	Pos(uchar move):x(move>>4), y(move & 0x0F) {}
+
+	ostream& dump(ostream& o=cout) const {
+		char h = 'A'+int(y);
+		char v = '1'+int(x);
+		return o<<h<<v;
+	}
+	friend inline ostream& operator<<(ostream& o, const Pos& p) { return p.dump(o); }
+};
+
+//轮谁下
+struct Turn {
+	color side;
+
+	Turn(color who):side(who) {}
+
+	ostream& dump(ostream& o=cout) const {
+		if (side==BLACK) return o<<"BLACK";
+		else if (side==WHITE) return o<<"WHITE";
+		else assert(false);
+		return o;
+	}
+	friend inline ostream& operator<<(ostream& o, const Turn& t) { return t.dump(o); }
+
+	inline void swap() { side=OPPO(side); }
+	inline bool is_black() const { return side==BLACK; }
+	inline bool is_white() const { return side==WHITE; }
+};
+
+//一步棋，包括落子位置，轮谁下等
+struct Move {
+public:
+	Pos		pos;
+	Turn	turn;
+
+	Move(Pos pos, Turn turn):pos(pos), turn(turn) {}
+
+	ostream& dump(ostream& o=cout) const {
+		char base= (turn.is_black()?'A':'a');
+		char h = base + int(pos.y);
+		char v = '1' + int(pos.x);
+		return o <<"pos=" << h << v <<" turn="<<turn;
+	}
+	friend inline ostream& operator<<(ostream& o, const Move& m) { return m.dump(o); }
 };
 
 //在各个方向上根据当前坐标计算下一个坐标，根据横纵坐标增量表计算
@@ -73,9 +118,6 @@ const static byte INV_D[8]={LEFT, LEFT_UP, UP, RIGHT_UP, RIGHT, RIGHT_DOWN, DOWN
 #define GOOD_LD 0x07
 #define GOOD_RD 0x77
 #define IS_GOOD_MOVE(m) ((m)==GOOD_LU or (m)==GOOD_RU or (m)==GOOD_LD or (m)==GOOD_RD)
-
-//获取对手的颜色
-#define OPPO(x) (ACTIVE-x)
 
 //放弃下子的move表示方法
 #define PASS 0xFF
@@ -124,6 +166,7 @@ public:
 	inline uchar black_cnt() const { return total[BLACK]; }
 	inline uchar white_cnt() const { return total[WHITE]; }
 	inline bool is_active(uchar x, uchar y) const { return map[x][y]==ACTIVE; }
+	inline bool is_active(move_t move) const { return is_active(move>>4, move&0x0F); }
 	
 	//从包含65字节的字符串初始化, 棋盘(64字节)，下子方(1字节)
 	//为游戏引擎提供此接口
@@ -224,7 +267,7 @@ public:
 		return mobility;
 	}
 
-	void dump(ostream& o=cout) {
+	void dump(ostream& o=cout) const {
 		char h = (turn==BLACK?'A':'a');
 		o<<endl<<'+'<<' ';
 		for_n(j, 8) o<<(char)(h+j)<<' ';
@@ -232,7 +275,7 @@ public:
 		for_n(i, 8) {
 			o<<(i+1)<<' ';
 			for_n(j, 8) {
-				color& c=map[i][j];
+				const color& c=map[i][j];
 				if (c==EMPTY) o<<'.';
 				else if (c==BLACK) o<<'X';
 				else if (c==WHITE) o<<'O';
@@ -251,7 +294,7 @@ public:
 		o<<"--------------------------------------------"<<endl;
 	}
 	
-	friend inline ostream& operator<<(ostream& o, Board& b) {
+	friend inline ostream& operator<<(ostream& o, const Board& b) {
 		b.dump(o);
 		return o;
 	}

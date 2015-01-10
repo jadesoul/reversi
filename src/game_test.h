@@ -33,22 +33,23 @@ void AI_vs_AI() {
 //	EasyAIPlayer black;
 //	EasyAIPlayer white;
 
-//	Look1AIPlayer black;
+	Look1AIPlayer black;
 //	Look1AIPlayer white;
 
 //	Look2AIPlayer black;
 //	Look2AIPlayer white;
 
-	RandomAIPlayer black;
-//	RandomAIPlayer white;
+//	RandomAIPlayer black;
+	RandomAIPlayer white;
 
 //	MonteCarloAIPlayer black;
 //	MonteCarloAIPlayer white;
 
 //	LookNAIPlayer black;
-	LookNAIPlayer white;
+//	LookNAIPlayer white;
 
-	uint total = 1 / TOTAL_THREADS;
+	uint total = 1000 / TOTAL_THREADS;
+//	cin>>total;
 	log_warn("start "<<total<<" games ...");
 	uint win[3] = { 0, 0, 0 };
 	int total_diff = 0;
@@ -80,9 +81,9 @@ public:
 class GameTest {
 public:
 	GameTest() {
-		 human_vs_human();
+//		 human_vs_human();
 		// human_vs_AI();
-//		AI_vs_AI();
+		AI_vs_AI();
 //		 multithread_test();
 	}
 
