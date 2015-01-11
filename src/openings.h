@@ -35,7 +35,7 @@
 
 class OpeningBook {
 public:
-	map<Board, set<move_t> > book;
+	map<Board, Choices> book;
 	Random random;
 
 	OpeningBook() {
@@ -58,7 +58,7 @@ public:
 		}
 
 		uint total_moves;
-		for (map<Board, set<move_t> >::iterator it=book.begin(); it!=book.end(); ++it) {
+		for (map<Board, Choices>::iterator it=book.begin(); it!=book.end(); ++it) {
 			total_moves+=it->second.size();
 		}
 		log_status("loaded opening book: "<<cnt<<" openings, now "<<book.size()<<" boards, "<<total_moves<<" moves");
@@ -66,36 +66,41 @@ public:
 	}
 
 	move_t lookup(const Board& board) const {
-		map<Board, set<move_t> >::const_iterator it=book.find(board);
-		log_status(board);
+		map<Board, Choices>::const_iterator it=book.find(board);
 		if (it==book.end()) {
 			return PASS;
 		} else {
 
-			const set<move_t>& moves=it->second;
+			const Choices& moves=it->second;
 			uint n=moves.size();
 			assert(n>0);
-
-			uint cnt=0;
-			for (set<move_t>::const_iterator it2=moves.begin(); it2!=moves.end(); ++it2) {
-				++cnt;
-				log_status("found opening "<<cnt<<" : "<<Move(*it2, board.turn));
-			}
+			log_status(board);
 
 			move_t move=PASS;
-
-			if (n==1) {//只有1种方案
-				move= *(moves.begin());
-			} else {//多种方案，随机选择一个结果
-				uint index=random.randindex(n);
-				set<move_t>::const_iterator it3=moves.begin();
-				while (index-- > 0) {
-					++it3;
+			uint cnt=0;
+			double max_score=INT32_MIN;
+			for (Choices::const_iterator it2=moves.begin(); it2!=moves.end(); ++it2) {
+				double score=it2->second;
+				if (score>max_score) {
+					max_score=score;
+					move=it2->first;
 				}
-				move= *it3;
+				++cnt;
+				log_status("found opening "<<cnt<<" : "<<Move(it2->first, board.turn));
 			}
 
-			log_status("found "<<n<<" opening moves in opening book, choose move: "<<Move(move, board.turn));
+//			if (n==1) {//只有1种方案
+//				move= moves.begin()->first;
+//			} else {//多种方案，随机选择一个结果
+//				uint index=random.randindex(cnt);
+//				Choices::const_iterator it3=moves.begin();
+//				while (index-- > 0) {
+//					++it3;
+//				}
+//				move= it3->first;
+//			}
+
+			log_status("found "<<n<<" opening moves in opening book, choose move: "<<Move(move, board.turn)<<", score="<<max_score);
 			return move;
 		}
 		return PASS;

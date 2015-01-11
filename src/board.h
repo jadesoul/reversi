@@ -39,6 +39,9 @@ const static byte RIGHT_UP=7;
 
 typedef uchar move_t;
 
+//代表在当前局面下，在每个位置下一步棋，当前下子方最终赢得棋子数的期望(大于0赢棋，小于0输棋)
+typedef map<move_t, double> Choices;
+
 //落子的位置
 struct Pos {
 public:
@@ -304,10 +307,16 @@ public:
 				for_n(d, 8) {
 					uint x=i, y=j;
 					uint cnt=0;//该方向上能吃几个子
+
 					SET_NEXT(x, y, d);
+
+//					int inc_x=INC_X[d], inc_y=INC_Y[d];
+//					x += inc_x; y += inc_y;
+
 					while (x<8 and y<8 and map[x][y]==o) {//注意x, y都是uint，一定非负
 						cnt+=1;//累加吃子数
 						SET_NEXT(x, y, d);//探测下一个位置
+//						x += inc_x; y += inc_y;
 					}
 					if (x<8 and y<8) {
 						//没碰墙，要么是自己的子，要么是空子，或者已经是ACTIVE
@@ -431,19 +440,31 @@ public:
 		for_n(d, 8) {
 			uint x=i, y=j;
 			uint cnt=0;//该方向上能吃几个子
-			SET_NEXT(x, y, d);
+			int inc_x=INC_X[d], inc_y=INC_Y[d];
+			color* chain[8];//当前方向上吃的子存放在链中，最多能吃6个子，避免后面的反向回溯吃子
+
+//			SET_NEXT(x, y, d);
+			x+=inc_x; y+=inc_y;
+
 			while (x<8 and y<8 and map[x][y]==o) {//注意x, y都是uint，一定非负
+				chain[cnt]=&(map[x][y]);
 				++cnt;//累加吃子数
-				SET_NEXT(x, y, d);//探测下一个位置
+//				SET_NEXT(x, y, d);//探测下一个位置
+				x+=inc_x; y+=inc_y;
 			}
 			if (x<8 and y<8) {//没碰墙
 				if (map[x][y]==s and cnt>0) {//如果是自己的子且可吃子，则吃子
-					uint d_inverse=INVERSE_DIRECTION(d);//向相反的方向顺序扫描并吃子
-					SET_NEXT(x, y, d_inverse);
-					while (map[x][y]==o) {//一定不会越界，直到遇到下子点才结束
-						map[x][y]=s;
-						SET_NEXT(x, y, d_inverse);
-					}
+
+//					uint d_inverse=INVERSE_DIRECTION(d);//向相反的方向顺序扫描并吃子
+//					SET_NEXT(x, y, d_inverse);
+//					while (map[x][y]==o) {//一定不会越界，直到遇到下子点才结束
+//						map[x][y]=s;
+//						SET_NEXT(x, y, d_inverse);
+//					}
+
+					//性能优化
+					for_n(k, cnt) *(chain[k])=s;
+
 					all_cnt+=cnt;//累加总吃子数
 				} else {
 					//不能吃子，或者是一个激活状态
@@ -467,6 +488,86 @@ public:
 		return all_cnt;
 	}
 
+	//返回所有与who的棋子相邻的空格个数
+	uchar potential_mobility(color who) {
+		uint cnt=0;
+		for_n(x, 8) {
+			for_n(y, 8) {
+				color& c=map[x][y];
+				if (c == EMPTY or c==ACTIVE) {
+					int x_U=int(x)-1;
+					int x_D=int(x)+1;
+					int y_L=int(y)-1;
+					int y_R=int(y)+1;
+
+					bool x_U_ok=(x_U >= 0 and x_U < 8);
+					bool x_D_ok=(x_D >= 0 and x_D < 8);
+					bool y_L_ok=(y_L >= 0 and y_L < 8);
+					bool y_R_ok=(y_R >= 0 and y_R < 8);
+
+					//x_U
+					if (x_U_ok) {
+
+						if (y_L_ok) {
+							if (map[x_U][y_L] == who) {
+								++cnt;
+								continue;
+							}
+						}
+
+						if (map[x_U][y] == who) {
+							++cnt;
+							continue;
+						}
+
+						if (y_R_ok) {
+							if (map[x_U][y_R] == who) {
+								++cnt;
+								continue;
+							}
+						}
+					}
+
+					//x
+					if (y_L_ok) {
+						if (map[x][y_L] == who) {
+							++cnt;
+							continue;
+						}
+					}
+
+					if (y_R_ok) {
+						if (map[x][y_R] == who) {
+							++cnt;
+							continue;
+						}
+					}
+
+					//x_D
+					if (x_D_ok) {
+						if (y_L_ok) {
+							if (map[x_D][y_L] == who) {
+								++cnt;
+								continue;
+							}
+
+						}
+						if (map[x_D][y] == who) {
+							++cnt;
+							continue;
+						}
+						if (y_R_ok) {
+							if (map[x_D][y_R] == who) {
+								++cnt;
+								continue;
+							}
+						}
+					}
+				}
+			}
+		}
+		return cnt;
+	}
 };
 
 #endif /* BOARD_H_1371483294_09 */

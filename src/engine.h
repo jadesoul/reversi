@@ -41,7 +41,8 @@ const char* server(const char* s) {
 //	Look1AIPlayer player;
 //	Look2AIPlayer player;
 //	RandomAIPlayer player;
-	MonteCarloAIPlayer player;
+//	MonteCarloAIPlayer player;
+	CachedMonteCarloAIPlayer player;
 //	LookNAIPlayer player;
 
 	Player& black = player;

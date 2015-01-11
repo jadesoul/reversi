@@ -34,8 +34,18 @@ public:
 	}
 	
 	inline int win(color turn) {
-		if (turn==BLACK) return diff();
-		else return -diff();
+		if (turn == BLACK)
+			return diff();
+		else
+			return -diff();
+	}
+
+	//turn赢返回1，输返回-1，平局返回0
+	inline int sign(color turn) {
+		if (winner==turn) return 1;
+		if (winner!=DRAW) return -1;
+		//must be DRAW
+		return 0;
 	}
 
 	ostream& dump(ostream& o=cout) {
@@ -85,17 +95,17 @@ public:
 
 		log_info("Game Over!!");
 		
-		log_debug(board);
-//		log_status(board);
+//		log_debug(board);
+		log_status(board);
 
 		Score score(board);
-		log_info(score);
+//		log_status(score);
 		
 		return score;
 	}
-	
+
 	//用于加载开局库
-	bool start_one_opening(const string& opening, map<Board, set<move_t> >& book) {
+	bool start_one_opening(const string& opening, map<Board, Choices>& book) {
 		log_debug("Game for Opening Start!!");
 		black.reset();
 		white.reset();
@@ -150,7 +160,7 @@ public:
 //					moves.insert(the_move);
 //				}
 
-				book[the_board].insert(the_move);
+				book[the_board][the_move]=1;
 			}
 
 			uint eat=board.play(move);
@@ -161,6 +171,65 @@ public:
 		return true;
 	}
 
+	//用于蒙特卡洛扩展开局库
+	bool start_expand_opening(map<Board, Choices>& book) {
+		black.reset();
+		white.reset();
+
+		vector<pair<Board, move_t> > history;
+		while (!game_over()) {
+
+			color& turn = board.turn;
+			Player& player = (turn == BLACK) ? black : white;
+			uchar mobility = board.mobility();
+
+			if (mobility == 0) {
+				board.pass();
+			} else {
+				history.push_back(make_pair(board, PASS));
+
+				move_t move=player.play(board);
+				history.back().second=move;
+			}
+		}
+		Score score(board);
+		int diff=score.diff();//黑子数减去白子数之差
+
+		uint n=history.size();
+		for_n(i, n) {
+			Board& b=history[i].first;
+			move_t move=history[i].second;
+
+			color& board_turn=b.turn;
+			int my_diff=(board_turn!=BLACK) ? diff : -diff;
+
+			assert(b.mobility()!=0);
+			assert(b.is_active(move));
+
+			vector<Board> mirror_boards(4, b);//拷贝4份
+			mirror_boards[1].mirror_xy();
+			mirror_boards[2].mirror_ldru();
+			mirror_boards[3].mirror_ldru_xy();
+
+			vector<Pos> mirror_moves(4, Pos(move));
+			mirror_moves[1].mirror_xy();
+			mirror_moves[2].mirror_ldru();
+			mirror_moves[3].mirror_ldru_xy();
+
+			//添加开局走法
+			for_n(j, 4) {
+				Board& the_board=mirror_boards[j];
+				move_t the_move=mirror_moves[j].tomove();
+
+				assert(the_board.mobility()!=0);
+				assert(the_board.is_active(the_move));
+
+				book[the_board][the_move]+=0;
+				book[the_board][the_move]=(book[the_board][the_move]+my_diff)*0.45;
+			}
+		}
+		return true;
+	}
 
 	//用于游戏引擎，给定字符串（64字符的游戏局面和1个字符的turn）
 	//返回下子的位置坐标 (2个字符)，下标均是从1开始计算
