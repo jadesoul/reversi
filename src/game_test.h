@@ -39,7 +39,7 @@ void AI_vs_AI() {
 //	EasyAIPlayer black;
 //	EasyAIPlayer white;
 
-//	Look1AIPlayer black;
+	Look1AIPlayer black;
 //	Look1AIPlayer white;
 
 //	Look2AIPlayer black;
@@ -51,7 +51,7 @@ void AI_vs_AI() {
 //	MonteCarloAIPlayer black;
 //	MonteCarloAIPlayer white;
 
-	CachedMonteCarloAIPlayer black;
+//	CachedMonteCarloAIPlayer black;
 //	CachedMonteCarloAIPlayer white;
 
 //	LookNAIPlayer black;
