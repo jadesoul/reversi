@@ -9,6 +9,7 @@
  */
 
 #define APP_NAME "Reversi"
+#include "neuralnet.h"
 #include "board_test.h"
 #include "game_test.h"
 
@@ -19,8 +20,10 @@ int main () {
 	openings=new OpeningBook();
 
 //	 delete new BoardTest;
-	delete new GameTest;
+//	delete new GameTest;
 	
+	delete new NeuralNetworkTest;
+
 	// system("pause");
 
 	delete openings;
