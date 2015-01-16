@@ -20,7 +20,9 @@ typedef float real;
 
 class NeuralNetwork {
 	private:
-		color X[64];//输入层，对应棋盘上的64个棋子，各个棋子的取值可以是BLACK,WHITE,EMPTY
+//		color X[64];//输入层，对应棋盘上的64个棋子，各个棋子的取值可以是BLACK,WHITE,EMPTY
+		const color * X;//指向一个board.map即可
+
 		real XH[64][HIDDEN_SIZE];//输入层到隐藏层的权重矩阵XH[i][j]代表weight(X[i], H[j])
 		real H[HIDDEN_SIZE];//隐藏层节点的取值
 		real H_ERR[HIDDEN_SIZE];//隐藏层节点的误差
@@ -59,7 +61,9 @@ class NeuralNetwork {
 					log_info(board);
 
 					//拷贝棋盘
-					memcpy((void*)X, (const void*)board.map, 64);
+//					memcpy((void*)X, (const void*)board.map, 64);
+					//性能优化
+					X=&(board.map[0][0]);
 
 					for (pair<const move_t, double>& choice : choices) {
 						move_t move=choice.first;
@@ -160,7 +164,7 @@ class NeuralNetwork {
 			log_info("reset network");
 			//空子
 			for_n(i, 64) {
-				X[i]=EMPTY;
+//				X[i]=EMPTY;
 				Y[i]=0;
 			}
 
@@ -215,5 +219,41 @@ class NeuralNetworkTest {
 			trained<<network;
 		}
 };
+
+class NeuralNetworkAIPlayer : public Player {
+private:
+	NeuralNetwork network;
+
+public:
+	NeuralNetworkAIPlayer() {
+		network.train();
+	}
+
+	uchar play(Board& b) {
+
+//		move_t opening_move=openings->lookup(b);
+//		if (opening_move!=PASS) {
+//			assert(b.is_active(opening_move));
+//			b.play(opening_move);
+//			return opening_move;
+//		}
+
+		uchar self=b.turn;
+		uint x, y;
+		do {
+			log_debug(b);
+			log_info(((self==BLACK)?"BLACK":"WHITE")<<" HumanPlayer, Please input point for play:");
+			clog<<"x=";
+			cin>>x;
+			clog<<"y=";
+			cin>>y;
+			cout<<endl;
+			log_info("(x, y)=("<<x<<", "<<y<<")");
+
+		} while (x<8 and y<8 and b.play(x, y)==0);
+		return (x<<4)+y;
+	}
+};
+
 
 #endif /* NEURALNET_H_1421152572_56 */
