@@ -22,7 +22,7 @@ int main () {
 //	 delete new BoardTest;
 //	delete new GameTest;
 	
-	delete new NeuralNetworkTest;
+	NeuralNetworkTest a;
 
 	// system("pause");
 
