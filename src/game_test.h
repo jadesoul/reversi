@@ -13,6 +13,7 @@
 #include "player.h"
 #include "game.h"
 #include "ai.h"
+#include "neuralnet.h"
 
 #define TOTAL_THREADS 1
 
@@ -39,7 +40,7 @@ void AI_vs_AI() {
 //	EasyAIPlayer black;
 //	EasyAIPlayer white;
 
-	Look1AIPlayer black;
+//	Look1AIPlayer black;
 //	Look1AIPlayer white;
 
 //	Look2AIPlayer black;
@@ -57,7 +58,10 @@ void AI_vs_AI() {
 //	LookNAIPlayer black;
 //	LookNAIPlayer white;
 
-	uint total = 10 / TOTAL_THREADS;
+	NeuralNetworkAIPlayer black;
+//	NeuralNetworkAIPlayer white;
+
+	uint total = 1000 / TOTAL_THREADS;
 //	cin>>total;
 	log_warn("start "<<total<<" games ...");
 	uint win[3] = { 0, 0, 0 };

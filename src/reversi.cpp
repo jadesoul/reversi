@@ -20,9 +20,9 @@ int main () {
 	openings=new OpeningBook();
 
 //	 delete new BoardTest;
-//	delete new GameTest;
+	delete new GameTest;
 	
-	NeuralNetworkTest a;
+//	NeuralNetworkTest a;
 
 	// system("pause");
 

@@ -100,7 +100,7 @@ public:
 			for_n(y, 8) {
 				if (b.map[x][y]==ACTIVE) {
 					if (--index==0) {
-						log_info(((self==BLACK)?"BLACK":"WHITE")<<" AIPlayer, play at ("<<x<<", "<<y<<")");
+						log_info(((self==BLACK)?"BLACK":"WHITE")<<" RandomAIPlayer, play at "<<Pos(x, y));
 						b.play(x, y);
 						return (x<<4)+y;
 					}

@@ -12,7 +12,7 @@
 
 #include "ai.h"
 
-#define HIDDEN_SIZE 20//隐藏层的节点个数
+#define HIDDEN_SIZE 64//隐藏层的节点个数
 typedef float real;
 
 #define EXP_TABLE_SIZE 1000			//sigmoid缓存表大小
@@ -44,6 +44,7 @@ class NeuralNetwork {
 		}
 
 		void train() {
+			log_warn("NeuralNetwork start training ...");
 			if (true) {
 				//			RandomAIPlayer black, white;
 				//			Game game(black, white);
@@ -54,11 +55,11 @@ class NeuralNetwork {
 				uint cnt=0;
 				for (pair<const Board, Choices>& entry : book) {
 					++cnt;
-					if (cnt%1000==0) log_status("processed: "<<cnt<<"/"<<total<<"="<<(float(cnt)/total));
+					if (cnt%10000==0) log_warn("trained: "<<cnt<<"/"<<total<<"="<<(float(cnt)/total));
 					const Board& board=entry.first;
 					Choices& choices=entry.second;
 
-					log_info(board);
+					log_debug(board);
 
 					//拷贝棋盘
 //					memcpy((void*)X, (const void*)board.map, 64);
@@ -71,13 +72,13 @@ class NeuralNetwork {
 						uint kk = pos.x * 8 + pos.y;
 						double score=choice.second;
 
-						log_info("train nwetwork from move:"<<Move(pos, board.turn)<<", score="<<score);
+						log_debug("train nwetwork from move:"<<Move(pos, board.turn)<<", score="<<score);
 
 						//将当前棋步作为训练数据
 						reset_hidden();
 
 						// X -> H : 每个隐藏层节点的值等于输入层向量 点乘 对应的权重向量
-						log_info("X -> H");
+						log_debug("X -> H");
 						for_n(j, HIDDEN_SIZE) {
 							H[j]=0;
 							for_n(i, 64) {
@@ -86,7 +87,7 @@ class NeuralNetwork {
 						}
 
 						// H -> Y : 每个输出层节点的值等于隐藏节点向量 点乘 对应的权重向量
-						log_info("H -> Y");
+						log_debug("H -> Y");
 						for_n(k, 64) {
 
 							real label;
@@ -108,10 +109,10 @@ class NeuralNetwork {
 							//计算梯度
 							real f=sigmoid(Y[k]);
 							double g = alpha * (label - f);
-							log_info("caculate label="<<label<<", f="<<f<<", g="<<g<<", alpha="<<alpha<<", move="<<Pos(move));
+							log_debug("caculate label="<<label<<", f="<<f<<", g="<<g<<", alpha="<<alpha<<", move="<<Pos(move));
 
 							//Y -> H: 计算误差向量,后向传播误差
-							log_info("Y -> H");
+							log_debug("Y -> H");
 							for_n(j, HIDDEN_SIZE) {
 								H_ERR[j] += g * HY[j][k];	
 							}
@@ -122,21 +123,60 @@ class NeuralNetwork {
 							}
 
 							//H -> X: 误差向量累加到输入到隐藏层权重向量 
-							log_info("H -> X");
+							log_debug("H -> X");
 							for_n(i, 64) {
 								for_n(j, HIDDEN_SIZE) {
 									XH[i][j] += H_ERR[j];
 								}
 							}
-
 						}
-
-
-
 					}
 				}
 			}
+			log_warn("NeuralNetwork finished training");
 		}
+
+	move_t predict(const Board& board) {
+		X = &(board.map[0][0]);
+
+		//将当前棋步作为训练数据
+		reset_hidden();
+
+		// X -> H : 每个隐藏层节点的值等于输入层向量 点乘 对应的权重向量
+		log_debug("X -> H");
+		for_n(j, HIDDEN_SIZE)
+		{
+			H[j] = 0;
+			for_n(i, 64)
+			{
+				H[j] += X[i] * XH[i][j];
+			}
+		}
+
+		// H -> Y : 每个输出层节点的值等于隐藏节点向量 点乘 对应的权重向量
+		log_debug("H -> Y");
+
+		real max_score=INT32_MIN;
+		uint best;
+
+		for_n(k, 64)
+		{
+			uint x=k/8, y=k%8;
+			if (! board.is_active(x, y)) continue;
+
+//			move_t move=Pos(k/8, k%8).tomove();
+			Y[k] = 0;
+			for_n(j, HIDDEN_SIZE)
+			{
+				Y[k] += H[j] * HY[j][k];
+			}
+			if (Y[k]>max_score) {
+				max_score=Y[k];
+				best=k;
+			}
+		}
+		return Pos(best/8, best%8).tomove();
+	}
 	
 	ostream& dump(ostream& o=cout) const {
 		o<<"===================NeuralNetwork==================="<<endl;
@@ -161,7 +201,7 @@ class NeuralNetwork {
 
 	private:
 		void reset() {
-			log_info("reset network");
+			log_debug("reset network");
 			//空子
 			for_n(i, 64) {
 //				X[i]=EMPTY;
@@ -181,7 +221,7 @@ class NeuralNetwork {
 		}
 
 		void reset_hidden() {
-			log_info("reset hidden node values");
+			log_debug("reset hidden node values");
 			for_n(i, HIDDEN_SIZE) {
 				H[i]=0;
 				H_ERR[i]=0;
@@ -226,10 +266,23 @@ private:
 
 public:
 	NeuralNetworkAIPlayer() {
+
+		log_warn("start generating big book, size="<<openings->book.size());
+		RandomAIPlayer player;//用于推演时随机下棋
+		//利用蒙特卡罗思想，开始随机下棋若干次
+		uint total=10000;
+		for_n(i, total) {
+			if (i%1000==0) log_warn("generated: "<<i<<"/"<<total<<"="<<(float(i)/total));
+			Game game(player, player);//举办一场比赛
+			game.start_expand_opening(openings->book);
+		}
+		log_warn("generated big book, size="<<openings->book.size());
+
 		network.train();
 	}
 
 	uchar play(Board& b) {
+		uchar self=b.turn;
 
 //		move_t opening_move=openings->lookup(b);
 //		if (opening_move!=PASS) {
@@ -238,20 +291,13 @@ public:
 //			return opening_move;
 //		}
 
-		uchar self=b.turn;
-		uint x, y;
-		do {
-			log_debug(b);
-			log_info(((self==BLACK)?"BLACK":"WHITE")<<" HumanPlayer, Please input point for play:");
-			clog<<"x=";
-			cin>>x;
-			clog<<"y=";
-			cin>>y;
-			cout<<endl;
-			log_info("(x, y)=("<<x<<", "<<y<<")");
+		move_t best_move=network.predict(b);
 
-		} while (x<8 and y<8 and b.play(x, y)==0);
-		return (x<<4)+y;
+		assert(best_move!=PASS);
+		uint x=best_move>>4, y=best_move&0x0F;
+		log_info(((self==BLACK)?"BLACK":"WHITE")<<" NeuralNetworkAIPlayer, play at "<<Pos(x, y));
+		b.play(x, y);
+		return best_move;
 	}
 };
 
