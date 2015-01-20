@@ -24,7 +24,7 @@ const static color BLACK=2;
 const static color ACTIVE=3;
 
 //获取对手的颜色
-#define OPPO(x) (ACTIVE-x)
+#define OPPO(x) (BLACK+WHITE-x)
 
 //8个方向
 typedef uchar byte;
