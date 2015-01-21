@@ -14,7 +14,10 @@
 #include "compiler.h"
 #include "types.h"
 #include "macros.h"
+#include "timer.h"
 #include "logging.h"
+#include "random.h"
+#include "thread.h"
 
 //standard libaries
 #include <stdio.h>

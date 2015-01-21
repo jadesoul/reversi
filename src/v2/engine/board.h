@@ -81,8 +81,6 @@ private:
 	//更新完毕后调用mobility()返回所有被激活的ACTIVE位置数，也就是行动力值
 	void update_possible_moves(color s);
 
-
-
 private:
 	//存放64个棋子状态，以及周边的3面墙
 	color data[MAP_SIZE];
@@ -103,21 +101,6 @@ private:
 //	uchar blink[BOARD_SIZE];//指示下一个白子在black数组中的下标
 };
 
-
 //Game用来控制游戏结束逻辑：如果有连续两次PASS，则游戏结束
-
-//#define SEARCH(DIRECTION) \
-//			p=DIRECTION(pos); \
-//			if (BOARD(p)==o) { \
-//				cnt=0; \
-//				while (BOARD(p)==o) { \
-//					p=DIRECTION(p); \
-//					++cnt; \
-//				} \
-//				if (BOARD(p)==EMPTY and cnt>0) { \
-//					BOARD(p)=ACTIVE; \
-//					++active; \
-//				} \
-//			}
 
 #endif /* BOARD_H_1421483226_58 */
