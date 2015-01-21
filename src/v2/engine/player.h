@@ -22,25 +22,4 @@ public:
 	virtual ~Player() {}
 };
 
-class HumanPlayer : public Player {
-public:
-	uchar play(Board& b) {
-		uchar self=b.turn;
-		uint x, y;
-		do {
-			log_debug(b);
-			log_info(((self==BLACK)?"BLACK":"WHITE")<<" HumanPlayer, Please input point for play:");
-			clog<<"x=";
-			cin>>x;
-			clog<<"y=";
-			cin>>y;
-			cout<<endl;
-			log_info("(x, y)=("<<x<<", "<<y<<")");
-
-		} while (x<8 and y<8 and b.play(x, y)==0);
-		return (x<<4)+y;
-	}
-};
-
-
 #endif /* PLAYER_H_1371915057_31 */
