@@ -55,6 +55,7 @@ public:
 	//在指定的位置放置指定颜色的棋子，检查是否合法
 	//若不合法则返回0，否则返回吃子数，吃子数一定不是0
 	uint play(int pos);
+	inline uint play(uint x, uint y) { return play(POS(x, y)); }
 
 	//撤销上一个Move
 	void undo();

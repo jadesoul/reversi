@@ -10,7 +10,7 @@
  * Written In: Alibaba-inc, Hangzhou, China
  */
 
-#include "bootstrap.h"
+#include "pypp/bootstrap.h"
 
 typedef uint color;
 
