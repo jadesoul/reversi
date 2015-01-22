@@ -8,9 +8,5 @@
  * Written In: Alibaba-inc, Hangzhou, China
  */
 
-#include <pypp.h>
-
-int main () {
-	cout<<"hello, world"<<endl;
-}
+#include "openingbook.h"
 

@@ -10,10 +10,33 @@
  * Written In: Alibaba-inc, Hangzhou, China
  */
 
-#include <pypp.h>
+#include "engine/player.h"
 
-int main () {
-	cout<<"hello, world"<<endl;
-}
+class OpeningBookPlayer : public Player {
+public:
+	uchar play(Board& b) {
 
+		move_t opening_move=openings->lookup(b);
+		if (opening_move!=PASS) {
+			assert(b.is_active(opening_move));
+			b.play(opening_move);
+			return opening_move;
+		}
+
+		uchar self=b.turn;
+		uint x, y;
+		do {
+			log_debug(b);
+			log_info(((self==BLACK)?"BLACK":"WHITE")<<" HumanPlayer, Please input point for play:");
+			clog<<"x=";
+			cin>>x;
+			clog<<"y=";
+			cin>>y;
+			cout<<endl;
+			log_info("(x, y)=("<<x<<", "<<y<<")");
+
+		} while (x<8 and y<8 and b.play(x, y)==0);
+		return (x<<4)+y;
+	}
+};
 #endif /* OPENINGBOOK_H_1421891844_15 */

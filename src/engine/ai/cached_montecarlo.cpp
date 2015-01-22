@@ -8,9 +8,6 @@
  * Written In: Alibaba-inc, Hangzhou, China
  */
 
-#include <pypp.h>
+#include "cached_montecarlo.h"
 
-int main () {
-	cout<<"hello, world"<<endl;
-}
 

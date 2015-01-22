@@ -10,10 +10,41 @@
  * Written In: Alibaba-inc, Hangzhou, China
  */
 
-#include <pypp.h>
+#include "engine/player.h"
 
-int main () {
-	cout<<"hello, world"<<endl;
-}
+//也是很简单的AI，随机选择一个可下子的位置下子
+//棋力灰常弱，可以作为Baseline
+class RandomAIPlayer : public AIPlayer {
+	Random random;
+public:
+	uchar play(Board& b) {
+		uchar self=b.turn;
+
+		log_debug(b);
+
+		uint mobility=b.mobility();
+		assert(mobility>=1);
+
+		//uint index=random.randint(1, mobility);
+
+		//optimize here:
+		uint index=1+random.randuint(mobility-1);
+
+		for_n(x, 8) {
+			for_n(y, 8) {
+				if (b.map[x][y]==ACTIVE) {
+					if (--index==0) {
+						log_info(((self==BLACK)?"BLACK":"WHITE")<<" RandomAIPlayer, play at "<<Pos(x, y));
+						b.play(x, y);
+						return (x<<4)+y;
+					}
+				}
+			}
+		}
+		assert(false);
+		return PASS;
+	}
+};
+
 
 #endif /* RANDOM_H_1421891813_43 */

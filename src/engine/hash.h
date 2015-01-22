@@ -10,10 +10,7 @@
  * Written In: Alibaba-inc, Hangzhou, China
  */
 
-#include <pypp.h>
+#include "common.h"
 
-int main () {
-	cout<<"hello, world"<<endl;
-}
 
 #endif /* HASH_H_1421891912_21 */
