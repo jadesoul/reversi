@@ -48,36 +48,6 @@ public:
 //optimized here:
 typedef Player AIPlayer;
 
-
-//最简单的AI，选择第一个可下子的位置下子
-class EasyAIPlayer : public AIPlayer {
-public:
-	uchar play(Board& b) {
-		uchar self=b.turn;
-
-		log_debug(b);
-
-		move_t opening_move=openings->lookup(b);
-		if (opening_move!=PASS) {
-			assert(b.is_active(opening_move));
-			b.play(opening_move);
-			return opening_move;
-		}
-
-		for_n(x, 8) {
-			for_n(y, 8) {
-				if (b.map[x][y]==ACTIVE) {
-					log_info(((self==BLACK)?"BLACK":"WHITE")<<" AIPlayer, play at ("<<x<<", "<<y<<")");
-					b.play(x, y);
-					return (x<<4)+y;
-				}
-			}
-		}
-		assert(false);
-		return PASS;
-	}
-};
-
 //也是很简单的AI，随机选择一个可下子的位置下子
 //棋力灰常弱，可以作为Baseline
 class RandomAIPlayer : public AIPlayer {
