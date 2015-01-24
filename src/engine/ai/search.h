@@ -11,6 +11,9 @@
  */
 
 #include "engine/player.h"
+#include "engine/state.h"
+#include "engine/game.h"
+#include "engine/score.h"
 
 
 
@@ -70,7 +73,8 @@ public:
 							best_move = move1;
 						}
 
-						if (IS_BAD_POS2(x1, y1)) {
+						pos_t p=POS(x1, y1);
+						if (BESIDE_GOOD_CORNER(p)) {
 							continue;
 						}
 
@@ -123,7 +127,7 @@ public:
 									} else { //搜索深度达到了
 										++total_meet_depth;
 //										current.update_score(0);
-										current.update_score(self==think.turn ? think.mobility() : -think.mobility());
+										current.update_score(self==think.get_current_turn() ? think.mobility() : -think.mobility());
 									}
 								}
 								current.next();
@@ -156,7 +160,7 @@ public:
 	}
 
 	uchar play_bfs(Board& b) {//广度优先搜索
-		uchar self=b.turn;
+		uchar self=b.turn();
 		log_debug(b);
 		log_status(b);
 
@@ -181,7 +185,7 @@ public:
 		//找出下子之后使得对方行动力最低的一步走法
 		for_n(x1, 8) {
 			for_n(y1, 8) {
-				if (b.map[x1][y1]==ACTIVE) {
+				if (b.is_active(x1, y1)) {
 					Board think1=b;
 					uchar move1=(x1<<4)+y1;//自己走法
 					uchar eat1=think1.play(x1, y1);//自己吃子数
@@ -251,7 +255,7 @@ public:
 									total_mobility_by_search+=score.win(self);
 								} else {
 									++total_meet_limit;
-									if (self==think.turn)
+									if (self==think.turn())
 										total_mobility_by_search+=think.mobility();
 									else
 										total_mobility_by_search-=think.mobility();

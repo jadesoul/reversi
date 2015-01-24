@@ -8,11 +8,11 @@
  * Written In: Alibaba-inc, Hangzhou, China
  */
 
+#include "openings.h"
+
 #include "player.h"
 #include "human.h"
 #include "game.h"
-
-#include "openings.h"
 
 OpeningBook::OpeningBook() {
 	load("/Users/jadesoul/git/reversi/data/openingslarge.txt");

@@ -14,15 +14,7 @@
 #include <time.h>
 //extern uint verbose;
 
-void get_now(char out[]) {
-	time_t now;
-	struct tm *tm_now;
-	time(&now);
-	tm_now = localtime(&now);
-	sprintf(out, "%d-%d-%d %d:%d:%d", tm_now->tm_year + 1900,
-			tm_now->tm_mon + 1, tm_now->tm_mday, tm_now->tm_hour,
-			tm_now->tm_min, tm_now->tm_sec);
-}
+void get_now(char out[]);
 
 //#define LOG_BEGIN char now[128]; get_now(now);
 #define LOG_BEGIN

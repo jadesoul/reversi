@@ -21,15 +21,12 @@ Score Game::start() {
 
 		if (mobility==0) {
 			board.pass();
-			++pass_cnt;
 		} else if (mobility==1) {
 			pos_t p=board.get_first_move();
 			assert(p!=PASS);
 			board.play(p);
-			pass_cnt=0;
 		} else {
 			player.play(board);
-			pass_cnt=0;
 		}
 	}
 

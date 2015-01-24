@@ -48,7 +48,7 @@ public:
 
 		for_n(x1, 8) {
 			for_n(y1, 8) {
-				if (b.map[x1][y1]==ACTIVE) {
+				if (b.is_active(x1, y1)) {
 					uchar move1=(x1<<4)+y1;//自己走法
 
 					//默认下法

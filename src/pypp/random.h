@@ -52,8 +52,5 @@ public:
 	}
 };
 
-uint Random::instance_cnt = 0;
-
-
 #endif /* RANDOM_H_1356527036_22 */
 

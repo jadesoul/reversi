@@ -20,18 +20,17 @@ private:
 	Player& black;
 	Player& white;
 	Board board;
-	uint pass_cnt;
 	
 public:
 	Game(Player& self):
-		black(self), white(self), pass_cnt(0) {}
+		black(self), white(self) {}
 	Game(Player& black, Player& white):
-		black(black), white(white), pass_cnt(0) {}
+		black(black), white(white) {}
 	Game(Player& black, Player& white, Board& board):
-		black(black), white(white), board(board), pass_cnt(0) {}
+		black(black), white(white), board(board) {}
 	
-	//无子可下，或者连续两次PASS
-	inline bool game_over() { return board.empty_cnt()==0 or pass_cnt>=2; }
+	//游戏是否结束
+	inline bool game_over() { return board.game_over(); }
 
 	//开始一盘游戏，直到结束，返回比分对象
 	Score start();

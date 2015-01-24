@@ -116,6 +116,7 @@ void Board::pass() {
 	assert(total[ACTIVE]==0);
 	color oppo = OPPO(get_current_turn());	//交换下子方
 	update_possible_moves(oppo);
+	++total[PASS];//累加PASS次数
 }
 
 int Board::get_first_move() {
@@ -173,7 +174,7 @@ uint Board::play(int pos) {
 	total[s] += eat;
 
 	update_possible_moves(o);
-
+	total[PASS]=0;//清空连续PASS次数
 	return eat;
 }
 
@@ -228,6 +229,7 @@ void Board::init_from_str(const string& query) {
 	total[EMPTY] = 0;
 	total[BLACK] = 0;
 	total[WHITE] = 0;
+	total[PASS] = 0;
 	for_n(x, 8)
 	{
 		for_n(y, 8)
@@ -279,6 +281,7 @@ void Board::init_board_map() {
 	total[WHITE]=2;//白子总数
 	total[BLACK]=2;//黑子总数
 	total[ACTIVE]=4;//激活空格数
+	total[PASS] = 0;
 
 	//	memset(blink, END, BOARD_SIZE);
 	//	memset(wlink, END, BOARD_SIZE);

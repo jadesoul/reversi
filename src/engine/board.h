@@ -24,8 +24,12 @@ public:
 	inline uchar empty_cnt() const { return total[EMPTY]; }
 	inline uchar black_cnt() const { return total[BLACK]; }
 	inline uchar white_cnt() const { return total[WHITE]; }
+	inline uchar pass_cnt() const { return total[PASS]; }
 	inline bool is_active(uchar x, uchar y) const { return is_active(POS(x, y)); }
 	inline bool is_active(int pos) const { return BOARD(pos)==ACTIVE; }
+
+	//无子可下，或者连续两次PASS
+	inline bool game_over() { return empty_cnt()==0 or pass_cnt()>=2; }
 
 	//用于比较排序, map存储等
 	bool operator <(const Board& another) const;
@@ -66,6 +70,7 @@ public:
 
 	//根据历史数组判断当前轮谁下
 	color get_current_turn() const;
+	inline color turn() const { return get_current_turn(); }
 
 	//从包含65字节的字符串初始化, 棋盘(64字节)，下子方(1字节)
 	//为游戏引擎提供此接口
@@ -73,7 +78,6 @@ public:
 private:
 	//开局时，初始化棋盘
 	void init_board_map();
-
 
 	//清除局面上所有的ACTIVE状态
 	void clear_active_states();
@@ -88,7 +92,8 @@ private:
 	color data[MAP_SIZE];
 
 	//存放4种颜色棋子的个数并动态更新，其中ACTIVE的个数与EMPTY个数重叠
-	uint total[4];
+	//total[PASS=4]存放当前棋局已有几次连续PASS MOVE
+	uchar total[5];
 
 	//下子历史，包括位置和颜色，约定PASS MOVE不放到历史中
 	//如果有连续两个Move的color相同，说明对手PASS了

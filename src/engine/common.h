@@ -24,7 +24,8 @@ typedef map<pos_t, double> Choices;
 #define ACTIVE	1//激活状态，可下子
 #define WHITE	2//白子
 #define BLACK	3//黑子
-#define WALL	4//墙壁，用于判断棋子出界
+#define PASS	4//代表无子可下
+#define WALL	5//墙壁，用于判断棋子出界
 
 //给定自己棋子的颜色，获取对手的颜色
 #define OPPO(c) (BLACK+WHITE-(c))
@@ -63,7 +64,6 @@ typedef map<pos_t, double> Choices;
 #define DELTA(di, dj)	((di) * MAP_WIDTH + (dj))
 #define I(pos)			((pos) / MAP_WIDTH - 1)
 #define J(pos)			((pos) % MAP_WIDTH - 1)
-#define PASS			0
 #define ERROR_POS		MAP_SIZE
 #define N				(-MAP_WIDTH)
 #define S				MAP_WIDTH
