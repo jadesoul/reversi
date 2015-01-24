@@ -22,7 +22,7 @@ public:
 //			return play_dfs(b);
 //		}
 
-		uchar self=b.turn;
+		uchar self=b.get_current_turn();
 		log_debug(b);
 
 		move_t opening_move = openings->lookup(b);
@@ -40,7 +40,7 @@ public:
 
 		for_n(x, 8) {
 			for_n(y, 8) {
-				if (b.map[x][y]==ACTIVE) {
+				if (b.is_active(x, y)) {
 					Board think=b;
 					uchar move=(x<<4)+y;//走法
 
@@ -63,7 +63,8 @@ public:
 						goto play1;
 					}
 
-					if (IS_BAD_POS2(x, y)) {
+					pos_t p=POS(x, y);
+					if (BESIDE_GOOD_CORNER(p)) {
 						continue;
 					}
 

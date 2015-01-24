@@ -11,13 +11,14 @@
  */
 
 #include "engine/player.h"
+#include "search.h"
 
 //向后看2步棋的AI
 //class Look2AIPlayer : public AIPlayer {
 class Look2AIPlayer : public LookNAIPlayer {
 public:
 	uchar play(Board& b) {
-		uchar self=b.turn;
+		uchar self=b.get_current_turn();
 		log_debug(b);
 
 		if (b.empty_cnt() <= 10) {
@@ -69,8 +70,8 @@ public:
 						goto play;
 					}
 
-//					if (IS_BAD_MOVE(move1)) {
-					if (IS_BAD_POS2(x1, y1)) {
+					pos_t p=POS(x1, y1);
+					if (BESIDE_GOOD_CORNER(p)) {
 						continue;
 					}
 
@@ -80,12 +81,14 @@ public:
 					bool oppo_has_good_move=false;
 					for_n(x2, 8) {
 						for_n(y2, 8) {
-							if (think1.map[x2][y2]==ACTIVE) {
+							if (think1.is_active(x2, y2)) {
 								Board think2=think1;
 								uchar move2=(x2<<4)+y2;//对手走法
-								if (IS_GOOD_MOVE(move2)) {
+								pos_t p2=POS(x2, y2);
+								if (IS_GOOD_CORNER(p2)) {
 									oppo_has_good_move=true;
 								}
+
 								uchar eat2=think2.play(x2, y2);//对手吃子数
 								uchar mobility2=think2.mobility();//自己行动力
 								total_mobility2+=mobility2;

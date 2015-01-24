@@ -42,7 +42,7 @@ public:
 	}
 
 	uchar play_dfs(Board& b) {//深度优先搜索
-		uchar self=b.turn;
+		uchar self=b.get_current_turn();
 		log_status(b);
 
 		uchar best_move=PASS;
@@ -62,7 +62,7 @@ public:
 			//找出下子之后使得对方行动力最低的一步走法
 			for_n(x1, 8) {
 				for_n(y1, 8) {
-					if (b.map[x1][y1]==ACTIVE) {
+					if (b.is_active(x1, y1)) {
 						uchar move1=(x1<<4)+y1;//自己走法
 
 						//默认下法

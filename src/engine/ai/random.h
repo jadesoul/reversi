@@ -18,7 +18,7 @@ class RandomAIPlayer : public AIPlayer {
 	Random random;
 public:
 	uchar play(Board& b) {
-		uchar self=b.turn;
+		uchar self=b.get_current_turn();
 
 		log_debug(b);
 
@@ -32,7 +32,7 @@ public:
 
 		for_n(x, 8) {
 			for_n(y, 8) {
-				if (b.map[x][y]==ACTIVE) {
+				if (b.is_active(x, y)) {
 					if (--index==0) {
 						log_info(((self==BLACK)?"BLACK":"WHITE")<<" RandomAIPlayer, play at "<<Pos(x, y));
 						b.play(x, y);

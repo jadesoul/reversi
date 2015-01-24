@@ -23,7 +23,7 @@ public:
 			return opening_move;
 		}
 
-		uchar self=b.turn;
+		uchar self=b.get_current_turn();
 		uint x, y;
 		do {
 			log_debug(b);

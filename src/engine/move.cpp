@@ -10,8 +10,8 @@
 
 #include "move.h"
 
-Move::Move(const char* two_bytes[2]) :
-		turn(BLACK), pos(PASS) {
+Move::Move(const char two_bytes[2]) :
+		turn(EMPTY), pos(ERROR_POS) {
 	char h = two_bytes[0]; //水平方向
 	char v = two_bytes[1]; //垂直方向
 	if (v >= '1' and v <= '8') {
@@ -27,7 +27,7 @@ Move::Move(const char* two_bytes[2]) :
 	}
 }
 
-ostream& Move::dump(ostream& o = cout) const {
+ostream& Move::dump(ostream& o) const {
 	if (pos == PASS)
 		return o << (turn == BLACK ? "PASS" : "pass");
 	char base = (turn == BLACK ? 'A' : 'a');

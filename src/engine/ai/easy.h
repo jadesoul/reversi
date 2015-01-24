@@ -16,11 +16,11 @@
 class EasyAIPlayer : public AIPlayer {
 public:
 	uchar play(Board& b) {
-		uchar self=b.turn;
+		uchar self=b.get_current_turn();
 
 		log_debug(b);
 
-		move_t opening_move=openings->lookup(b);
+		pos_t opening_move=openings->lookup(b);
 		if (opening_move!=PASS) {
 			assert(b.is_active(opening_move));
 			b.play(opening_move);
@@ -29,7 +29,7 @@ public:
 
 		for_n(x, 8) {
 			for_n(y, 8) {
-				if (b.map[x][y]==ACTIVE) {
+				if (b.is_active(x, y)) {
 					log_info(((self==BLACK)?"BLACK":"WHITE")<<" AIPlayer, play at ("<<x<<", "<<y<<")");
 					b.play(x, y);
 					return (x<<4)+y;

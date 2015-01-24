@@ -11,6 +11,8 @@
  */
 
 #include "engine/player.h"
+#include "random.h"
+#include "engine/game.h"
 
 //利用开局库缓存 + 蒙特卡罗搜索算法
 class CachedMonteCarloAIPlayer : public AIPlayer {
@@ -32,10 +34,10 @@ public:
 			generate_big_book();
 		}
 
-		uchar self=board.turn;
+		uchar self=board.get_current_turn();
 		log_debug(board);
 
-		move_t opening_move=openings->lookup(board);
+		pos_t opening_move=openings->lookup(board);
 		if (opening_move!=PASS) {
 			assert(board.is_active(opening_move));
 			board.play(opening_move);
@@ -47,7 +49,7 @@ public:
 
 		for_n(x, 8) {
 			for_n(y, 8) {
-				if (board.map[x][y]==ACTIVE) {//针对每个落子点
+				if (board.is_active(x, y)) {//针对每个落子点
 					// log_warn("MonteCarloAIPlayer: try @ ("<<x<<", "<<y<<")");
 
 					Board think=board;

@@ -56,6 +56,7 @@ public:
 	//若不合法则返回0，否则返回吃子数，吃子数一定不是0
 	uint play(int pos);
 	inline uint play(uint x, uint y) { return play(POS(x, y)); }
+	inline uint play(const Move& move) { return play(move.pos); }
 
 	//撤销上一个Move
 	void undo();
@@ -63,19 +64,19 @@ public:
 	//返回所有与c的棋子相邻的空格个数,也就是潜在行动力
 	uint potential_mobility(color c);
 
-private:
-	//开局时，初始化棋盘
-	void init_board_map();
+	//根据历史数组判断当前轮谁下
+	color get_current_turn() const;
 
 	//从包含65字节的字符串初始化, 棋盘(64字节)，下子方(1字节)
 	//为游戏引擎提供此接口
 	void init_from_str(const string& query);
+private:
+	//开局时，初始化棋盘
+	void init_board_map();
+
 
 	//清除局面上所有的ACTIVE状态
 	void clear_active_states();
-
-	//根据历史数组判断当前轮谁下
-	color get_current_turn() const;
 
 	//给定本次已经下子的落子方颜色
 	//重新生成（更新）局面上所有的ACTIVE位置
@@ -101,7 +102,5 @@ private:
 //	uchar black[BOARD_SIZE];//存放所有已下黑子的pos, 最多64个
 //	uchar blink[BOARD_SIZE];//指示下一个白子在black数组中的下标
 };
-
-//Game用来控制游戏结束逻辑：如果有连续两次PASS，则游戏结束
 
 #endif /* BOARD_H_1421483226_58 */

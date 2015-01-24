@@ -27,6 +27,7 @@ using std::ostringstream;
 #ifdef OS_WIN32
 #include <process.h>
 #else
+#include <unistd.h>
 #include <pthread.h>
 #include <semaphore.h>
 #endif

@@ -17,8 +17,19 @@ struct Move {
 	color turn;
 	int pos;
 
-	Move(color turn=BLACK, int pos=PASS):turn(turn), pos(PASS) {}
-	Move(const char* two_bytes[2]);
+	Move(color turn=BLACK, int pos=PASS):turn(turn), pos(pos) {}
+	Move(const char two_bytes[2]);
+
+	inline bool is_illegal_move() { return turn==EMPTY and pos==ERROR_POS; }
+
+	//将位置按照xy夹角对应的对角线镜像变换
+	inline void mirror_xy() { pos=MIRROR_XY(pos); }
+
+	//将位置按照左下-右上对角线镜像变换
+	inline void mirror_ldru() { pos=MIRROR_IJ(pos); }
+
+	//将位置按照左下-右上对角线镜像变换，同时按照xy夹角对应的对角线镜像变换
+	inline void mirror_ldru_xy() { pos=MIRROR_IY(pos); }
 
 	ostream& dump(ostream& o=cout) const;
 	friend inline ostream& operator<<(ostream& o, const Move& m) { return m.dump(o); }

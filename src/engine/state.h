@@ -20,52 +20,16 @@ public:
 	double		score;	//评估函数：当前节点的分数
 
 public:
-	State(const Board& board) {
-		this->board=board;
-		uchar mobility=board.mobility();
-		if (mobility==0) {
-			moves.push_back(PASS);
-		} else {
-			for_n(x1, 8) {
-				for_n(y1, 8) {
-					if (board.map[x1][y1]==ACTIVE) {
-						uchar move=(x1<<4)+y1;//自己走法
-						moves.push_back(move);
-					}
-				}
-			}
-			std::random_shuffle(moves.begin(), moves.end());
-			assert(moves.size()==mobility);
-		}
-		index=0;
-		score=0;
-	}
+	State(const Board& board);
 
-	inline void update_score(double child_score) {//根据某个孩子状态的分数更新当前状态的分数
-		if (child_score>score) score=child_score;
-//		if (child_score>score) score=(score+child_score)/2;
-//		if (child_score>score) score=(2*score+child_score)/3;
-//		if (child_score>score) score=(score+2*child_score)/3;
+	//根据某个孩子状态的分数更新当前状态的分数
+	void update_score(double child_score);
 
-		// score=(score+child_score)/2;
+	inline bool end() { return !(index<moves.size()); }
 
-//		score+=child_score/moves.size();
+	inline void next() { ++index; }
 
-//		score+=child_score;
-	}
-
-	bool end() {
-		return !(index<moves.size());
-	}
-
-	void next() {
-		++index;
-	}
-
-	uchar get_move() {
-		assert(!end());
-		return moves[index];
-	}
+	inline uchar get_move() { assert(!end()); return moves[index]; }
 };
 
 #endif /* STATE_H_1421891892_98 */

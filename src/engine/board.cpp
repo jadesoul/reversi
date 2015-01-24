@@ -62,7 +62,7 @@ void Board::mirror_ldru_xy() {
 	mirror_xy();
 }
 
-ostream& Board::dump(ostream& o = cout) const {
+ostream& Board::dump(ostream& o) const {
 	color turn = get_current_turn();
 	char h = (turn == BLACK ? 'A' : 'a');
 	o << endl << '+' << ' ';
@@ -172,7 +172,7 @@ uint Board::play(int pos) {
 	total[o] -= eat;
 	total[s] += eat;
 
-	update_possible_moves(turn);
+	update_possible_moves(o);
 
 	return eat;
 }
@@ -213,6 +213,50 @@ uint Board::potential_mobility(color c) {
 #endif
 }
 
+color Board::get_current_turn() const {
+	int pointer = (60 - 1) - total[EMPTY];	//指向历史中的最后一个有效元素
+	color turn;
+	if (pointer == -1)
+		turn=BLACK;	//开局黑先
+	else
+		turn=OPPO(history[pointer].turn);	//上一手的对手
+	return turn;
+}
+
+void Board::init_from_str(const string& query) {
+	assert(query.size() == 65);
+	total[EMPTY] = 0;
+	total[BLACK] = 0;
+	total[WHITE] = 0;
+	for_n(x, 8)
+	{
+		for_n(y, 8)
+		{
+			uint i = x * 8 + y;
+			int pos=POS(x, y);
+			char c = query[i];
+			if (c == '.') {
+				BOARD(pos) = EMPTY;
+				total[EMPTY] += 1;
+			} else if (c == 'X') {	//代表 BLACK
+				BOARD(pos) = BLACK;
+				total[BLACK] += 1;
+			} else if (c == 'O') {	//代表 WHITE
+				BOARD(pos) = WHITE;
+				total[WHITE] += 1;
+			} else
+				assert(false);
+		}
+	}
+	color turn = (query[64] == 'X') ? BLACK : WHITE;
+
+	int pointer = (60 - 1) - total[EMPTY];	//指向历史中的最后一个有效元素
+	if (pointer >= 0)
+		history[pointer].turn = OPPO(turn);	//只能恢复到上一次下子时的颜色
+
+	update_possible_moves(turn);
+}
+
 void Board::init_board_map() {
 	for_n(pos, MAP_SIZE)
 	{
@@ -246,38 +290,6 @@ void Board::init_board_map() {
 	//	wlink[OFFSET(4, 3)]=END;
 }
 
-void Board::init_from_str(const string& query) {
-	assert(query.size() == 65);
-	total[EMPTY] = 0;
-	total[BLACK] = 0;
-	total[WHITE] = 0;
-	for_n(x, 8)
-	{
-		for_n(y, 8)
-		{
-			uint i = x * 8 + y;
-			char c = query[i];
-			if (c == '.') {
-				map[x][y] = EMPTY;
-				total[EMPTY] += 1;
-			} else if (c == 'X') {	//代表 BLACK
-				map[x][y] = BLACK;
-				total[BLACK] += 1;
-			} else if (c == 'O') {	//代表 WHITE
-				map[x][y] = WHITE;
-				total[WHITE] += 1;
-			} else
-				assert(false);
-		}
-	}
-	color turn = (query[64] == 'X') ? BLACK : WHITE;
-
-	int pointer = (60 - 1) - total[EMPTY];	//指向历史中的最后一个有效元素
-	if (pointer >= 0)
-		history[pointer].turn = OPPO(turn);	//只能恢复到上一次下子时的颜色
-
-	update_possible_moves(turn);
-}
 
 void Board::clear_active_states() {	//TODO: 将所有激活状态的棋子记录下来
 	for (int i = FIRST; i < LAST; ++i)
@@ -286,15 +298,7 @@ void Board::clear_active_states() {	//TODO: 将所有激活状态的棋子记录
 	total[ACTIVE] = 0;
 }
 
-color Board::get_current_turn() const {
-	int pointer = (60 - 1) - total[EMPTY];	//指向历史中的最后一个有效元素
-	color turn;
-	if (pointer == -1)
-		turn=BLACK;	//开局黑先
-	else
-		turn=OPPO(history[pointer].turn);	//上一手的对手
-	return turn;
-}
+
 
 void Board::update_possible_moves(color s) {
 	clear_active_states();	//先清除状态

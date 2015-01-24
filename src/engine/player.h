@@ -11,6 +11,7 @@
  */
 
 #include "board.h"
+#include "openings.h"
 
 //所有玩家的抽象基类
 class Player {
@@ -21,5 +22,11 @@ public:
 	virtual void reset() {}
 	virtual ~Player() {}
 };
+
+//所有AI的基类
+//class AIPlayer : public Player {};
+
+//optimized here:
+typedef Player AIPlayer;
 
 #endif /* PLAYER_H_1371915057_31 */

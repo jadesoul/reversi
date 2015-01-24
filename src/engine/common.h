@@ -12,7 +12,11 @@
 
 #include "pypp/bootstrap.h"
 
-typedef uint color;
+typedef uchar color;//颜色
+typedef uchar pos_t;//位置
+typedef pos_t move_t;
+//代表在当前局面下，在每个位置下一步棋，当前下子方最终赢得棋子数的期望(大于0赢棋，小于0输棋)
+typedef map<pos_t, double> Choices;
 
 //棋子的颜色状态
 #define DRAW	0//平局
@@ -60,6 +64,7 @@ typedef uint color;
 #define I(pos)			((pos) / MAP_WIDTH - 1)
 #define J(pos)			((pos) % MAP_WIDTH - 1)
 #define PASS			0
+#define ERROR_POS		MAP_SIZE
 #define N				(-MAP_WIDTH)
 #define S				MAP_WIDTH
 #define W				(-1)
@@ -138,6 +143,8 @@ typedef uint color;
 #define IS_RU_CORNER(pos)			((pos)==RU)
 #define IS_LD_CORNER(pos)			((pos)==LD)
 #define IS_RD_CORNER(pos)			((pos)==RD)
+
+//用于判断是否是四个角上的好手位置上
 #define IS_GOOD_CORNER(pos)			(IS_LU_CORNER(pos) \
 									|| IS_RU_CORNER(pos) \
 									|| IS_LD_CORNER(pos) \
@@ -161,6 +168,7 @@ typedef uint color;
 #define BESIDE_LD_CORNER(pos)		((pos)==LD1 or (pos)==LD2 or (pos)==LD3)
 #define BESIDE_RD_CORNER(pos)		((pos)==RD1 or (pos)==RD2 or (pos)==RD3)
 
+//用于判断是否是与四个角相邻的12个坏手位置上
 #define BESIDE_GOOD_CORNER(pos)		(BESIDE_LU_CORNER(pos) \
 									|| BESIDE_RU_CORNER(pos) \
 									|| BESIDE_LD_CORNER(pos) \
@@ -191,5 +199,14 @@ typedef uint color;
 #define MIN(a, b) ((a)<(b) ? (a) : (b))
 #define MAX(a, b) ((a)<(b) ? (b) : (a))
 
+//8个方向
+#define RIGHT		0
+#define RIGHT_DOWN	1
+#define DOWN		2
+#define LEFT_DOWN	3
+#define LEFT		4
+#define LEFT_UP		5
+#define UP			6
+#define RIGHT_UP	7
 
 #endif /* COMMON_H_1421849265_74 */

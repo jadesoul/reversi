@@ -14,12 +14,6 @@
 #include "game.h"
 #include "openings.h"
 
-//所有AI的基类
-//class AIPlayer : public Player {};
-
-//optimized here:
-typedef Player AIPlayer;
-
 #include "ai/easy.h"
 #include "ai/random.h"
 #include "ai/look1.h"

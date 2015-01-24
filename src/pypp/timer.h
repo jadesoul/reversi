@@ -10,6 +10,7 @@
  * Written In: Alibaba-inc, Hangzhou, China
  */
 
+#include <limits>
 #include <ctime>
 
 class timer {

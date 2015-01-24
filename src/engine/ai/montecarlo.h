@@ -13,7 +13,7 @@
 #include "engine/player.h"
 #include "engine/game.h"
 #include "engine/openings.h"
-
+#include "random.h"
 
 //利用蒙特卡罗搜索算法找出赢棋概率最大的走法
 //基本思想:
@@ -23,7 +23,7 @@
 class MonteCarloAIPlayer : public AIPlayer {
 public:
 	uchar play(Board& board) {
-		uchar self=board.turn;
+		uchar self=board.get_current_turn();
 		log_debug(board);
 
 		move_t opening_move=openings->lookup(board);
@@ -38,7 +38,7 @@ public:
 
 		for_n(x, 8) {
 			for_n(y, 8) {
-				if (board.map[x][y]==ACTIVE) {//针对每个落子点
+				if (board.is_active(x, y)) {//针对每个落子点
 					// log_warn("MonteCarloAIPlayer: try @ ("<<x<<", "<<y<<")");
 
 					Board think=board;
