@@ -11,7 +11,8 @@
 #include "look1.h"
 
 pos_t Look1AIPlayer::play(Board& board) {
-	log_debug(b);
+	log_debug(board);
+	assert(board.mobility()>=2);
 
 	pos_t pos=OpeningBookPlayer::play(board);
 	if (pos!=PASS) return pos;
@@ -20,9 +21,6 @@ pos_t Look1AIPlayer::play(Board& board) {
 	int min_mobility=INT32_MAX;
 
 	//找出下子之后使得对方行动力最低的一步走法
-	size_t mobility=board.mobility();
-	assert(mobility>=2);
-
 	for (pos_t pos = FIRST; pos < LAST; ++pos) {
 		if (board.is_active(pos)) {
 			Board think=board;

@@ -14,10 +14,10 @@
 
 class State {
 public:
-	Board 		board;	//当前棋局
-	vector<uchar> 	moves;	//当前棋局下所有可能的下法
-	uchar 		index;	//已经处理到了第几种下法
-	double		score;	//评估函数：当前节点的分数
+	Board 			board;	//当前棋局
+	vector<pos_t> 	moves;	//当前棋局下所有可能的下法
+	uchar 			index;	//已经处理到了第几种下法
+	double			score;	//评估函数：当前节点的分数
 
 public:
 	State(const Board& board);
@@ -29,7 +29,7 @@ public:
 
 	inline void next() { ++index; }
 
-	inline uchar get_move() { assert(!end()); return moves[index]; }
+	inline pos_t get_move() { assert(!end()); return moves[index]; }
 };
 
 #endif /* STATE_H_1421891892_98 */

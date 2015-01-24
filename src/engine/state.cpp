@@ -12,18 +12,13 @@
 
 State::State(const Board& board) {
 	this->board = board;
-	uchar mobility = board.mobility();
+	size_t mobility = board.mobility();
 	if (mobility == 0) {
 		moves.push_back(PASS);
 	} else {
-		for_n(x1, 8)
-		{
-			for_n(y1, 8)
-			{
-				if (board.is_active(x1, y1)) {
-					uchar move = (x1 << 4) + y1; //自己走法
-					moves.push_back(move);
-				}
+		for (pos_t pos = FIRST; pos < LAST; ++pos) {
+			if (board.is_active(pos)) {
+				moves.push_back(pos);
 			}
 		}
 		std::random_shuffle(moves.begin(), moves.end());
