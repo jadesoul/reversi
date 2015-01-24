@@ -10,36 +10,12 @@
  * Written In: Alibaba-inc, Hangzhou, China
  */
 
-#include "engine/player.h"
+#include "book.h"
 
 //最简单的AI，选择第一个可下子的位置下子
-class EasyAIPlayer : public AIPlayer {
+class EasyAIPlayer : public OpenBookPlayer {
 public:
-	uchar play(Board& b) {
-		uchar self=b.get_current_turn();
-
-		log_debug(b);
-
-		pos_t opening_move=openings->lookup(b);
-		if (opening_move!=PASS) {
-			assert(b.is_active(opening_move));
-			b.play(opening_move);
-			return opening_move;
-		}
-
-		for_n(x, 8) {
-			for_n(y, 8) {
-				if (b.is_active(x, y)) {
-					log_info(((self==BLACK)?"BLACK":"WHITE")<<" AIPlayer, play at ("<<x<<", "<<y<<")");
-					b.play(x, y);
-					return (x<<4)+y;
-				}
-			}
-		}
-		assert(false);
-		return PASS;
-	}
+	virtual pos_t play(Board& board);
 };
-
 
 #endif /* EASY_H_1421891030_52 */

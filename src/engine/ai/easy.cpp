@@ -9,3 +9,17 @@
  */
 
 #include "easy.h"
+
+pos_t EasyAIPlayer::play(Board& board) {
+	uchar self=board.turn();
+
+	log_debug(board);
+
+	pos_t pos=OpenBookPlayer::play(board);
+	if (pos!=PASS) return pos;
+
+	pos=board.first();
+	log_info(COLOR(self)<<" EasyAIPlayer, play at "<<Move(self, pos));
+	board.play(pos);
+	return pos;
+}

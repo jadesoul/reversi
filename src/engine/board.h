@@ -54,11 +54,13 @@ public:
 	void pass();
 
 	//获取第一个可以下子的位置
-	int get_first_move();
+	pos_t get_first_move() const;
+	inline pos_t first() const { return this->get_first_move(); }
 
 	//在指定的位置放置指定颜色的棋子，检查是否合法
 	//若不合法则返回0，否则返回吃子数，吃子数一定不是0
 	uint play(int pos);
+
 	inline uint play(uint x, uint y) { return play(POS(x, y)); }
 	inline uint play(const Move& move) { return play(move.pos); }
 
@@ -70,7 +72,7 @@ public:
 
 	//根据历史数组判断当前轮谁下
 	color get_current_turn() const;
-	inline color turn() const { return get_current_turn(); }
+	inline color turn() const { return this->get_current_turn(); }
 
 	//从包含65字节的字符串初始化, 棋盘(64字节)，下子方(1字节)
 	//为游戏引擎提供此接口

@@ -19,6 +19,7 @@ struct Move {
 
 	Move(color turn=BLACK, int pos=PASS):turn(turn), pos(pos) {}
 	Move(const char two_bytes[2]);
+	Move(const string& s):Move(s.c_str()) {}
 
 	inline bool is_illegal_move() { return turn==EMPTY and pos==ERROR_POS; }
 

@@ -14,7 +14,7 @@
 
 class HumanPlayer : public Player {
 public:
-	uchar play(Board& b);
+	virtual pos_t play(Board& board);
 };
 
 #endif /* HUMAN_H_1421852298_01 */

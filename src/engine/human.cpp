@@ -10,19 +10,17 @@
 
 #include "human.h"
 
-uchar HumanPlayer::play(Board& b) {
-	color self=b.get_current_turn();
-	uint x, y;
+pos_t HumanPlayer::play(Board& board) {
+	color self = board.turn();
+	Move m;
 	do {
-		log_debug(b);
-		log_info(((self==BLACK)?"BLACK":"WHITE")<<" HumanPlayer, Please input point for play:");
-		clog<<"x=";
-		cin>>x;
-		clog<<"y=";
-		cin>>y;
-		cout<<endl;
-		log_info("(x, y)=("<<x<<", "<<y<<")");
-
-	} while (x<8 and y<8 and b.play(x, y)==0);
-	return (x<<4)+y;
+		log_debug(board);
+		log_info(COLOR(self)<<" HumanPlayer, Please input point for play:");
+		clog << "move=";
+		string s;
+		cin >> s;
+		m = Move(s);
+		cout << endl;
+	} while (!m.is_illegal_move() or board.play(m.pos) == 0);
+	return m.pos;
 }

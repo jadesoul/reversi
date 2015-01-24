@@ -119,7 +119,7 @@ void Board::pass() {
 	++total[PASS];//累加PASS次数
 }
 
-int Board::get_first_move() {
+pos_t Board::get_first_move() {
 	for (int pos = FIRST; pos < LAST; ++pos) {
 		if (BOARD(pos)==ACTIVE) return pos;
 	}
