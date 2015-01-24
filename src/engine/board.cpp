@@ -38,7 +38,7 @@ void Board::mirror_xy() {
 		{
 			if (x >= y)
 				continue;
-			int pos = POS(x, y);
+			pos_t pos = POS(x, y);
 			swap(data[pos], data[MIRROR_XY(pos)]);
 		}
 	}
@@ -51,7 +51,7 @@ void Board::mirror_ldru() {
 		{
 			if (x + y >= 7)
 				continue;
-			int pos = POS(x, y);
+			pos_t pos = POS(x, y);
 			swap(data[pos], data[MIRROR_IJ(pos)]);
 		}
 	}
@@ -120,7 +120,7 @@ void Board::pass() {
 }
 
 pos_t Board::get_first_move() const {
-	for (int pos = FIRST; pos < LAST; ++pos) {
+	for (pos_t pos = FIRST; pos < LAST; ++pos) {
 		if (BOARD(pos)==ACTIVE) return pos;
 	}
 	return PASS;
@@ -188,7 +188,7 @@ size_t Board::potential_mobility(color c) {
 #define USE_ALGORITHM_2
 #ifdef USE_ALGORITHM_1
 	std::set<int> poss;
-	for (int pos=FIRST; pos<LAST; ++pos) {
+	for (pos_t pos=FIRST; pos<LAST; ++pos) {
 		if (BOARD(pos)==c) {
 
 #define FIND_EMPTY_OR_ACTIVE(DIRECTION) \
@@ -203,7 +203,7 @@ size_t Board::potential_mobility(color c) {
 	return poss.size();
 #else
 	size_t cnt = 0;
-	for (int pos = FIRST; pos < LAST; ++pos) {
+	for (pos_t pos = FIRST; pos < LAST; ++pos) {
 		if (IS_EMPTY_OR_ACTIVE(pos)) {
 			if (NEIGHBOR_HAS_COLOR(pos, c)) {
 				++cnt;
@@ -295,7 +295,7 @@ void Board::init_board_map() {
 
 
 void Board::clear_active_states() {	//TODO: 将所有激活状态的棋子记录下来
-	for (int i = FIRST; i < LAST; ++i)
+	for (pos_t i = FIRST; i < LAST; ++i)
 		if (data[i] == ACTIVE)
 			data[i] = EMPTY;
 	total[ACTIVE] = 0;
@@ -307,7 +307,7 @@ void Board::update_possible_moves(color s) {
 	clear_active_states();	//先清除状态
 	uint active = 0;	//激活状态数=行动力值
 
-	for (int pos = FIRST; pos < LAST; ++pos) {
+	for (pos_t pos = FIRST; pos < LAST; ++pos) {
 		color c = BOARD(pos);
 		if (c != s)
 			continue;	//寻找所有自己的子

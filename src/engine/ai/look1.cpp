@@ -23,7 +23,7 @@ pos_t Look1AIPlayer::play(Board& board) {
 	size_t mobility=board.mobility();
 	assert(mobility>=2);
 
-	for (int pos = FIRST; pos < LAST; ++pos) {
+	for (pos_t pos = FIRST; pos < LAST; ++pos) {
 		if (board.is_active(pos)) {
 			Board think=board;
 

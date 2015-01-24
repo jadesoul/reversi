@@ -18,5 +18,4 @@ public:
 	virtual pos_t play(Board& board);
 };
 
-
 #endif /* LOOK1_H_1421891961_96 */
