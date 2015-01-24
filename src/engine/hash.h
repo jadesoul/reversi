@@ -12,5 +12,7 @@
 
 #include "common.h"
 
+extern int hash_table[3];
+
 
 #endif /* HASH_H_1421891912_21 */

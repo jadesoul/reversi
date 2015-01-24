@@ -1,14 +1,15 @@
 /**
- * File: logging.cpp
+ * File: datetime.cpp
  * Description: 
  *
  * Copyright (c) 2010-2013 Jadesoul (Home Page: http://jadesoul.sinaapp.com) <shenglan.wsl@alibaba-inc.com>
  * 
- * Date: 2015-01-24 16:41:41.706405
+ * Date: 2015-01-24 17:06:16.804207
  * Written In: Alibaba-inc, Hangzhou, China
  */
 
-#include "logging.h"
+#include <stdio.h>
+#include "datetime.h"
 
 void get_now(char out[]) {
 	time_t now;
