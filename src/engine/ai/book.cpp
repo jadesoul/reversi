@@ -10,7 +10,7 @@
 
 #include "book.h"
 
-pos_t OpenBookPlayer::play(Board& board) {
+pos_t OpeningBookPlayer::play(Board& board) {
 	uchar self=board.turn();
 	pos_t pos=openings->lookup(board);
 	if (pos!=PASS) {

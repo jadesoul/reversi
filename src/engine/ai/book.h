@@ -14,7 +14,7 @@
 #include "engine/openings.h"
 
 //使用开局库的AI
-class OpenBookPlayer : public AIPlayer {
+class OpeningBookPlayer : public AIPlayer {
 public:
 	virtual pos_t play(Board& board);
 };

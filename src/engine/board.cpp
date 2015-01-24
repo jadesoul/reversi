@@ -119,14 +119,14 @@ void Board::pass() {
 	++total[PASS];//累加PASS次数
 }
 
-pos_t Board::get_first_move() {
+pos_t Board::get_first_move() const {
 	for (int pos = FIRST; pos < LAST; ++pos) {
 		if (BOARD(pos)==ACTIVE) return pos;
 	}
 	return PASS;
 }
 
-uint Board::play(int pos) {
+size_t Board::play(pos_t pos) {
 	uint i = I(pos), j = J(pos);
 	color s = get_current_turn();	//自己的颜色
 
@@ -142,7 +142,7 @@ uint Board::play(int pos) {
 	//同时将各个方向上所吃的子翻转为自己的子
 	color o = OPPO(s);	//对手的颜色
 
-	uint eat = 0;	//记录所有方向上总吃子数
+	size_t eat = 0;	//记录所有方向上总吃子数
 	int p;
 
 #define SCAN_FOR_EAT(DIRECTION, INVERSE_DIRECTION) \
@@ -182,7 +182,7 @@ void Board::undo() {
 	//
 }
 
-uint Board::potential_mobility(color c) {
+size_t Board::potential_mobility(color c) {
 	//算法1：将所有颜色是c的棋子周围的所有空格或者ACTIVE状态棋子位置放入集合 O(N*8*log(M)),M为目标棋子数
 	//算法2：遍历所有空格，如果其周围8个方向有颜色是c的邻居，则加入列表 O(N*8)
 #define USE_ALGORITHM_2
@@ -202,7 +202,7 @@ uint Board::potential_mobility(color c) {
 	}
 	return poss.size();
 #else
-	uint cnt = 0;
+	size_t cnt = 0;
 	for (int pos = FIRST; pos < LAST; ++pos) {
 		if (IS_EMPTY_OR_ACTIVE(pos)) {
 			if (NEIGHBOR_HAS_COLOR(pos, c)) {

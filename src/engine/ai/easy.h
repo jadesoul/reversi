@@ -13,7 +13,7 @@
 #include "book.h"
 
 //最简单的AI，选择第一个可下子的位置下子
-class EasyAIPlayer : public OpenBookPlayer {
+class EasyAIPlayer : public OpeningBookPlayer {
 public:
 	virtual pos_t play(Board& board);
 };

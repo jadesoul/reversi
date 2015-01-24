@@ -489,7 +489,7 @@ public:
 	}
 
 	//返回所有与who的棋子相邻的空格个数
-	uchar potential_mobility(color who) {
+	size_t potential_mobility(color who) {
 		uint cnt=0;
 		for_n(x, 8) {
 			for_n(y, 8) {

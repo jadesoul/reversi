@@ -20,7 +20,6 @@
 #include "ai/look2.h"
 #include "ai/montecarlo.h"
 #include "ai/cached_montecarlo.h"
-#include "ai/openingbook.h"
 #include "ai/search.h"
 
 #endif /* AI_H_1372368194_48 */

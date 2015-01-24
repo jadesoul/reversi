@@ -12,10 +12,9 @@
 
 pos_t EasyAIPlayer::play(Board& board) {
 	uchar self=board.turn();
-
 	log_debug(board);
 
-	pos_t pos=OpenBookPlayer::play(board);
+	pos_t pos=OpeningBookPlayer::play(board);
 	if (pos!=PASS) return pos;
 
 	pos=board.first();

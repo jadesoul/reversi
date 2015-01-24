@@ -20,13 +20,13 @@ public:
 	Board(const string& board);
 	~Board();
 
-	inline uchar mobility() const { return total[ACTIVE]; }
-	inline uchar empty_cnt() const { return total[EMPTY]; }
-	inline uchar black_cnt() const { return total[BLACK]; }
-	inline uchar white_cnt() const { return total[WHITE]; }
-	inline uchar pass_cnt() const { return total[PASS]; }
-	inline bool is_active(uchar x, uchar y) const { return is_active(POS(x, y)); }
-	inline bool is_active(int pos) const { return BOARD(pos)==ACTIVE; }
+	inline size_t mobility() const { return total[ACTIVE]; }
+	inline size_t empty_cnt() const { return total[EMPTY]; }
+	inline size_t black_cnt() const { return total[BLACK]; }
+	inline size_t white_cnt() const { return total[WHITE]; }
+	inline size_t pass_cnt() const { return total[PASS]; }
+	inline bool is_active(uint x, uint y) const { return is_active(POS(x, y)); }
+	inline bool is_active(pos_t pos) const { return BOARD(pos)==ACTIVE; }
 
 	//无子可下，或者连续两次PASS
 	inline bool game_over() { return empty_cnt()==0 or pass_cnt()>=2; }
@@ -59,16 +59,15 @@ public:
 
 	//在指定的位置放置指定颜色的棋子，检查是否合法
 	//若不合法则返回0，否则返回吃子数，吃子数一定不是0
-	uint play(int pos);
-
-	inline uint play(uint x, uint y) { return play(POS(x, y)); }
-	inline uint play(const Move& move) { return play(move.pos); }
+	size_t play(pos_t pos);
+	inline size_t play(uint x, uint y) { return play(POS(x, y)); }
+	inline size_t play(const Move& move) { return play(move.pos); }
 
 	//撤销上一个Move
 	void undo();
 
 	//返回所有与c的棋子相邻的空格个数,也就是潜在行动力
-	uint potential_mobility(color c);
+	size_t potential_mobility(color c);
 
 	//根据历史数组判断当前轮谁下
 	color get_current_turn() const;
@@ -95,7 +94,7 @@ private:
 
 	//存放4种颜色棋子的个数并动态更新，其中ACTIVE的个数与EMPTY个数重叠
 	//total[PASS=4]存放当前棋局已有几次连续PASS MOVE
-	uchar total[5];
+	size_t total[5];
 
 	//下子历史，包括位置和颜色，约定PASS MOVE不放到历史中
 	//如果有连续两个Move的color相同，说明对手PASS了
