@@ -14,8 +14,8 @@
 #include "player.h"
 #include "game.h"
 #include "ai.h"
-
-OpeningBook* openings = new OpeningBook();
+#include "human.h"
+//#include "neuralnet.h"
 
 bool check1(const char* s) {
 	int n = strlen(s);

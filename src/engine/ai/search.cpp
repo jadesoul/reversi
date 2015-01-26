@@ -19,7 +19,7 @@ pos_t LookNAIPlayer::play(Board& board) {
 
 	//深度优先搜索
 	uchar self=board.turn();
-	log_status(board);
+//	log_status(board);
 
 	pos_t best_pos=PASS;
 	uint depth=3; //最多的搜索层数

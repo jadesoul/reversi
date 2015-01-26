@@ -35,7 +35,6 @@ public:
 	bool operator <(const Board& another) const;
 
 	//输出棋盘的字符界面
-	ostream& dump(ostream& o=cout) const ;
 	friend inline ostream& operator<<(ostream& o, const Board& b) { return b.dump(o); }
 
 	//将64个棋子的状态按照xy夹角对应的对角线镜像变换
@@ -49,6 +48,7 @@ public:
 
 	//设置指定位置的棋子颜色，本函数仅用于布局
 	void set(uchar pos, color c);
+	inline void set(uint x, uint y, color c) { set(POS(x, y), c); }
 
 	//turn方PASS，放弃下子，需满足ACTIVE个数为0
 	void pass();
@@ -61,7 +61,7 @@ public:
 	//若不合法则返回0，否则返回吃子数，吃子数一定不是0
 	size_t play(pos_t pos);
 	inline size_t play(uint x, uint y) { return play(POS(x, y)); }
-	inline size_t play(const Move& move) { return play(move.pos); }
+	inline size_t play(const Move& move) { assert(move.turn==turn()); return play(move.pos); }
 
 	//撤销上一个Move
 	void undo();
@@ -87,6 +87,9 @@ private:
 	//重新生成（更新）局面上所有的ACTIVE位置
 	//更新完毕后调用mobility()返回所有被激活的ACTIVE位置数，也就是行动力值
 	void update_possible_moves(color s);
+
+	//输出棋盘内容
+	ostream& dump(ostream& o=cout) const;
 
 private:
 	//存放64个棋子状态，以及周边的3面墙

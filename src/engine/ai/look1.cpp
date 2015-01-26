@@ -11,6 +11,7 @@
 #include "look1.h"
 
 pos_t Look1AIPlayer::play(Board& board) {
+	color self=board.turn();
 	log_debug(board);
 	assert(board.mobility()>=2);
 
@@ -56,7 +57,7 @@ pos_t Look1AIPlayer::play(Board& board) {
 	}
 play_look1:
 	assert(best_pos!=PASS);
-	log_info(COLOR(self)<<" Look1AIPlayer, play at "<<Move(board.turn(), best_pos));
+	log_info(COLOR(self)<<" Look1AIPlayer, play at "<<Move(self, best_pos));
 	board.play(best_pos);
 	return best_pos;
 }

@@ -39,7 +39,8 @@ void OpeningBook::load(const char* fp) {
 	for (map<Board, Choices>::iterator it = book.begin(); it != book.end();
 			++it) {
 		total_moves += it->second.size();
-	} log_status("loaded opening book: "<<cnt<<" openings, now "<<book.size()<<" boards, "<<total_moves<<" moves");
+	}
+	log_status("loaded opening book: "<<cnt<<" openings, now "<<book.size()<<" boards, "<<total_moves<<" moves");
 	fin.close();
 }
 
@@ -64,7 +65,7 @@ pos_t OpeningBook::lookup(const Board& board) const {
 				move = it2->first;
 			}
 			++cnt;
-			log_status("found opening "<<cnt<<" : "<<Move(it2->first, board.turn));
+			log_status("found opening "<<cnt<<" : "<<Move(board.turn(), it2->first));
 		}
 
 //			if (n==1) {//只有1种方案
@@ -78,7 +79,7 @@ pos_t OpeningBook::lookup(const Board& board) const {
 //				move= it3->first;
 //			}
 
-		log_status("found "<<n<<" opening moves in opening book, choose move: "<<Move(move, board.turn)<<", score="<<max_score);
+		log_status("found "<<n<<" opening moves in opening book, choose move: "<<Move(board.turn(), move)<<", score="<<max_score);
 		return move;
 	}
 	return PASS;

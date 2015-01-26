@@ -32,11 +32,11 @@ Score Game::start() {
 
 	log_info("Game Over!!");
 
-//		log_debug(board);
+	log_debug(board);
 	log_status(board);
 
 	Score score(board);
-//		log_status(score);
+//	log_status(score);
 
 	return score;
 }
@@ -47,25 +47,26 @@ bool Game::start_one_opening(const string& opening, map<Board, Choices>& book) {
 	black.reset();
 	white.reset();
 	for (uint i=0; i<opening.size(); i+=2) {
-		color board_turn=board.get_current_turn();
+		color board_turn=board.turn();
 
 		const char* two_bytes=opening.c_str()+i;
-		uchar x, y;
 
 		Move move(two_bytes);
-		if (! move.is_illegal_move()) {
-			log_warn("illegal opening:"<<opening<<" two_bytes from:"<<two_bytes);
+		if (move.is_illegal_move()) {
+			log_debug("illegal opening:"<<opening<<" two_bytes from:"<<two_bytes);
 			if (i != 0)
 				return true;
 			else
 				return false;
 		}
-		color turn=move.turn;
+//		color turn=move.turn;
+		move.turn=board_turn;
 
-//			assert(turn==board_turn);
+//		log_status(board);
+//		log_warn("move: "<<move<<" opening:"<<opening<<" two_bytes from:"<<two_bytes);
+//		assert(turn==board_turn);
 		assert(board.mobility()!=0);
-		assert(board.is_active(x, y));
-//			log_warn("move: "<<Move(move, turn));
+		assert(board.is_active(move.pos));
 
 		vector<Board> mirror_boards(4, board);//拷贝4份
 		mirror_boards[1].mirror_xy();
@@ -103,7 +104,7 @@ bool Game::start_one_opening(const string& opening, map<Board, Choices>& book) {
 			book[the_board][the_move]=1;
 		}
 
-		uint eat=board.play(move);
+		uint eat=board.play(move.pos);
 		assert(eat>0);
 
 	}

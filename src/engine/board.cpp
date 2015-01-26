@@ -62,39 +62,6 @@ void Board::mirror_ldru_xy() {
 	mirror_xy();
 }
 
-ostream& Board::dump(ostream& o) const {
-	color turn = get_current_turn();
-	char h = (turn == BLACK ? 'A' : 'a');
-	o << endl << '+' << ' ';
-	for_n(j, 8)
-		o << (char) (h + j) << ' ';
-	o << endl;
-	for_n(i, 8)
-	{
-		o << (i + 1) << ' ';
-		for_n(j, 8)
-		{
-			const color& c = BOARD(POS(i, j));
-			if (c == EMPTY)
-				o << '.';
-			else if (c == BLACK)
-				o << 'X';
-			else if (c == WHITE)
-				o << 'O';
-			else
-				o << '*';
-			o << ' ';
-		}
-		o << endl;
-	}
-	o << "BLACK=" << (uint) total[BLACK] << " WHITE=" << (uint) total[WHITE];
-	o << " EMPTY=" << (uint) total[EMPTY] << " ACTIVE=" << (uint) total[ACTIVE];
-	o << " turn=" << COLOR(turn);
-	o << endl;
-	return o << "--------------------------------------------" << endl;
-}
-
-
 void Board::set(uchar pos, color c) {
 	assert(c==BLACK or c==WHITE or c==EMPTY);
 
@@ -128,7 +95,7 @@ pos_t Board::get_first_move() const {
 
 size_t Board::play(pos_t pos) {
 	uint i = I(pos), j = J(pos);
-	color s = get_current_turn();	//自己的颜色
+	color s = turn();	//自己的颜色
 
 	//落子点必须是ACTIVE状态
 	if (BOARD(pos)!=ACTIVE) return 0;
@@ -153,7 +120,7 @@ size_t Board::play(pos_t pos) {
 		} \
 		while (BOARD(p)==o); \
 		if (BOARD(p)==s) { /*能吃子，反向回溯吃子*/ \
-			p=WEST(p); \
+			p=INVERSE_DIRECTION(p); \
 			do { \
 				BOARD(p)=s; /*吃子*/ \
 				++eat; \
@@ -169,12 +136,22 @@ size_t Board::play(pos_t pos) {
 #undef SCAN_FOR_EAT
 
 	assert(eat > 0);
+
 	//把对手的子翻转成了自己的子后，更新各自的棋子数
 	total[o] -= eat;
 	total[s] += eat;
 
 	update_possible_moves(o);
-	total[PASS]=0;//清空连续PASS次数
+
+	//清空连续PASS次数
+	total[PASS]=0;
+
+	//更新历史
+	int pointer = (60 - 1) - total[EMPTY];	//指向历史中的最后一个有效元素
+	assert(pointer>=0 and pointer<sizeof(history));
+	history[pointer].pos=pos;
+	history[pointer].turn=s;
+
 	return eat;
 }
 
@@ -334,4 +311,47 @@ void Board::update_possible_moves(color s) {
 	}
 	total[ACTIVE] = active;
 }
+
+ostream& Board::dump(ostream& o) const {
+	color turn = get_current_turn();
+	char h = (turn == BLACK ? 'A' : 'a');
+	o << endl << '+' << ' ';
+	for_n(j, 8)
+		o << (char) (h + j) << ' ';
+	o << '+' << ' ' << endl;
+	for_n(i, 8)
+	{
+		o << (i + 1) << ' ';
+		for_n(j, 8)
+		{
+			const color& c = BOARD(POS(i, j));
+			if (c == EMPTY)
+				o << '.';
+			else if (c == BLACK)
+				o << 'X';
+			else if (c == WHITE)
+				o << 'O';
+			else
+				o << '*';
+			o << ' ';
+		}
+		o << (i + 1) << ' ';
+		o << endl;
+	}
+	o << '+' << ' ';
+	for_n(j, 8)
+		o << (char) (h + j) << ' ';
+	o << '+' << ' ' << endl;
+	o << "BLACK=" << (uint) total[BLACK] << " WHITE=" << (uint) total[WHITE];
+	o << " EMPTY=" << (uint) total[EMPTY] << " ACTIVE=" << (uint) total[ACTIVE];
+	o << " PASS=" << (uint) total[PASS] << " TURN=" << COLOR(turn);
+
+	int pointer = (60 - 1) - total[EMPTY];	//指向历史中的最后一个有效元素
+	o << " HISTORY=";
+	for_n(i, pointer+1) o<<history[i];
+	o << endl;
+
+	return o << "--------------------------------------------" << endl;
+}
+
 
