@@ -270,15 +270,12 @@ void Board::init_board_map() {
 	//	wlink[OFFSET(4, 3)]=END;
 }
 
-
 void Board::clear_active_states() {	//TODO: 将所有激活状态的棋子记录下来
 	for (pos_t i = FIRST; i < LAST; ++i)
 		if (data[i] == ACTIVE)
 			data[i] = EMPTY;
 	total[ACTIVE] = 0;
 }
-
-
 
 void Board::update_possible_moves(color s) {
 	clear_active_states();	//先清除状态
