@@ -194,10 +194,12 @@ size_t Board::potential_mobility(color c) {
 color Board::get_current_turn() const {
 	int pointer = (60 - 1) - total[EMPTY];	//指向历史中的最后一个有效元素
 	color turn;
-	if (pointer == -1)
+	if (pointer == -1) {
 		turn=BLACK;	//开局黑先
-	else
-		turn=OPPO(history[pointer].turn);	//上一手的对手
+	} else {
+		assert(total[PASS]<2);
+		turn=(total[PASS] == 1) ? history[pointer].turn : OPPO(history[pointer].turn);	//上一手的对手
+	}
 	return turn;
 }
 
