@@ -23,3 +23,8 @@
 * Experiments with Monte Carlo Othello ，Evolutionary Computation, 2007. CEC 2007. IEEE Congress on
 * Playing Othello Using Monte Carlo (J.A.M. Nijssen 2007)
 
+更新历史：
+
+2015年01月26日23:11:27
+* 完全重构了棋盘，借鉴了GNUGo中的棋盘技巧，使用特殊的墙帮助判断出界，使用宏来实现方向、位置变换
+* 棋盘位置有二维降到一维，使用大量的宏简化工作，代码工程化，在新棋盘上的移植和整理

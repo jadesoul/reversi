@@ -345,7 +345,7 @@ ostream& Board::dump(ostream& o) const {
 
 	int pointer = (60 - 1) - total[EMPTY];	//指向历史中的最后一个有效元素
 	o << " HISTORY=";
-	for_n(i, pointer+1) o<<history[i];
+	for_n(i, pointer+1) o<<history[i]<<' ';
 	o << endl;
 
 	return o << "--------------------------------------------" << endl;
