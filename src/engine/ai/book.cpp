@@ -11,6 +11,7 @@
 #include "book.h"
 
 pos_t OpeningBookPlayer::play(Board& board) {
+//	log_status("in pos_t OpeningBookPlayer::play(Board& board)");
 	uchar self=board.turn();
 	pos_t pos=openings->lookup(board);
 	if (pos!=PASS) {

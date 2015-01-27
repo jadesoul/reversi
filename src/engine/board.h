@@ -13,6 +13,7 @@
 //重新实现棋盘类，实现高性能，以及局面hash
 
 #include "move.h"
+#include "hash.h"
 
 class Board {
 public:

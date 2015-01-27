@@ -365,7 +365,7 @@ void ReadVocab() {
 	char word[MAX_STRING];
 	FILE *fin = fopen(read_vocab_file, "rb");
 	if (fin == NULL) {
-		printf("Vocabulary file not found\n");
+		fprintf(stderr, "Vocabulary file not found\n");
 		exit(1);
 	}
 	for (a = 0; a < vocab_hash_size; a++) vocab_hash[a] = -1;

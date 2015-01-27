@@ -56,7 +56,7 @@ void AI_vs_AI() {
 //	NeuralNetworkAIPlayer black;
 //	NeuralNetworkAIPlayer white;
 
-	uint total = 100 / TOTAL_THREADS;
+	uint total = 1 / TOTAL_THREADS;
 //	cin>>total;
 	log_warn("start "<<total<<" games ...");
 	uint win[4] = { 0, 0, 0, 0 };

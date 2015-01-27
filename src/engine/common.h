@@ -25,7 +25,7 @@ typedef map<pos_t, double> Choices;
 #define WHITE	2//白子
 #define BLACK	3//黑子
 #define PASS	4//代表无子可下
-#define WALL	5//墙壁，用于判断棋子出界
+#define WALL	4//墙壁，用于判断棋子出界
 
 //给定自己棋子的颜色，获取对手的颜色
 #define OPPO(c) (BLACK+WHITE-(c))

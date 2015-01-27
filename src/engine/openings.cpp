@@ -52,7 +52,8 @@ pos_t OpeningBook::lookup(const Board& board) const {
 
 		const Choices& moves = it->second;
 		uint n = moves.size();
-		assert(n > 0); log_status(board);
+		assert(n > 0);
+		log_status(board);
 
 		pos_t move = PASS;
 		uint cnt = 0;
