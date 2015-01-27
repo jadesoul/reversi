@@ -32,7 +32,7 @@ void human_vs_AI() {
 }
 
 void AI_vs_AI() {
-	EasyAIPlayer black;
+//	EasyAIPlayer black;
 //	EasyAIPlayer white;
 
 //	Look1AIPlayer black;
@@ -50,16 +50,16 @@ void AI_vs_AI() {
 //	CachedMonteCarloAIPlayer black;
 //	CachedMonteCarloAIPlayer white;
 
-//	LookNAIPlayer black;
+	LookNAIPlayer black;
 //	LookNAIPlayer white;
 
 //	NeuralNetworkAIPlayer black;
 //	NeuralNetworkAIPlayer white;
 
-	uint total = 10000 / TOTAL_THREADS;
+	uint total = 100 / TOTAL_THREADS;
 //	cin>>total;
 	log_warn("start "<<total<<" games ...");
-	uint win[3] = { 0, 0, 0 };
+	uint win[4] = { 0, 0, 0, 0 };
 	int total_diff = 0;
 	//比赛，多比几盘
 	timer begin;
