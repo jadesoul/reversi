@@ -11,6 +11,7 @@
 #include "state.h"
 
 State::State(const Board& board) {
+	moves.reserve(24);
 	this->board = board;
 	size_t mobility = board.mobility();
 	if (mobility == 0) {

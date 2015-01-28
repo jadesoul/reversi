@@ -29,7 +29,7 @@ public:
 
 	inline void next() { ++index; }
 
-	inline pos_t get_move() { assert(!end()); return moves[index]; }
+	inline pos_t get_move_pos() { assert(!end()); return moves[index]; }
 };
 
 #endif /* STATE_H_1421891892_98 */

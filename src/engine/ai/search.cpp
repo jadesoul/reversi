@@ -34,20 +34,19 @@ pos_t LookNAIPlayer::play(Board& board) {
 	} else {
 		uint total_searched_nodes=0;
 		timer previous;
-		double max_score=-1e100;
+		double max_score=INT32_MIN;
 
-		//找出下子之后使得对方行动力最低的一步走法
 		for (pos_t pos = FIRST; pos < LAST; ++pos) {
 			if (board.is_active(pos)) {//自己走法
 
-				//默认下法
+				//第一步棋作为默认下法
 				if (best_pos == PASS) {
 					best_pos = pos;
 				}
 
-				if (BESIDE_GOOD_CORNER(pos)) {
-					continue;
-				}
+//				if (BESIDE_GOOD_CORNER(pos)) {
+//					continue;
+//				}
 
 				Board think1=board;
 
@@ -68,19 +67,25 @@ pos_t LookNAIPlayer::play(Board& board) {
 
 					if (total_searched_nodes%100000==0) {
 						double gap=previous.elapsed();
-						log_status("total="<<total_nodes_for_each_game<<" searched="<<total_searched_nodes<<" time="<<gap<<" depth="<<history.size()<<" speed="<<(0.001*total_searched_nodes/gap)<<"kn/s endgame="<<total_end_game<<" meetdepth="<<total_meet_depth);
+						log_status("total="<<total_nodes_for_each_game
+								<<" searched="<<total_searched_nodes
+								<<" time="<<gap
+								<<" depth="<<history.size()
+								<<" speed="<<(0.001*total_searched_nodes/gap)<<"kn/s"
+								<<" endgame="<<total_end_game
+								<<" meetdepth="<<total_meet_depth);
 					}
 
 					State& current=history.back();
 					if (! current.end()) {
-						pos_t move=current.get_move();
+						pos_t p=current.get_move_pos();
 						Board think=current.board;
 
 						size_t eat=0;
-						if (move==PASS) {
+						if (p==PASS) {
 							think.pass();
 						} else {
-							eat=think.play(move);
+							eat=think.play(p);
 							assert(eat>0);
 						}
 
@@ -93,12 +98,12 @@ pos_t LookNAIPlayer::play(Board& board) {
 								Score score(think);
 								current.update_score(score.win(self));
 //								current.update_score(score.sign(self));
-
-								if (think.black_cnt()==0 || think.white_cnt()==0) log_warn(think);
+								if (think.black_cnt()==0 or think.white_cnt()==0) log_warn(think);
 							} else { //搜索深度达到了
 								++total_meet_depth;
 //								current.update_score(0);
-								current.update_score(self==think.get_current_turn() ? think.mobility() : -think.mobility());
+								double score=think.evaluate_and_predict_win_score();
+								current.update_score(self==think.turn() ? score : -score);
 							}
 						}
 						current.next();

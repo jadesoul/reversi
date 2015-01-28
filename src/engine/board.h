@@ -28,6 +28,7 @@ public:
 	inline size_t pass_cnt() const { return total[PASS]; }
 	inline bool is_active(uint x, uint y) const { return is_active(POS(x, y)); }
 	inline bool is_active(pos_t pos) const { return BOARD(pos)==ACTIVE; }
+	inline hash_t get_hash() { return hash; }
 
 	//无子可下，或者连续两次PASS
 	inline bool game_over() { return empty_cnt()==0 or pass_cnt()>=2; }
@@ -68,7 +69,7 @@ public:
 	void undo();
 
 	//返回所有与c的棋子相邻的空格个数,也就是潜在行动力
-	size_t potential_mobility(color c);
+	size_t potential_mobility(color c) const;
 
 	//根据历史数组判断当前轮谁下
 	color get_current_turn() const;
@@ -77,6 +78,10 @@ public:
 	//从包含65字节的字符串初始化, 棋盘(64字节)，下子方(1字节)
 	//为游戏引擎提供此接口
 	void init_from_str(const string& query);
+
+	//局面评估函数，预测当前下子方能赢多少颗子
+	double evaluate_and_predict_win_score() const;
+
 private:
 	//开局时，初始化棋盘
 	void init_board_map();

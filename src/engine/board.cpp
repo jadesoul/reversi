@@ -179,7 +179,7 @@ void Board::undo() {
 	//
 }
 
-size_t Board::potential_mobility(color c) {
+size_t Board::potential_mobility(color c) const {
 	//算法1：将所有颜色是c的棋子周围的所有空格或者ACTIVE状态棋子位置放入集合 O(N*8*log(M)),M为目标棋子数
 	//算法2：遍历所有空格，如果其周围8个方向有颜色是c的邻居，则加入列表 O(N*8)
 #define USE_ALGORITHM_2
@@ -221,6 +221,15 @@ color Board::get_current_turn() const {
 		turn=(total[PASS] == 1) ? history[pointer].turn : OPPO(history[pointer].turn);	//上一手的对手
 	}
 	return turn;
+}
+
+double Board::evaluate_and_predict_win_score() const {
+	color s=turn();
+	color o=OPPO(s);
+//	size_t m=mobility();
+	int p_s = potential_mobility(s);
+	int p_o = potential_mobility(o);
+	return p_o - p_s;
 }
 
 void Board::init_from_str(const string& query) {
