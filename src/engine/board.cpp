@@ -62,7 +62,7 @@ void Board::mirror_ldru_xy() {
 	mirror_xy();
 }
 
-void Board::set(uchar pos, color c) {
+void Board::set(pos_t pos, color c) {
 	assert(c==BLACK or c==WHITE or c==EMPTY);
 
 	color orig = BOARD(pos);
@@ -70,19 +70,29 @@ void Board::set(uchar pos, color c) {
 		return;
 
 	total[orig] -= 1;
-	if (orig == ACTIVE)
+	if (orig == ACTIVE) {
 		total[EMPTY] -= 1;
+		hash ^= board_hash_table[pos][EMPTY];//先还原以前的hash
+	} else {
+		hash ^= board_hash_table[pos][orig];//先还原以前的hash
+	}
 
 	BOARD(pos)=c;
+	hash ^= board_hash_table[pos][c];//再更新当前hash
 
 	total[c] += 1;
-	//TODO: history已经乱了
 }
 
 void Board::pass() {
 	assert(total[ACTIVE]==0);
-	color oppo = OPPO(get_current_turn());	//交换下子方
-	update_possible_moves(oppo);
+	color s=turn();
+	color o = OPPO(s);//交换下子方
+	update_possible_moves(o);
+
+	//更新交换下子方后的hash
+	hash ^= board_hash_table[MAP_SIZE][s];/*先还原以前的hash*/
+	hash ^= board_hash_table[MAP_SIZE][o];/*再更新当前hash*/
+
 	++total[PASS];//累加PASS次数
 }
 
@@ -94,14 +104,18 @@ pos_t Board::get_first_move() const {
 }
 
 size_t Board::play(pos_t pos) {
-	uint i = I(pos), j = J(pos);
+//	uint i = I(pos), j = J(pos);
 	color s = turn();	//自己的颜色
+	assert(s==BLACK or s==WHITE);
 
 	//落子点必须是ACTIVE状态
 	if (BOARD(pos)!=ACTIVE) return 0;
 
 	//如果落子成功，则更新新的对手落子点
+	hash ^= board_hash_table[pos][EMPTY];/*先还原以前的hash*/
 	BOARD(pos)=s;	//首先在下子处落子
+	hash ^= board_hash_table[pos][s];/*再更新当前hash*/
+
 	total[ACTIVE] -= 1;
 	total[EMPTY] -= 1;
 	total[s] += 1;
@@ -122,7 +136,9 @@ size_t Board::play(pos_t pos) {
 		if (BOARD(p)==s) { /*能吃子，反向回溯吃子*/ \
 			p=INVERSE_DIRECTION(p); \
 			do { \
+				hash ^= board_hash_table[p][o];/*先还原以前的hash*/ \
 				BOARD(p)=s; /*吃子*/ \
+				hash ^= board_hash_table[p][s];/*再更新当前hash*/ \
 				++eat; \
 				p=INVERSE_DIRECTION(p); \
 			} \
@@ -141,7 +157,11 @@ size_t Board::play(pos_t pos) {
 	total[o] -= eat;
 	total[s] += eat;
 
-	update_possible_moves(o);
+	update_possible_moves(o);//轮到对手下子
+
+	//更新交换下子方后的hash
+	hash ^= board_hash_table[MAP_SIZE][s];/*先还原以前的hash*/
+	hash ^= board_hash_table[MAP_SIZE][o];/*再更新当前hash*/
 
 	//清空连续PASS次数
 	total[PASS]=0;
@@ -209,6 +229,14 @@ void Board::init_from_str(const string& query) {
 	total[BLACK] = 0;
 	total[WHITE] = 0;
 	total[PASS] = 0;
+
+	for_n(pos, MAP_SIZE)
+	{
+		if (! ON_BOARD(pos)) { //不在棋盘上，填满墙
+			BOARD(pos)=WALL;
+		}
+	}
+
 	for_n(x, 8)
 	{
 		for_n(y, 8)
@@ -233,9 +261,10 @@ void Board::init_from_str(const string& query) {
 
 	int pointer = (60 - 1) - total[EMPTY];	//指向历史中的最后一个有效元素
 	if (pointer >= 0)
-		history[pointer].turn = OPPO(turn);	//只能恢复到上一次下子时的颜色
+		history[pointer].turn = OPPO(turn);	//TODO: 只能恢复到上一次下子时的颜色
 
 	update_possible_moves(turn);
+	init_board_hash();
 }
 
 void Board::init_board_map() {
@@ -270,6 +299,23 @@ void Board::init_board_map() {
 	//	wlink[OFFSET(3, 4)]=OFFSET(4, 3);
 	//	white[OFFSET(4, 3)]=POS(4,3);
 	//	wlink[OFFSET(4, 3)]=END;
+
+	init_board_hash();
+}
+
+void Board::init_board_hash() {
+	hash=0;
+	for_n(pos, MAP_SIZE)
+	{
+		//针对当前位置更新hash
+		color c=BOARD(pos);
+		if (c==ACTIVE) c=EMPTY;//忽略激活状态，当做空格
+		hash ^= board_hash_table[pos][c];
+	}
+
+	//根据turn更新hash
+	color t=turn();
+	hash ^= board_hash_table[MAP_SIZE][t];
 }
 
 void Board::clear_active_states() {	//TODO: 将所有激活状态的棋子记录下来

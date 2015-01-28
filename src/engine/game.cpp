@@ -29,7 +29,7 @@ Score Game::start() {
 			player.play(board);
 		}
 
-		log_status(board);
+//		log_status(board);
 	}
 
 	log_info("Game Over!!");

@@ -12,8 +12,9 @@
 
 #include <stdint.h>
 
-typedef unsigned long ulong;
+typedef unsigned long long ulong;
 typedef unsigned char uchar;
 typedef unsigned int uint;
+
 
 #endif /* TYPES_H_1421848382_24 */

@@ -47,6 +47,7 @@ public:
 
 int main () {
 	openings = new OpeningBook();
+	init_board_hash_table();
 	BoardTest test;
 	delete openings;
 }

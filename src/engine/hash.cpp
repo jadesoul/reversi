@@ -9,17 +9,20 @@
  */
 
 #include "hash.h"
+#include "pypp/random.h"
 
 hash_t board_hash_table[MAP_SIZE+1][5];
 
 void init_board_hash_table() {
-	srand(time(NULL));
+	Random r;
 	for_n(i, MAP_SIZE+1) {
 		for_n(j, 5) {
-			uint a=rand();
-			uint b=rand();
-			uint c=rand();
-			board_hash_table[i][j]= a<<32+b<<16+c;
+			hash_t a=rand();
+			hash_t b=rand();
+			hash_t c=rand();
+			hash_t h=(a<<32) ^ (b<<16) ^ c;
+			board_hash_table[i][j]= h;
+			log_status("board_hash_table["<<i<<"]["<<j<<"]=0x"<<std::hex<<h<<std::dec);
 		}
 	}
 }

@@ -48,7 +48,7 @@ public:
 	void mirror_ldru_xy();
 
 	//设置指定位置的棋子颜色，本函数仅用于布局
-	void set(uchar pos, color c);
+	void set(pos_t pos, color c);
 	inline void set(uint x, uint y, color c) { set(POS(x, y), c); }
 
 	//turn方PASS，放弃下子，需满足ACTIVE个数为0
@@ -89,6 +89,9 @@ private:
 	//更新完毕后调用mobility()返回所有被激活的ACTIVE位置数，也就是行动力值
 	void update_possible_moves(color s);
 
+	//初始化棋盘局面哈希
+	void init_board_hash();
+
 	//输出棋盘内容
 	ostream& dump(ostream& o=cout) const;
 
@@ -105,6 +108,11 @@ private:
 	//每一个Move对占据棋盘上的一个位置
 	//历史中的有效元素数：黑子数+白子数-4 = 60 - 空格数
 	Move history[BOARD_SIZE-4];
+
+	//存储当前局面的hash值，当棋盘发生变化时，此值会自动同步计算
+	//包括局面上所有子的颜色，不包括ACTIVE，ACTIVE都当做EMPTY
+	//另外还包括当前的turn，即设置一个虚拟的棋子，其颜色与当前下子方一致
+	hash_t hash;
 
 //	记录棋盘上所有的白子位置和黑子位置，加速遍历
 //	uchar white[BOARD_SIZE];//存放所有已下白子的pos, 最多64个
