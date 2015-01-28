@@ -22,7 +22,7 @@ void init_board_hash_table() {
 			hash_t c=rand();
 			hash_t h=(a<<32) ^ (b<<16) ^ c;
 			board_hash_table[i][j]= h;
-			log_status("board_hash_table["<<i<<"]["<<j<<"]=0x"<<std::hex<<h<<std::dec);
+//			log_status("board_hash_table["<<i<<"]["<<j<<"]=0x"<<std::hex<<h<<std::dec);
 		}
 	}
 }

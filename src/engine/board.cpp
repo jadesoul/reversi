@@ -387,12 +387,14 @@ ostream& Board::dump(ostream& o) const {
 	for_n(j, 8)
 		o << (char) (h + j) << ' ';
 	o << '+' << ' ' << endl;
-	o << "BLACK=" << (uint) total[BLACK] << " WHITE=" << (uint) total[WHITE];
-	o << " EMPTY=" << (uint) total[EMPTY] << " ACTIVE=" << (uint) total[ACTIVE];
-	o << " PASS=" << (uint) total[PASS] << " TURN=" << COLOR(turn);
+	o << "black=" << (uint) total[BLACK] << " white=" << (uint) total[WHITE];
+	o << " empty=" << (uint) total[EMPTY] << " active=" << (uint) total[ACTIVE];
+	o << " pass=" << (uint) total[PASS] << " turn=" << COLOR(turn);
+	o << " hash=0x"<< std::hex << hash << std::dec;
+	o << endl;
 
 	int pointer = (60 - 1) - total[EMPTY];	//指向历史中的最后一个有效元素
-	o << " HISTORY=";
+	o << "history=";
 	for_n(i, pointer+1) o<<history[i]<<' ';
 	o << endl;
 
