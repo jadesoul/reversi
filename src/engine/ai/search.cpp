@@ -22,7 +22,7 @@ pos_t LookNAIPlayer::play(Board& board) {
 //	log_status(board);
 
 	pos_t best_pos=PASS;
-	uint depth=3; //最多的搜索层数
+	uint depth=2; //最多的搜索层数
 	if (board.empty_cnt()<=10) depth=16;//当游戏快结束时，多搜索几层
 
 	size_t total_choice=board.mobility();
@@ -67,7 +67,8 @@ pos_t LookNAIPlayer::play(Board& board) {
 
 					if (total_searched_nodes%100000==0) {
 						double gap=previous.elapsed();
-						log_status("total="<<total_nodes_for_each_game
+						log_status("empty="<<board.empty_cnt()
+								<<" total="<<total_nodes_for_each_game
 								<<" searched="<<total_searched_nodes
 								<<" time="<<gap
 								<<" depth="<<history.size()
@@ -89,7 +90,7 @@ pos_t LookNAIPlayer::play(Board& board) {
 							assert(eat>0);
 						}
 
-						if (history.size()<=depth && !think.game_over()) { // 不满足终止条件
+						if (history.size()<depth && !think.game_over()) { // 不满足终止条件
 							State next(think);
 							history.push_back(next);
 						} else { // 满足终止条件

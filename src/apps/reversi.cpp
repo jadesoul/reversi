@@ -35,14 +35,14 @@ void AI_vs_AI() {
 //	EasyAIPlayer black;
 //	EasyAIPlayer white;
 
-//	Look1AIPlayer black;
+	Look1AIPlayer black;
 //	Look1AIPlayer white;
 
 //	Look2AIPlayer black;
 //	Look2AIPlayer white;
 
 //	RandomAIPlayer black;
-	RandomAIPlayer white;
+//	RandomAIPlayer white;
 
 //	MonteCarloAIPlayer black;
 //	MonteCarloAIPlayer white;
@@ -50,8 +50,8 @@ void AI_vs_AI() {
 //	CachedMonteCarloAIPlayer black;
 //	CachedMonteCarloAIPlayer white;
 
-	LookNAIPlayer black;
-//	LookNAIPlayer white;
+//	LookNAIPlayer black;
+	LookNAIPlayer white;
 
 //	NeuralNetworkAIPlayer black;
 //	NeuralNetworkAIPlayer white;
