@@ -57,7 +57,7 @@ pos_t Look1AIPlayer::play(Board& board) {
 	}
 play_look1:
 	assert(best_pos!=PASS);
-	log_info(COLOR(self)<<" Look1AIPlayer, play at "<<Move(self, best_pos));
+	log_status(COLOR(self)<<" Look1AIPlayer, play at "<<Move(self, best_pos));
 	board.play(best_pos);
 	return best_pos;
 }

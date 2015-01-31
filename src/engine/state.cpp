@@ -26,19 +26,37 @@ State::State(const Board& board) {
 		assert(moves.size() == mobility);
 	}
 	index = 0;
-	score = 0;
+	score = -8888;
+	best = PASS;
 }
 
 void State::update_score(double child_score) { //根据某个孩子状态的分数更新当前状态的分数
-	if (child_score > score)
+	if (child_score > score) {
 		score = child_score;
-//		if (child_score>score) score=(score+child_score)/2;
-//		if (child_score>score) score=(2*score+child_score)/3;
-//		if (child_score>score) score=(score+2*child_score)/3;
+		best = this->get_move_pos();
+	}
 
-// score=(score+child_score)/2;
+//	if (child_score>score) score=(score+child_score)/2;
+//	if (child_score>score) score=(2*score+child_score)/3;
+//	if (child_score>score) score=(score+2*child_score)/3;
+//
+//	score=(score+child_score)/2;
+//
+//	score+=child_score/moves.size();
+//
+//	score+=child_score;
 
-//		score+=child_score/moves.size();
+}
 
-//		score+=child_score;
+ostream& State::dump(ostream& o) const {
+	color self=board.turn();
+	o << "State("
+		<<"best="<<Move(self, best)
+		<<", score="<<score
+		<<", index="<<index
+		<<", moves=[";
+	for_n(i, moves.size()) {
+		o<< i << ":" << Move(self, moves[i])<<" ";
+	}
+	return o<<"])";
 }

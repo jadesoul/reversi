@@ -16,8 +16,9 @@ class State {
 public:
 	Board 			board;	//当前棋局
 	vector<pos_t> 	moves;	//当前棋局下所有可能的下法
-	uchar 			index;	//已经处理到了第几种下法
-	double			score;	//评估函数：当前节点的分数
+	uint 			index;	//已经处理到了第几种下法
+	double			score;	//当前节点的分数，代表在所有可能性中自己最多赢多少子
+	pos_t			best;	//当孩子更新上来的分数取最大值时的下子位置，即最好的孩子位置
 
 public:
 	State(const Board& board);
@@ -25,11 +26,22 @@ public:
 	//根据某个孩子状态的分数更新当前状态的分数
 	void update_score(double child_score);
 
-	inline bool end() { return !(index<moves.size()); }
+	inline bool end() { return !(index < moves.size()); }
 
 	inline void next() { ++index; }
 
-	inline pos_t get_move_pos() { assert(!end()); return moves[index]; }
+	inline pos_t get_move_pos() {
+//		log_status("debug:"<<board);
+//		log_status("state:"<<*this);
+//		log_status("end():"<<end());
+//		log_status("index:"<<index);
+//		log_status("moves.size():"<<moves.size());
+//		assert(1<=index && index<=moves.size());
+		return moves[index-1];
+	}
+
+	ostream& dump(ostream& o=cout) const;
+	friend inline ostream& operator<<(ostream& o, const State& s) { return s.dump(o); }
 };
 
 #endif /* STATE_H_1421891892_98 */

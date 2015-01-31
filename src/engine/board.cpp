@@ -217,13 +217,16 @@ color Board::get_current_turn() const {
 	if (pointer == -1) {
 		turn=BLACK;	//开局黑先
 	} else {
-		assert(total[PASS]<2);
-		turn=(total[PASS] == 1) ? history[pointer].turn : OPPO(history[pointer].turn);	//上一手的对手
+//		assert(total[PASS]<2);
+		turn=(total[PASS] % 2 == 1) ? history[pointer].turn : OPPO(history[pointer].turn);	//上一手的对手
 	}
 	return turn;
 }
 
 double Board::evaluate_and_predict_win_score() const {
+	if (empty_cnt()<16) {
+		return 1;
+	}
 	color s=turn();
 	color o=OPPO(s);
 //	size_t m=mobility();

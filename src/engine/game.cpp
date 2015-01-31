@@ -21,9 +21,11 @@ Score Game::start() {
 
 		if (mobility==0) {
 			board.pass();
+			log_status(COLOR(turn)<<" Player, PASS");
 		} else if (mobility==1) {
 			pos_t p=board.get_first_move();
 			assert(p!=PASS);
+			log_status(COLOR(turn)<<" Player, can only play at "<<Move(turn, p));
 			board.play(p);
 		} else {
 			player.play(board);
@@ -35,7 +37,7 @@ Score Game::start() {
 	log_info("Game Over!!");
 
 //	log_debug(board);
-//	log_status(board);
+	log_status(board);
 
 	Score score(board);
 //	log_status(score);
