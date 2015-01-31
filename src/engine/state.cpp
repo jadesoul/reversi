@@ -22,7 +22,7 @@ State::State(const Board& board) {
 				moves.push_back(pos);
 			}
 		}
-		std::random_shuffle(moves.begin(), moves.end());
+//		std::random_shuffle(moves.begin(), moves.end());
 		assert(moves.size() == mobility);
 	}
 	index = 0;

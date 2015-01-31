@@ -15,6 +15,9 @@ Score Game::start() {
 	black.reset();
 	white.reset();
 	while (!game_over()) {
+
+		system("clear");
+
 		color turn=board.get_current_turn();
 		Player& player=(turn==BLACK)?black:white;
 		uchar mobility=board.mobility();
@@ -31,7 +34,8 @@ Score Game::start() {
 			player.play(board);
 		}
 
-//		log_status(board);
+		log_status(board);
+		getchar();
 	}
 
 	log_info("Game Over!!");

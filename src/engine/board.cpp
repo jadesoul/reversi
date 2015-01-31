@@ -370,6 +370,9 @@ void Board::update_possible_moves(color s) {
 }
 
 ostream& Board::dump(ostream& o) const {
+	int pointer = (60 - 1) - total[EMPTY];	//指向历史中的最后一个有效元素
+	pos_t last_pos=PASS;
+	if (pointer>=0) last_pos=history[pointer].pos;
 	color turn = get_current_turn();
 	char h = (turn == BLACK ? 'A' : 'a');
 	o << endl << '+' << ' ';
@@ -381,7 +384,8 @@ ostream& Board::dump(ostream& o) const {
 		o << (i + 1) << ' ';
 		for_n(j, 8)
 		{
-			const color& c = BOARD(POS(i, j));
+			pos_t p=POS(i, j);
+			const color& c = BOARD(p);
 			if (c == EMPTY)
 				o << '.';
 			else if (c == BLACK)
@@ -390,7 +394,11 @@ ostream& Board::dump(ostream& o) const {
 				o << 'O';
 			else
 				o << '*';
-			o << ' ';
+
+			pos_t p_east=EAST(p);
+			if (last_pos==p) o<< ']';
+			else if (last_pos==p_east) o<<'[';
+			else o << ' ';
 		}
 		o << (i + 1) << ' ';
 		o << endl;
@@ -405,7 +413,7 @@ ostream& Board::dump(ostream& o) const {
 	o << " hash=0x"<< std::hex << hash << std::dec;
 	o << endl;
 
-	int pointer = (60 - 1) - total[EMPTY];	//指向历史中的最后一个有效元素
+
 	o << "history=";
 	for_n(i, pointer+1) o<<history[i]<<' ';
 	o << endl;
