@@ -39,8 +39,8 @@ const char* server(const char* s) {
 //	Look2AIPlayer player;
 //	RandomAIPlayer player;
 //	MonteCarloAIPlayer player;
-	CachedMonteCarloAIPlayer player;
-//	LookNAIPlayer player;
+//	CachedMonteCarloAIPlayer player;
+	LookNAIPlayer player;
 
 	Player& black = player;
 	Player& white = player;

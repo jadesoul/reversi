@@ -224,15 +224,25 @@ color Board::get_current_turn() const {
 }
 
 double Board::evaluate_and_predict_win_score() const {
-	if (empty_cnt()<16) {
-		return 1;
-	}
-	color s=turn();
-	color o=OPPO(s);
-//	size_t m=mobility();
+	color s = turn();
+	color o = OPPO(s);
+	size_t m=mobility();
 	int p_s = potential_mobility(s);
 	int p_o = potential_mobility(o);
-	return p_o - p_s;
+	int win_potential = p_o - p_s;
+
+	int e=empty_cnt();
+	int d=60-e;
+	if (d<16) {
+		return win_potential;
+	} else {
+		if (is_active(LU) or is_active(RU) or is_active(LD) or is_active(RD)) {
+			return 5+win_potential;
+		} else {
+			return win_potential;
+		}
+	}
+	return 0;
 }
 
 void Board::init_from_str(const string& query) {
@@ -256,20 +266,20 @@ void Board::init_from_str(const string& query) {
 			uint i = x * 8 + y;
 			int pos=POS(x, y);
 			char c = query[i];
-			if (c == '.') {
+			if (c == '0') {
 				BOARD(pos) = EMPTY;
 				total[EMPTY] += 1;
-			} else if (c == 'X') {	//代表 BLACK
+			} else if (c == '1') {	//代表 BLACK
 				BOARD(pos) = BLACK;
 				total[BLACK] += 1;
-			} else if (c == 'O') {	//代表 WHITE
+			} else if (c == '2') {	//代表 WHITE
 				BOARD(pos) = WHITE;
 				total[WHITE] += 1;
 			} else
 				assert(false);
 		}
 	}
-	color turn = (query[64] == 'X') ? BLACK : WHITE;
+	color turn = (query[64] == '1') ? BLACK : WHITE;
 
 	int pointer = (60 - 1) - total[EMPTY];	//指向历史中的最后一个有效元素
 	if (pointer >= 0)

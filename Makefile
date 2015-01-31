@@ -8,13 +8,13 @@ prepare:
 	
 install:
 	@cd build ; make -sj install
-	#@cd src; python setup.py build_ext --inplace
+	@cd src/apps/pyreversi; python setup.py build_ext --inplace
 
 clean:
-	@rm -rf build lib bin cgi-bin
+	@rm -rf build lib bin cgi-bin src/apps/pyreversi/engine.so
 	
 test: all
 	bin/reversi
 
 server: all
-	cd src; bash start_server.sh
+	cd src/apps/pyreversi; bash start_server.sh

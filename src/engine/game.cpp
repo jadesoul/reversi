@@ -191,9 +191,8 @@ string Game::deal(const string& query) {
 	if (mobility==0) {
 		return "00";//表示PASS
 	} else {
-		uchar byte=player.play(board);
-		uchar x=byte>>4, y=byte&0x0F;
-		assert(x<8 and y<8);
+		pos_t pos=player.play(board);
+		int x=I(pos), y=J(pos);
 		char s[3];
 		s[0]='1'+x;//从1开始编号
 		s[1]='1'+y;
