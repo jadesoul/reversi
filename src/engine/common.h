@@ -194,6 +194,12 @@ typedef map<pos_t, double> Choices;
 									MACRO(SW, NE) \
 									MACRO(SE, NW)
 
+#define APPLY_4_TUPLE_DIRECTIONS(MACRO)	\
+									MACRO(LU, EAST, SOUTH) \
+									MACRO(RU, WEST, SOUTH) \
+									MACRO(LD, EAST, NORTH) \
+									MACRO(RD, WEST, NORTH)
+
 
 #define ABS(x) ((x) < 0 ? -(x) : (x))
 #define MIN(a, b) ((a)<(b) ? (a) : (b))

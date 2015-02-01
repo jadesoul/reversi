@@ -82,6 +82,8 @@ public:
 	//局面评估函数，预测当前下子方能赢多少颗子
 	double evaluate_and_predict_win_score() const;
 
+	//计算局面上有多少指定颜色的稳定子
+	size_t get_stable_stones_size(color s) const;
 private:
 	//开局时，初始化棋盘
 	void init_board_map();

@@ -21,8 +21,9 @@ pos_t LookNAIPlayer::play(Board& board) {
 	uchar self=board.turn();
 //	log_status(board);
 
-	uint depth=3; //最多的搜索层数
+	uint depth=5; //最多的搜索层数
 	if (board.empty_cnt()<=10) depth=16;//当游戏快结束时，多搜索几层
+//	if (board.empty_cnt()<=8) depth=16;//当游戏快结束时，多搜索几层
 
 	uint total_searched_nodes=0;
 	timer previous;
@@ -49,8 +50,10 @@ pos_t LookNAIPlayer::play(Board& board) {
 					<<" time="<<gap
 					<<" depth="<<history.size()
 					<<" speed="<<(0.001*total_searched_nodes/gap)<<"kn/s"
-					<<" endgame="<<total_end_game
-					<<" meetdepth="<<total_meet_depth);
+					<<" endg="<<total_end_game
+					<<" meetd="<<total_meet_depth
+					<<" win="<< history.front().score
+					);
 		}
 
 //		log_status("== Stack ==");

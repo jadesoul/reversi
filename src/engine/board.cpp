@@ -224,27 +224,67 @@ color Board::get_current_turn() const {
 }
 
 double Board::evaluate_and_predict_win_score() const {
+	size_t m=mobility();
+//	return m;
+
 	color s = turn();
 	color o = OPPO(s);
-	size_t m=mobility();
+
 	int p_s = potential_mobility(s);
 	int p_o = potential_mobility(o);
 	int win_potential = p_o - p_s;
 
+	//评估函数策略，开局主要看稳定子，中盘看行动力，收官直接完美搜索
 	int e=empty_cnt();
 	int d=60-e;
-	if (d<16) {
+	if (d<=16) {//开局
 		return win_potential;
-	} else {
-		if (is_active(LU) or is_active(RU) or is_active(LD) or is_active(RD)) {
-			return 5+win_potential;
-		} else {
-			return win_potential;
-		}
+	} else if (d<=50) {//中盘
+		int s_s = get_stable_stones_size(s);
+		int s_o = get_stable_stones_size(o);
+		int win_stable= s_s - s_o;
+
+//		if (IS_COLOR(LU, s)) ++cnt;
+//		if (IS_COLOR(RU, s)) ++cnt;
+//		if (IS_COLOR(LD, s)) ++cnt;
+//		if (IS_COLOR(RD, s)) ++cnt;
+		return 0.3* m + 0.6 * win_stable;
+	} else {//收官
+		return m;
+//		if (is_active(LU) or is_active(RU) or is_active(LD) or is_active(RD)) {
+//			return 5+win_potential;
+//		} else {
+//			return win_potential;
+//		}
 	}
-	return 0;
+	return win_potential;
 }
 
+size_t Board::get_stable_stones_size(color s) const {
+	//基本思想：从4个角出发，寻找和角相连的边上的子
+	size_t cnt=0;
+	pos_t p;
+
+#define SCAN_FOR_STABLE(VERTEX, DERECTION1, DERECTION2) \
+	if (IS_COLOR(VERTEX, s)) { \
+		p=VERTEX; \
+		do { \
+			++cnt; \
+			p=DERECTION1(p); \
+		} while (IS_COLOR(p, s)); \
+		p=VERTEX; \
+		do { \
+			++cnt; \
+			p=DERECTION2(p); \
+		} while (IS_COLOR(p, s)); \
+	}
+
+	APPLY_4_TUPLE_DIRECTIONS(SCAN_FOR_STABLE)
+
+#undef SCAN_FOR_STABLE
+
+	return cnt;
+}
 void Board::init_from_str(const string& query) {
 	assert(query.size() == 65);
 	total[EMPTY] = 0;

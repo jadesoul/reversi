@@ -16,7 +16,7 @@ Score Game::start() {
 	white.reset();
 	while (!game_over()) {
 
-		system("clear");
+//		system("clear");
 
 		color turn=board.get_current_turn();
 		Player& player=(turn==BLACK)?black:white;
@@ -35,7 +35,7 @@ Score Game::start() {
 		}
 
 		log_status(board);
-		getchar();
+//		getchar();
 	}
 
 	log_info("Game Over!!");
