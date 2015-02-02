@@ -55,7 +55,7 @@ typedef map<pos_t, double> Choices;
 #define LAST			(MAP_WIDTH + BOARD_BODY)
 
 //是否是棋子颜色（而非辅助性颜色）
-#define IS_STONE(color)	((color)==WHITE || (color)==BLACK)
+#define IS_STONE(color)	((color)==WHITE or (color)==BLACK)
 
 //Note that POS(-1, -1) == 0
 #define POS(i, j)		(FIRST + (i) * MAP_WIDTH + (j))
@@ -200,19 +200,37 @@ typedef map<pos_t, double> Choices;
 									MACRO(LD, EAST, NORTH) \
 									MACRO(RD, WEST, NORTH)
 
+#define APPLY_8_PAIR_DERECTION_AND_ENUM(MACRO)	\
+									MACRO(EAST, LEFT) \
+									MACRO(WEST, RIGHT) \
+									MACRO(NORTH, DOWN) \
+									MACRO(SOUTH, UP) \
+									MACRO(NW, RIGHT_DOWN) \
+									MACRO(NE, LEFT_DOWN) \
+									MACRO(SW, RIGHT_UP) \
+									MACRO(SE, LEFT_UP)
+
+
 
 #define ABS(x) ((x) < 0 ? -(x) : (x))
 #define MIN(a, b) ((a)<(b) ? (a) : (b))
 #define MAX(a, b) ((a)<(b) ? (b) : (a))
 
 //8个方向
-#define RIGHT		0
-#define RIGHT_DOWN	1
-#define DOWN		2
-#define LEFT_DOWN	3
-#define LEFT		4
-#define LEFT_UP		5
-#define UP			6
-#define RIGHT_UP	7
+#define RIGHT		1
+#define RIGHT_DOWN	1<<1
+#define DOWN		1<<2
+#define LEFT_DOWN	1<<3
+#define LEFT		1<<4
+#define LEFT_UP		1<<5
+#define UP			1<<6
+#define RIGHT_UP	1<<7
+
+//根据搜集得到的一个子周围的信息的8比特位判断是否是稳定子，即永远也不可能再被对手吃掉的子
+#define IS_STABLE_STONE(BITS) \
+	( ((BITS & LEFT) or (BITS & RIGHT)) \
+	and ((BITS & UP) or (BITS & DOWN)) \
+	and ((BITS & LEFT_UP) or (BITS & RIGHT_DOWN)) \
+	and ((BITS & LEFT_DOWN) or (BITS & RIGHT_UP)) )
 
 #endif /* COMMON_H_1421849265_74 */

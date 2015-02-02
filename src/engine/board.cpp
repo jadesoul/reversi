@@ -248,7 +248,9 @@ double Board::evaluate_and_predict_win_score() const {
 //		if (IS_COLOR(RU, s)) ++cnt;
 //		if (IS_COLOR(LD, s)) ++cnt;
 //		if (IS_COLOR(RD, s)) ++cnt;
-		return 0.3* m + 0.6 * win_stable;
+//		return 0.3* m + 0.6 * win_stable;
+		return win_stable;
+//		return 0.5*m + win_stable;
 	} else {//收官
 		return m;
 //		if (is_active(LU) or is_active(RU) or is_active(LD) or is_active(RD)) {
@@ -261,6 +263,10 @@ double Board::evaluate_and_predict_win_score() const {
 }
 
 size_t Board::get_stable_stones_size(color s) const {
+
+//#define GET_STABLE_ALGO_1
+
+#ifdef GET_STABLE_ALGO_1
 	//基本思想：从4个角出发，寻找和角相连的边上的子
 	size_t cnt=0;
 	pos_t p;
@@ -284,7 +290,51 @@ size_t Board::get_stable_stones_size(color s) const {
 #undef SCAN_FOR_STABLE
 
 	return cnt;
+#else
+
+	//判断是稳定子的标准：
+	//	从当前子出发，如果横竖撇捺四条线（8个方向），每条线上都至少有一个方向满足：
+	//	当前子直接与墙相邻，或者当前子通过连续的自己的子与墙相连
+	//	如果某一条线的两个方向都满足当前子两侧都没有空格，也可以
+
+	uchar touching_wall[MAP_SIZE];//每个棋子在哪些方向上直接或间接地挨着墙壁
+//	uchar has_empty[MAP_SIZE];//每个棋子的各个方向的一侧是否有空格
+	memset(touching_wall, 0, sizeof(uchar)*MAP_SIZE);
+//	memset(has_empty, 0, sizeof(uchar)*MAP_SIZE);
+	size_t cnt=0;
+	pos_t p;
+
+	//射线法，从边缘的墙出发，向各个方向投射射线
+	for_n(pos, MAP_SIZE) {
+		if (BOARD(pos)==WALL) {
+
+#define SCAN_FOR_STABLE_BY_LIGHTING(DIRECTION, ENUM) \
+			p=DIRECTION(pos); \
+			if (p<MAP_SIZE and (BOARD(p)==s)) { \
+				do { \
+					touching_wall[p] |= ENUM; \
+					p=DIRECTION(p); \
+				} while (BOARD(p)==s); \
+			}
+
+			APPLY_8_PAIR_DERECTION_AND_ENUM(SCAN_FOR_STABLE_BY_LIGHTING)
+
+#undef SCAN_FOR_STABLE_BY_LIGHTING
+
+		}
+	}
+
+	for (pos_t pos = FIRST; pos < LAST; ++pos) {
+		if (BOARD(pos)==s) {
+			uchar bits=touching_wall[pos];
+			if (IS_STABLE_STONE(bits)) ++cnt;
+		}
+	}
+	return cnt;
+
+#endif
 }
+
 void Board::init_from_str(const string& query) {
 	assert(query.size() == 65);
 	total[EMPTY] = 0;

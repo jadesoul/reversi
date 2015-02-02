@@ -22,6 +22,8 @@ State::State(const Board& board) {
 				moves.push_back(pos);
 			}
 		}
+		//可以在这里随机丢掉一些节点，通过减少节点数提高深度，近似于蒙特卡洛思想
+		//if (size>10) { shuffle, pop pop }
 //		std::random_shuffle(moves.begin(), moves.end());
 		assert(moves.size() == mobility);
 	}

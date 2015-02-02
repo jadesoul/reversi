@@ -84,6 +84,10 @@ public:
 
 	//计算局面上有多少指定颜色的稳定子
 	size_t get_stable_stones_size(color s) const;
+
+	//计算局面上指定颜色的稳定子与对手稳定子个数之差
+//	int get_stable_stones_size_diff(color s) const;
+
 private:
 	//开局时，初始化棋盘
 	void init_board_map();
