@@ -20,35 +20,35 @@ public:
 	}
 
 	void playTest() {
-		Board b;
-		b.dump();
-		cout<<"b.play(2, 3)="<<b.play(2, 3)<<endl;
-		b.dump();
-		cout<<"b.play(2, 4)="<<b.play(2, 4)<<endl;
-		b.dump();
-		cout<<"b.play(4, 5)="<<b.play(4, 5)<<endl;
-		b.dump();
+		init_board_map();
+		dump();
+		cout<<"b.play(2, 3)="<<play(2, 3)<<endl;
+		dump();
+		cout<<"b.play(2, 4)="<<play(2, 4)<<endl;
+		dump();
+		cout<<"b.play(4, 5)="<<play(4, 5)<<endl;
+		dump();
 
-		cout<<"b.play(0, 0)="<<b.play(0, 0)<<endl;
-		b.dump();
+		cout<<"b.play(0, 0)="<<play(0, 0)<<endl;
+		dump();
 	}
 
 	void setTest() {
-		Board b;
-		b.dump();
-		b.set(0, 7, BLACK);
+		init_board_map();
+		dump();
+		set(0, 7, BLACK);
 		cout<<"b.set(0, 7, BLACK);"<<endl;
-		b.dump();
-		b.set(6, 2, WHITE);
+		dump();
+		set(6, 2, WHITE);
 		cout<<"b.set(6, 2, WHITE);"<<endl;
-		b.dump();
+		dump();
 	}
 };
 
 int main () {
-	openings = new OpeningBook();
+//	openings = new OpeningBook();
 	init_board_hash_table();
 	BoardTest test;
-	delete openings;
+//	delete openings;
 }
 

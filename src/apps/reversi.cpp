@@ -33,7 +33,7 @@ void human_vs_AI() {
 
 void AI_vs_AI() {
 //	EasyAIPlayer black;
-//	EasyAIPlayer white;
+	EasyAIPlayer white;
 
 //	Look1AIPlayer black;
 //	Look1AIPlayer white;
@@ -42,7 +42,7 @@ void AI_vs_AI() {
 //	Look2AIPlayer white;
 
 //	RandomAIPlayer black;
-	RandomAIPlayer white;
+//	RandomAIPlayer white;
 
 //	MonteCarloAIPlayer black;
 //	MonteCarloAIPlayer white;
@@ -55,6 +55,9 @@ void AI_vs_AI() {
 
 //	NeuralNetworkAIPlayer black;
 //	NeuralNetworkAIPlayer white;
+
+//	CompoundAIPlayer black;
+//	CompoundAIPlayer white;
 
 	uint total = 1 / TOTAL_THREADS;
 //	cin>>total;

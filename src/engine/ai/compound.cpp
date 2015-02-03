@@ -12,7 +12,8 @@
 
 pos_t CompoundAIPlayer::play(Board& board) {
 	if (board.empty_cnt() <= 10) {
-		return LookNAIPlayer::play(board);
+		return lookn.play(board);
 	}
-	return Look2AIPlayer::play(board);;
+	return look2.play(board);
 }
+

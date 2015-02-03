@@ -15,7 +15,7 @@
 #include "game.h"
 #include "ai.h"
 #include "human.h"
-//#include "neuralnet.h"
+#include "neuralnet.h"
 
 bool check1(const char* s) {
 	int n = strlen(s);

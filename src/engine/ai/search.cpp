@@ -21,7 +21,7 @@ pos_t LookNAIPlayer::play(Board& board) {
 	uchar self=board.turn();
 //	log_status(board);
 
-	uint depth=4; //最多的搜索层数
+	uint depth=5; //最多的搜索层数
 	if (board.empty_cnt()<=10) depth=16;//当游戏快结束时，多搜索几层
 //	if (board.empty_cnt()<=8) depth=16;//当游戏快结束时，多搜索几层
 
@@ -68,6 +68,7 @@ pos_t LookNAIPlayer::play(Board& board) {
 //		getchar();
 
 		if (! current.end()) {
+			
 			current.next();//每次进来先自增，再处理自增前的
 			pos_t p=current.get_move_pos();
 			Board think=current.board;
@@ -91,7 +92,10 @@ pos_t LookNAIPlayer::play(Board& board) {
 					int win=score.win(think.turn());
 					current.update_score(- win);
 					log_debug("game over, win="<<win);
-					if (think.black_cnt()==0 or think.white_cnt()==0) log_warn(think);
+					if (think.black_cnt()==0 or think.white_cnt()==0) {
+						log_warn(think);
+						cout<<think<<endl;
+					}
 				} else { //搜索深度达到了
 					++total_meet_depth;
 					double score=think.evaluate_and_predict_win_score();
@@ -105,8 +109,16 @@ pos_t LookNAIPlayer::play(Board& board) {
 			if (n==1) { //root出栈，处理完了
 				root_score=history[0].score;
 				best_pos=history[0].best;
+//				log_status("current="<<current);
+//				root=history[0];
 			} else if (n>1) { //搜集当前节点的评分到父节点
 				history[n-2].update_score(- history[n-1].score);
+//				if (n==2) {
+//					log_status("current="<<current<<" update="<< -history[n-1].score);
+//				}
+//				if (current.score==8888) {
+//					log_status("current="<<current);
+//				}
 			}
 			history.pop_back();
 		}

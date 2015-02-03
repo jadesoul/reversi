@@ -21,5 +21,7 @@
 #include "ai/montecarlo.h"
 #include "ai/cached_montecarlo.h"
 #include "ai/search.h"
+#include "ai/compound.h"
+#include "ai/neuralnet.h"
 
 #endif /* AI_H_1372368194_48 */

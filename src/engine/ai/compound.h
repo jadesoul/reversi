@@ -15,7 +15,10 @@
 #include "search.h"
 
 //合成各种AI的特长
-class CompoundAIPlayer : public Look2AIPlayer, LookNAIPlayer {
+class CompoundAIPlayer : public OpeningBookPlayer {
+private:
+	Look2AIPlayer look2;
+	LookNAIPlayer lookn;
 public:
 	virtual pos_t play(Board& board);
 };

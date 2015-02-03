@@ -224,42 +224,51 @@ color Board::get_current_turn() const {
 }
 
 double Board::evaluate_and_predict_win_score() const {
-	size_t m=mobility();
-//	return m;
-
+	double m=mobility();
 	color s = turn();
 	color o = OPPO(s);
-
-	int p_s = potential_mobility(s);
-	int p_o = potential_mobility(o);
-	int win_potential = p_o - p_s;
 
 	//评估函数策略，开局主要看稳定子，中盘看行动力，收官直接完美搜索
 	int e=empty_cnt();
 	int d=60-e;
 	if (d<=16) {//开局
+		int p_s = potential_mobility(s);
+		int p_o = potential_mobility(o);
+		int win_potential = p_o - p_s;
 		return win_potential;
-	} else if (d<=50) {//中盘
+	} else /*if (d<=50)*/ {//中盘//收官
 		int s_s = get_stable_stones_size(s);
 		int s_o = get_stable_stones_size(o);
 		int win_stable= s_s - s_o;
 
-//		if (IS_COLOR(LU, s)) ++cnt;
-//		if (IS_COLOR(RU, s)) ++cnt;
-//		if (IS_COLOR(LD, s)) ++cnt;
-//		if (IS_COLOR(RD, s)) ++cnt;
-//		return 0.3* m + 0.6 * win_stable;
-		return win_stable;
-//		return 0.5*m + win_stable;
-	} else {//收官
-		return m;
-//		if (is_active(LU) or is_active(RU) or is_active(LD) or is_active(RD)) {
-//			return 5+win_potential;
-//		} else {
-//			return win_potential;
-//		}
+		int good=0;
+//		if (is_active(LU)) ++good;
+//		if (is_active(RU)) ++good;
+//		if (is_active(LD)) ++good;
+//		if (is_active(RD)) ++good;
+//
+//		if (IS_COLOR(LU1, s)) --good;
+//		if (IS_COLOR(LU2, s)) --good;
+//		if (IS_COLOR(LU3, s)) --good;
+//
+//		if (IS_COLOR(RU1, s)) --good;
+//		if (IS_COLOR(RU2, s)) --good;
+//		if (IS_COLOR(RU3, s)) --good;
+//
+//		if (IS_COLOR(LD1, s)) --good;
+//		if (IS_COLOR(LD2, s)) --good;
+//		if (IS_COLOR(LD3, s)) --good;
+//
+//		if (IS_COLOR(RD1, s)) --good;
+//		if (IS_COLOR(RD2, s)) --good;
+//		if (IS_COLOR(RD3, s)) --good;
+
+		return win_stable+2*good;
+
+//		if (win_stable>0) return win_stable;
+//		else return m+win_stable;
 	}
-	return win_potential;
+	return 0;
 }
 
 size_t Board::get_stable_stones_size(color s) const {
@@ -513,6 +522,10 @@ ostream& Board::dump(ostream& o) const {
 	o << " hash=0x"<< std::hex << hash << std::dec;
 	o << endl;
 
+	o << "black_stable=" << get_stable_stones_size(BLACK);
+	o << " white_stable=" << get_stable_stones_size(WHITE);
+	o << " win=" << evaluate_and_predict_win_score();
+	o << endl;
 
 	o << "history=";
 	for_n(i, pointer+1) o<<history[i]<<' ';

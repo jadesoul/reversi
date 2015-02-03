@@ -28,7 +28,12 @@ public:
 	inline size_t pass_cnt() const { return total[PASS]; }
 	inline bool is_active(uint x, uint y) const { return is_active(POS(x, y)); }
 	inline bool is_active(pos_t pos) const { return BOARD(pos)==ACTIVE; }
-	inline hash_t get_hash() { return hash; }
+
+	//获取棋盘局面哈希
+	inline hash_t get_hash() const { return hash; }
+
+	//获取指定位置棋子的颜色
+	inline color get_stone_color(pos_t pos) const { return BOARD(pos); }
 
 	//无子可下，或者连续两次PASS
 	inline bool game_over() { return empty_cnt()==0 or pass_cnt()>=2; }
@@ -88,7 +93,7 @@ public:
 	//计算局面上指定颜色的稳定子与对手稳定子个数之差
 //	int get_stable_stones_size_diff(color s) const;
 
-private:
+protected:
 	//开局时，初始化棋盘
 	void init_board_map();
 

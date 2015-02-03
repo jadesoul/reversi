@@ -228,9 +228,9 @@ typedef map<pos_t, double> Choices;
 
 //根据搜集得到的一个子周围的信息的8比特位判断是否是稳定子，即永远也不可能再被对手吃掉的子
 #define IS_STABLE_STONE(BITS) \
-	( ((BITS & LEFT) or (BITS & RIGHT)) \
-	and ((BITS & UP) or (BITS & DOWN)) \
-	and ((BITS & LEFT_UP) or (BITS & RIGHT_DOWN)) \
-	and ((BITS & LEFT_DOWN) or (BITS & RIGHT_UP)) )
+			( ((BITS & LEFT) or (BITS & RIGHT)) \
+			and ((BITS & UP) or (BITS & DOWN)) \
+			and ((BITS & LEFT_UP) or (BITS & RIGHT_DOWN)) \
+			and ((BITS & LEFT_DOWN) or (BITS & RIGHT_UP)) )
 
 #endif /* COMMON_H_1421849265_74 */
