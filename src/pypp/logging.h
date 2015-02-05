@@ -56,27 +56,35 @@
 //#define LOG_LEVEL LOG_LEVEL_NONE
 
 #if defined(LOG_LEVEL) && (LOG_LEVEL<LOG_LEVEL_DEBUG)
+    #undef log_debug
 	#define log_debug(...)
 #endif
 
 #if defined(LOG_LEVEL) && (LOG_LEVEL<LOG_LEVEL_INFO)
+    #undef log_info
 	#define log_info(...)
 #endif
 
 #if defined(LOG_LEVEL) && (LOG_LEVEL<LOG_LEVEL_STATUS)
+    #undef log_status
 	#define log_status(...)
 #endif
 
 #if defined(LOG_LEVEL) && (LOG_LEVEL<LOG_LEVEL_WARN)
+    #undef log_warn
 	#define log_warn(...)
 #endif
 
 #if defined(LOG_LEVEL) && (LOG_LEVEL<LOG_LEVEL_ERROR)
+    #undef log_error
+    #undef die_error
 	#define log_error(...)
 	#define die_error(...)
 #endif
 
 #if defined(LOG_LEVEL) && (LOG_LEVEL<LOG_LEVEL_FATAL)
+    #undef log_fatal
+    #undef die_fatal
 	#define log_fatal(...)
 	#define die_fatal(...)
 #endif

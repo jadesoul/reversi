@@ -135,7 +135,7 @@ bool Game::start_expand_opening(map<Board, Choices>& book) {
 		if (mobility == 0) {
 			board.pass();
 		} else {
-			history.push_back(make_pair(board, PASS));
+			history.push_back(std::make_pair(board, PASS));
 
 			pos_t pos=player.play(board);
 			history.back().second=pos;

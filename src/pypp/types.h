@@ -10,9 +10,11 @@
  * Written In: Alibaba-inc, Hangzhou, China
  */
 
+#include <limits.h>
+#define __STDC_LIMIT_MACROS
 #include <stdint.h>
 
-typedef unsigned long long ulong;
+//typedef unsigned long long ulong;
 typedef unsigned char uchar;
 typedef unsigned int uint;
 
