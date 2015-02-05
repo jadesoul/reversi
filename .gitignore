@@ -20,3 +20,4 @@ src/engine.cpp
 .DS_Store
 .buildpath
 .settings
+model
