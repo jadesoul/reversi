@@ -28,7 +28,7 @@ State::State(const Board& board) {
 		assert(moves.size() == mobility);
 	}
 	index = 0;
-	score = INT32_MIN;
+	score = -1e100;
 	best = PASS;
 }
 

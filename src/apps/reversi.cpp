@@ -33,7 +33,8 @@ void human_vs_AI() {
 
 void AI_vs_AI() {
 //	EasyAIPlayer black;
-	EasyAIPlayer white;
+	//EasyAIPlayer white;
+
 
 //	Look1AIPlayer black;
 //	Look1AIPlayer white;
@@ -51,7 +52,7 @@ void AI_vs_AI() {
 //	CachedMonteCarloAIPlayer white;
 
 	LookNAIPlayer black;
-//	LookNAIPlayer white;
+    LookNAIPlayer white;
 
 //	NeuralNetworkAIPlayer black;
 //	NeuralNetworkAIPlayer white;
