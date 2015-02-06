@@ -44,6 +44,7 @@ protected:
 	inline void read_input(const Board& board) { for_n(i, 64) X[i]=board.get_stone_color(POS(i/8, i%8)); }
 
 	void reset();
+	void train_one_move(const Board& board, pos_t pos);
 
 	inline void reset_hidden() { for_n(i, HIDDEN_SIZE) H[i] = H_ERR[i] = 0; }
 

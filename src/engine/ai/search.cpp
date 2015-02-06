@@ -21,7 +21,7 @@ pos_t LookNAIPlayer::play(Board& board) {
 	uchar self=board.turn();
 //	log_status(board);
 
-	uint depth=7; //最多的搜索层数
+	uint depth=5; //最多的搜索层数
 	if (board.empty_cnt()<=10) depth=16;//当游戏快结束时，多搜索几层
 //	if (board.empty_cnt()<=8) depth=16;//当游戏快结束时，多搜索几层
 

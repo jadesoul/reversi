@@ -11,16 +11,16 @@
 #include "engine/engine.h"
 
 class NeuralNetworkTest {
-	public:
-		NeuralNetwork network;
+public:
+	NeuralNetwork network;
 
-		NeuralNetworkTest() {
-			ofstream init("model/init.model");
-			init<<network;
-			network.train();
-			ofstream trained("model/trained.model");
-			trained<<network;
-		}
+	NeuralNetworkTest() {
+		ofstream init("model/init.model");
+		init<<network;
+		network.train();
+		ofstream trained("model/trained.model");
+		trained<<network;
+	}
 };
 
 int main () {

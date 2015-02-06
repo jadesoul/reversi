@@ -29,6 +29,8 @@ public:
 	inline bool is_active(uint x, uint y) const { return is_active(POS(x, y)); }
 	inline bool is_active(pos_t pos) const { return BOARD(pos)==ACTIVE; }
 
+	inline Move get_history_move(int i) const { return history[i]; }
+
 	//获取棋盘局面哈希
 	inline hash_t get_hash() const { return hash; }
 

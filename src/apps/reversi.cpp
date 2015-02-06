@@ -33,7 +33,7 @@ void human_vs_AI() {
 
 void AI_vs_AI() {
 //	EasyAIPlayer black;
-	//EasyAIPlayer white;
+//	EasyAIPlayer white;
 
 
 //	Look1AIPlayer black;

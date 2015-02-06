@@ -9,6 +9,7 @@
  */
 
 #include "neuralnet.h"
+#include "ai.h"
 
 NeuralNetwork::NeuralNetwork() {
 	alpha = 0.025;
@@ -17,13 +18,117 @@ NeuralNetwork::NeuralNetwork() {
 	fill_sigmoid_table();
 }
 
+void NeuralNetwork::train_one_move(const Board& board, pos_t pos) {
+	read_input(board);
+
+	uint kk = I(pos) * 8 + J(pos);
+	log_debug("train nwetwork from move:"<<Move(pos, board.turn)<<", score="<<score);
+
+	//将当前棋步作为训练数据
+	reset_hidden();
+
+	// X -> H : 每个隐藏层节点的值等于输入层向量 点乘 对应的权重向量
+	log_debug("X -> H");
+	for_n(j, HIDDEN_SIZE)
+	{
+		H[j] = 0;
+		for_n(i, 64)
+		{
+			H[j] += X[i] * XH[i][j];
+		}
+	}
+
+	// H -> Y : 每个输出层节点的值等于隐藏节点向量 点乘 对应的权重向量
+	log_debug("H -> Y");
+	for_n(k, 64)
+	{
+		real label;
+
+		if (k == kk) {	//正样本
+			label = 1;
+		} else {	//负样本
+			if ((rand() / (real) RAND_MAX) < 0.01)
+				label = 0;
+			else
+				continue;
+		}
+
+		Y[k] = 0;
+		for_n(j, HIDDEN_SIZE)
+		{
+			Y[k] += H[j] * HY[j][k];
+		}
+
+		//计算梯度
+		real f = sigmoid(Y[k]);
+		double g = alpha * (label - f);
+		log_debug("caculate label="<<label<<", f="<<f<<", g="<<g<<", alpha="<<alpha<<", move="<<Pos(move));
+
+		//Y -> H: 计算误差向量,后向传播误差
+		log_debug("Y -> H");
+		for_n(j, HIDDEN_SIZE)
+		{
+			H_ERR[j] += g * HY[j][k];
+		}
+
+		//更新隐藏层到输出层权重
+		for_n(j, HIDDEN_SIZE)
+		{
+			HY[j][k] += g * H[j];
+		}
+
+		//H -> X: 误差向量累加到输入到隐藏层权重向量
+		log_debug("H -> X");
+		for_n(i, 64)
+		{
+			for_n(j, HIDDEN_SIZE)
+			{
+				XH[i][j] += H_ERR[j];
+			}
+		}
+	}
+}
+
 void NeuralNetwork::train() {
 	log_warn("NeuralNetwork start training ...");
-	if (true) {
-		//			RandomAIPlayer black, white;
-		//			Game game(black, white);
 
-		//先拿开局库试水
+	uint train_with_random_games_cnt=10000;
+	RandomAIPlayer black, white;
+	uint total=train_with_random_games_cnt;
+	for_n(cnt, total) {
+		if (cnt % 100 == 0)
+			log_warn("trained: "<<cnt<<"/"<<total<<"="<<(float(cnt)/total));
+
+		Game game(black, white);
+		Score score = game.start();
+		int diff = score.diff();
+		Board& finished=game.get_board();
+
+		Board board;
+		int pointer=0;
+		while (!board.game_over()) {
+			uchar mobility=board.mobility();
+
+			if (mobility==0) {
+				board.pass();
+			} else {
+				Move move=finished.get_history_move(pointer);
+				color turn=board.get_current_turn();
+//				if (move.turn!=turn) {
+//					log_warn("why:"<<board);
+//				}
+				assert(move.turn==turn);
+				pos_t pos=move.pos;
+
+				train_one_move(board, pos);
+				board.play(pos);
+				++pointer;
+			}
+		}
+	}
+
+	bool train_with_opennings=false;
+	if (train_with_opennings) {
 		map<Board, Choices>& book = openings->book;
 		uint total = book.size();
 		uint cnt = 0;
@@ -31,91 +136,19 @@ void NeuralNetwork::train() {
 			++cnt;
 			if (cnt % 10000 == 0)
 				log_warn("trained: "<<cnt<<"/"<<total<<"="<<(float(cnt)/total));
+
 			const Board& board = entry.first;
 			Choices& choices = entry.second;
 
 			log_debug(board);
 
-			//拷贝棋盘
-//					memcpy((void*)X, (const void*)board.map, 64);
-			//性能优化
-//				X = &(board.map[0][0]);
-			read_input(board);
-
 			for (pair<const pos_t, double>& choice : choices) {
 				pos_t pos = choice.first;
-				uint kk = I(pos) * 8 + J(pos);
-				double score = choice.second;
-
-				log_debug("train nwetwork from move:"<<Move(pos, board.turn)<<", score="<<score);
-
-				//将当前棋步作为训练数据
-				reset_hidden();
-
-				// X -> H : 每个隐藏层节点的值等于输入层向量 点乘 对应的权重向量
-				log_debug("X -> H");
-				for_n(j, HIDDEN_SIZE)
-				{
-					H[j] = 0;
-					for_n(i, 64)
-					{
-						H[j] += X[i] * XH[i][j];
-					}
-				}
-
-				// H -> Y : 每个输出层节点的值等于隐藏节点向量 点乘 对应的权重向量
-				log_debug("H -> Y");
-				for_n(k, 64)
-				{
-
-					real label;
-
-					if (k == kk) {					//正样本
-						label = 1;
-					} else {					//负样本
-						if ((rand() / (real) RAND_MAX) < 0.01)
-							label = 0;
-						else
-							continue;
-					}
-
-					Y[k] = 0;
-					for_n(j, HIDDEN_SIZE)
-					{
-						Y[k] += H[j] * HY[j][k];
-					}
-
-					//计算梯度
-					real f = sigmoid(Y[k]);
-					double g = alpha * (label - f);
-					log_debug("caculate label="<<label<<", f="<<f<<", g="<<g<<", alpha="<<alpha<<", move="<<Pos(move));
-
-					//Y -> H: 计算误差向量,后向传播误差
-					log_debug("Y -> H");
-					for_n(j, HIDDEN_SIZE)
-					{
-						H_ERR[j] += g * HY[j][k];
-					}
-
-					//更新隐藏层到输出层权重
-					for_n(j, HIDDEN_SIZE)
-					{
-						HY[j][k] += g * H[j];
-					}
-
-					//H -> X: 误差向量累加到输入到隐藏层权重向量
-					log_debug("H -> X");
-					for_n(i, 64)
-					{
-						for_n(j, HIDDEN_SIZE)
-						{
-							XH[i][j] += H_ERR[j];
-						}
-					}
-				}
+				train_one_move(board, pos);
 			}
 		}
 	}
+
 	log_warn("NeuralNetwork finished training");
 }
 

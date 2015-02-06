@@ -29,6 +29,8 @@ public:
 	Game(Player& black, Player& white, Board& board):
 		black(black), white(white), board(board) {}
 	
+	inline Board& get_board() { return board; }
+
 	//游戏是否结束
 	inline bool game_over() { return board.game_over(); }
 
