@@ -95,9 +95,17 @@ void NeuralNetwork::train() {
 	uint train_with_random_games_cnt=10000;
 	RandomAIPlayer black, white;
 	uint total=train_with_random_games_cnt;
+	uint trained=0;
+	timer previous;
 	for_n(cnt, total) {
-		if (cnt % 100 == 0)
-			log_warn("trained: "<<cnt<<"/"<<total<<"="<<(float(cnt)/total));
+		if (cnt % 100 == 0) {
+			double gap=previous.elapsed();
+			log_status("games: "<<cnt<<"/"<<total<<"="<<(float(cnt)/total)
+					<<" trained="<<trained
+					<<" time="<<gap
+					<<" speed="<<(0.001*trained/gap)<<"kboard/s"
+					);
+		}
 
 		Game game(black, white);
 		Score score = game.start();
@@ -120,7 +128,11 @@ void NeuralNetwork::train() {
 				assert(move.turn==turn);
 				pos_t pos=move.pos;
 
-				train_one_move(board, pos);
+				if (turn==score.winner) {
+					++trained;
+					train_one_move(board, pos);
+				}
+
 				board.play(pos);
 				++pointer;
 			}
@@ -144,6 +156,7 @@ void NeuralNetwork::train() {
 
 			for (pair<const pos_t, double>& choice : choices) {
 				pos_t pos = choice.first;
+				++trained;
 				train_one_move(board, pos);
 			}
 		}
