@@ -225,7 +225,7 @@ color Board::get_current_turn() const {
 
 double Board::evaluate_and_predict_win_score() const {
 	double m=mobility();
-//    return m;
+    return m;
 	color s = turn();
 	color o = OPPO(s);
 

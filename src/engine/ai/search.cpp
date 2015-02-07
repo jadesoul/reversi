@@ -49,7 +49,7 @@ pos_t LookNAIPlayer::play(Board& board) {
 					<<" searched="<<total_searched_nodes
 					<<" time="<<gap
 					<<" depth="<<history.size()
-					<<" speed="<<(0.001*total_searched_nodes/gap)<<"kn/s"
+					<<" speed="<<(0.001*total_searched_nodes/gap)<<"KN/s"
 					<<" endg="<<total_end_game
 					<<" meetd="<<total_meet_depth
 					<<" win="<< history.front().score
@@ -92,10 +92,9 @@ pos_t LookNAIPlayer::play(Board& board) {
 					int win=score.win(think.turn());
 					current.update_score(- win);
 					log_debug("game over, win="<<win);
-					if (think.black_cnt()==0 or think.white_cnt()==0) {
-						log_warn(think);
-						cout<<think<<endl;
-					}
+//					if (think.black_cnt()==0 or think.white_cnt()==0) {
+//						log_warn(think);
+//					}
 				} else { //搜索深度达到了
 					++total_meet_depth;
 					double score=think.evaluate_and_predict_win_score();
@@ -125,7 +124,7 @@ pos_t LookNAIPlayer::play(Board& board) {
 	}
 
 	assert(best_pos!=PASS);
-	log_status(COLOR(self)<<" LookNAIPlayer, play at "<<Move(self, best_pos)<<", score="<<root_score);
+	log_info(COLOR(self)<<" LookNAIPlayer, play at "<<Move(self, best_pos)<<", score="<<root_score);
 	board.play(best_pos);
 
 	return best_pos;

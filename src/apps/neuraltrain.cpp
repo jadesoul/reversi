@@ -15,11 +15,13 @@ public:
 	NeuralNetwork network;
 
 	NeuralNetworkTest() {
-		ofstream init("model/init.model");
-		init<<network;
-		network.train();
-		ofstream trained("model/trained.model");
-		trained<<network;
+//		network.save_model("model/init.model");
+
+//		network.train();
+//		network.save_model("model/trained.model");
+
+		network.load_model("model/trained.model");
+		network.save_model("model/trained2.model");
 	}
 };
 
@@ -32,3 +34,4 @@ int main () {
 	delete openings;
 	return 0;
 }
+

@@ -93,17 +93,19 @@ void NeuralNetwork::train() {
 	log_warn("NeuralNetwork start training ...");
 
 	uint train_with_random_games_cnt=10000;
-	RandomAIPlayer black, white;
+	RandomAIPlayer black;
+//	RandomAIPlayer white;
+    LookNAIPlayer white;
 	uint total=train_with_random_games_cnt;
 	uint trained=0;
 	timer previous;
 	for_n(cnt, total) {
-		if (cnt % 100 == 0) {
+		if (cnt % 10 == 0) {
 			double gap=previous.elapsed();
 			log_status("games: "<<cnt<<"/"<<total<<"="<<(float(cnt)/total)
 					<<" trained="<<trained
 					<<" time="<<gap
-					<<" speed="<<(0.001*trained/gap)<<"kboard/s"
+					<<" speed="<<(0.001*trained/gap)<<"KB/s"
 					);
 		}
 
@@ -208,6 +210,12 @@ pos_t NeuralNetwork::predict(const Board& board) {
 	return POS(best / 8, best % 8);
 }
 
+void NeuralNetwork::save_model(const string& fp) const {
+	ofstream fout(fp);
+	fout<<*this;
+	fout.close();
+}
+
 ostream& NeuralNetwork::dump(ostream& o) const {
 	o << "===================NeuralNetwork===================" << endl;
 	o << "XH[j][i]:" << endl;
@@ -229,6 +237,36 @@ ostream& NeuralNetwork::dump(ostream& o) const {
 		o << endl;
 	}
 	return o << endl;
+}
+
+void NeuralNetwork::load_model(const string& fp) {
+	ifstream fin(fp);
+	fin>>*this;
+	fin.close();
+}
+
+istream& NeuralNetwork::from(istream& in) {
+	string s;
+	getline(in, s);
+	getline(in, s);
+	for_n(i, 64)
+	{
+		for_n(j, HIDDEN_SIZE)
+		{
+			in >> XH[i][j];
+		}
+		getline(in, s);
+	}
+	getline(in, s);
+	for_n(j, HIDDEN_SIZE)
+	{
+		for_n(k, 64)
+		{
+			in >> HY[j][k];
+		}
+		getline(in, s);
+	}
+	return in;
 }
 
 void NeuralNetwork::reset() {

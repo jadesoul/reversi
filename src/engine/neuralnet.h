@@ -13,7 +13,7 @@
 #include "board.h"
 #include "game.h"
 
-#define HIDDEN_SIZE 64//隐藏层的节点个数
+#define HIDDEN_SIZE 64	//隐藏层的节点个数
 typedef float real;
 
 #define EXP_TABLE_SIZE 1000			//sigmoid缓存表大小
@@ -37,8 +37,13 @@ public:
 
 	pos_t predict(const Board& board);
 
+	void save_model(const string& fp) const;
 	ostream& dump(ostream& o = cout) const;
 	friend inline ostream& operator<<(ostream& o, const NeuralNetwork& n) { return n.dump(o); }
+
+	void load_model(const string& fp);
+	istream& from(istream& i = cin);
+	friend inline istream& operator>>(istream& i, NeuralNetwork& n) { return n.from(i); }
 
 protected:
 	inline void read_input(const Board& board) { for_n(i, 64) X[i]=board.get_stone_color(POS(i/8, i%8)); }
