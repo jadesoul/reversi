@@ -34,16 +34,35 @@ const char* server(const char* s) {
 	if (!check1(s))
 		return "";
 
-//	EasyAIPlayer player;
-//	Look1AIPlayer player;
-//	Look2AIPlayer player;
-//	RandomAIPlayer player;
-//	MonteCarloAIPlayer player;
-//	CachedMonteCarloAIPlayer player;
-	LookNAIPlayer player;
+	if (openings==NULL) openings = new OpeningBook();
 
-	Player& black = player;
-	Player& white = player;
+//	EasyAIPlayer black;
+//	EasyAIPlayer white;
+
+//	Look1AIPlayer black;
+//	Look1AIPlayer white;
+
+//	Look2AIPlayer black;
+//	Look2AIPlayer white;
+
+//	RandomAIPlayer black;
+//	RandomAIPlayer white;
+
+//	MonteCarloAIPlayer black;
+//	MonteCarloAIPlayer white;
+
+//	CachedMonteCarloAIPlayer black;
+//	CachedMonteCarloAIPlayer white;
+
+	LookNAIPlayer black;
+	LookNAIPlayer white;
+
+//	NeuralNetworkAIPlayer black;
+//	NeuralNetworkAIPlayer white;
+
+//	CompoundAIPlayer black;
+//	CompoundAIPlayer white;
+
 	Game game(black, white);
 
 	string query = s;

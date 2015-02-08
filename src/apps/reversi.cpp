@@ -36,7 +36,7 @@ void AI_vs_AI() {
 //	EasyAIPlayer white;
 
 
-	Look1AIPlayer black;
+//	Look1AIPlayer black;
 //	Look1AIPlayer white;
 
 //	Look2AIPlayer black;
@@ -51,11 +51,11 @@ void AI_vs_AI() {
 //	CachedMonteCarloAIPlayer black;
 //	CachedMonteCarloAIPlayer white;
 
-//	LookNAIPlayer black;
-//    LookNAIPlayer white;
+	LookNAIPlayer black;
+    LookNAIPlayer white;
 
 //	NeuralNetworkAIPlayer black;
-	NeuralNetworkAIPlayer white;
+//	NeuralNetworkAIPlayer white;
 
 //	CompoundAIPlayer black;
 //	CompoundAIPlayer white;
@@ -107,7 +107,6 @@ public:
 		parallel<GameTestThread>(job_ids, TOTAL_THREADS, LOG_LEVEL_INFO);
 	}
 };
-
 
 int main () {
 	openings = new OpeningBook();

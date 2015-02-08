@@ -187,16 +187,19 @@ string Game::deal(const string& query) {
 	color turn=board.get_current_turn();
 	Player& player=(turn==BLACK)?black:white;
 	uchar mobility=board.mobility();
+	pos_t pos;
 
 	if (mobility==0) {
 		return "00";//表示PASS
+	} else if (mobility==1) {
+		pos=board.get_first_move();
 	} else {
-		pos_t pos=player.play(board);
-		int x=I(pos), y=J(pos);
-		char s[3];
-		s[0]='1'+x;//从1开始编号
-		s[1]='1'+y;
-		s[2]=0;
-		return s;
+		pos=player.play(board);
 	}
+	int x=I(pos), y=J(pos);
+	char s[3];
+	s[0]='1'+x;//从1开始编号
+	s[1]='1'+y;
+	s[2]=0;
+	return s;
 }

@@ -14,7 +14,7 @@
 #include "human.h"
 #include "game.h"
 
-OpeningBook* openings;
+OpeningBook* openings=NULL;
 
 OpeningBook::OpeningBook() {
 	load("/Users/jadesoul/git/reversi/data/openingslarge.txt");

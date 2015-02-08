@@ -10,6 +10,10 @@
  * 
  */
 
+function alert() {
+	return;
+}
+
 String.prototype.format = function() {
 	var s=this.valueOf();
 	for (var i=0; i<arguments.length; i++) {
@@ -244,14 +248,18 @@ Player.ComputerPlayer=function(name, color) {
 	this.play=function() {
 		if (game.over) return game.gameOver('游戏已结束，重新再来一局吧！');
 		game.clearSel();
-		$.get(this.AI.url+'?'+game.map.toString()+game.turn, this.realPlay);
+		var url=this.AI.url+'?'+game.map.toString()+game.turn;
+		
+		game.np.refreshGuys();
+		game.np.findAvails();
+		
+		$.get(url, this.realPlay);
 	}
 	
 	this.realPlay=function(r) {
-		//alert(r);
 		game.clearSel();
-		
 		game.np.refreshGuys();
+		
 		if (game.np.findAvails()>0) {
 			if (!(r && r.length==2 && r.charAt(0)>=1 && r.charAt(0)<=8 && r.charAt(1)>=1 && r.charAt(1)<=8)) alert('engine error, result:'+r);
 			var g=game.map.grid(r.charAt(0), r.charAt(1));
@@ -283,13 +291,11 @@ Player.ComputerPlayer=function(name, color) {
 			}
 		}
 		game.onePassed=null;
-		setTimeout('game.np.play()', 10);
+		setTimeout('game.np.play()', 510);
 	}
 	
 	return this;
 }
-
-
 
 Player.HumanPlayer=function(name, color) {
 	
@@ -429,8 +435,8 @@ Game.Reversi=function(blackPlayer, whitePlayer, initialMap) {
 				else if (this.map.grid(i, j).state==GridState.WHITE) this.w++;
 			}
 		}
-		$('#chess-black-count').html('<center style="margin-top:10px;">深蓝<br/>'+this.b+'</center>');
-		$('#chess-white-count').html('<center style="margin-top:10px;">游客<br/>'+this.w+'</center>');
+		$('#chess-black-count').html('<center style="margin-top:10px;">'+this.bp.name+'<br/>'+this.b+'</center>');
+		$('#chess-white-count').html('<center style="margin-top:10px;">'+this.wp.name+'<br/>'+this.w+'</center>');
 		if (this.b+this.w==64 || this.b==0 || this.w==0) game.over=true;
 	}
 	
@@ -458,6 +464,21 @@ var game;
 
 $(function (){
 	initGUI();
-	game=new Game.Reversi(new Player.ComputerPlayer('深蓝', GridState.BLACK), new Player.HumanPlayer('游客', GridState.WHITE));
+	
+//	game=new Game.Reversi(
+//		new Player.ComputerPlayer('深蓝', GridState.BLACK), 
+//		new Player.HumanPlayer('游客', GridState.WHITE)
+//	);
+
+	game=new Game.Reversi(
+		new Player.ComputerPlayer('深蓝', GridState.BLACK), 
+		new Player.ComputerPlayer('浅绿', GridState.WHITE)
+	);
+	
+//	game=new Game.Reversi(
+//		new Player.HumanPlayer('游客', GridState.BLACK), 
+//		new Player.ComputerPlayer('深蓝', GridState.WHITE)
+//	);
+	
 	game.start();
 })

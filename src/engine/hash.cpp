@@ -26,3 +26,4 @@ void init_board_hash_table() {
 		}
 	}
 }
+
