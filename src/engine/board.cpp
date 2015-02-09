@@ -229,10 +229,41 @@ double Board::evaluate_and_predict_win_score() const {
 	color s = turn();
 	color o = OPPO(s);
 
+
 	//评估函数策略，开局主要看稳定子，中盘看行动力，收官直接完美搜索
 	int e=empty_cnt();
 	int d=60-e;
-	if (d<=16) {//开局
+
+	bool opening2middle=(d<=16);
+
+#define USE_COMPLEX_RULE_OPEN2MID
+#ifdef USE_COMPLEX_RULE_OPEN2MID
+	//判断从开局进入中盘的标准：第一颗子下在边上
+	if (! opening2middle) {
+		for_n(i, 8) {
+			pos_t p1=POS(i, 0), p2=POS(i, 7);
+			color c1=BOARD(p1), c2=BOARD(p2);
+			if (IS_STONE(c1) or IS_STONE(c2)) {
+				opening2middle=true;
+				break;
+			}
+		}
+	}
+
+	if (! opening2middle) {
+		for (int j=1; j<7; ++j) {
+			pos_t p1=POS(0, j), p2=POS(7, j);
+			color c1=BOARD(p1), c2=BOARD(p2);
+			if (IS_STONE(c1) or IS_STONE(c2)) {
+				opening2middle=true;
+				break;
+			}
+		}
+	}
+
+#endif
+
+	if (! opening2middle) {//开局
 		int p_s = potential_mobility(s);
 		int p_o = potential_mobility(o);
 		int win_potential = p_o - p_s;
@@ -243,11 +274,11 @@ double Board::evaluate_and_predict_win_score() const {
 		int win_stable= s_s - s_o;
 
 		int good=0;
-//		if (is_active(LU)) ++good;
-//		if (is_active(RU)) ++good;
-//		if (is_active(LD)) ++good;
-//		if (is_active(RD)) ++good;
-//
+		if (is_active(LU)) ++good;
+		if (is_active(RU)) ++good;
+		if (is_active(LD)) ++good;
+		if (is_active(RD)) ++good;
+
 //		if (IS_COLOR(LU1, s)) --good;
 //		if (IS_COLOR(LU2, s)) --good;
 //		if (IS_COLOR(LU3, s)) --good;
