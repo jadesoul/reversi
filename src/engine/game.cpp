@@ -50,7 +50,7 @@ Score Game::start() {
 }
 
 //用于加载开局库
-bool Game::start_one_opening(const string& opening, map<Board, Choices>& book) {
+bool Game::start_one_opening(const string& opening, book_t& book) {
 	log_debug("Game for Opening Start!!");
 	black.reset();
 	white.reset();
@@ -109,7 +109,7 @@ bool Game::start_one_opening(const string& opening, map<Board, Choices>& book) {
 //					moves.insert(the_move);
 //				}
 
-			book[the_board][the_move]=1;
+			book[the_board.get_hash()][the_move]=1;
 		}
 
 		uint eat=board.play(move.pos);
@@ -121,7 +121,7 @@ bool Game::start_one_opening(const string& opening, map<Board, Choices>& book) {
 }
 
 //用于蒙特卡洛扩展开局库
-bool Game::start_expand_opening(map<Board, Choices>& book) {
+bool Game::start_expand_opening(book_t& book) {
 	black.reset();
 	white.reset();
 
@@ -173,8 +173,9 @@ bool Game::start_expand_opening(map<Board, Choices>& book) {
 			assert(the_board.mobility()!=0);
 			assert(the_board.is_active(the_move));
 
-			book[the_board][the_move]+=0;
-			book[the_board][the_move]=(book[the_board][the_move]+my_diff)*0.45;
+			hash_t board_hash=the_board.get_hash();
+			book[board_hash][the_move]+=0;
+			book[board_hash][the_move]=(book[board_hash][the_move]+my_diff)*0.45;
 		}
 	}
 	return true;

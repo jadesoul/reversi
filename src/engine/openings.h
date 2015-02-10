@@ -37,7 +37,7 @@ private:
 	Random random;
 
 public:
-	map<Board, Choices> book;
+	book_t book;
 
 	OpeningBook();
 
@@ -48,6 +48,6 @@ public:
 	pos_t lookup(const Board& board) const;
 };
 
-extern OpeningBook* openings;
+extern OpeningBook openings;
 
 #endif /* OPENINGS_H_1372388367_57 */

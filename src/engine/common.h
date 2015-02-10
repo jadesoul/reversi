@@ -15,8 +15,14 @@
 typedef uchar color;//颜色
 typedef uchar pos_t;//位置
 typedef pos_t move_t;
+
+typedef uint64_t hash_t;
+
 //代表在当前局面下，在每个位置下一步棋，当前下子方最终赢得棋子数的期望(大于0赢棋，小于0输棋)
 typedef map<pos_t, double> Choices;
+
+//开局库数据格式，一个局面hash，对应若干个带分数的下法
+typedef map<hash_t, Choices> book_t;
 
 //棋子的颜色状态
 #define DRAW	0//平局

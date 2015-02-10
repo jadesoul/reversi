@@ -14,7 +14,7 @@
 #include "human.h"
 #include "game.h"
 
-OpeningBook* openings=NULL;
+OpeningBook openings;
 
 OpeningBook::OpeningBook() {
 	load("/Users/jadesoul/git/reversi/data/openingslarge.txt");
@@ -45,7 +45,7 @@ void OpeningBook::load(const char* fp) {
 }
 
 pos_t OpeningBook::lookup(const Board& board) const {
-	map<Board, Choices>::const_iterator it = book.find(board);
+	book_t::const_iterator it = book.find(board.get_hash());
 	if (it == book.end()) {
 		return PASS;
 	} else {

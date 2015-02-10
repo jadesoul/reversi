@@ -38,10 +38,10 @@ public:
 	Score start();
 
 	//用于加载开局库
-	bool start_one_opening(const string& opening, map<Board, Choices>& book);
+	bool start_one_opening(const string& opening, book_t& book);
 
 	//用于蒙特卡洛扩展开局库
-	bool start_expand_opening(map<Board, Choices>& book);
+	bool start_expand_opening(book_t& book);
 
 	//用于游戏引擎，给定字符串（64字符的游戏局面和1个字符的turn）
 	//返回下子的位置坐标 (2个字符)，下标均是从1开始计算

@@ -34,8 +34,6 @@ const char* server(const char* s) {
 	if (!check1(s))
 		return "";
 
-	if (openings==NULL) openings = new OpeningBook();
-
 //	EasyAIPlayer black;
 //	EasyAIPlayer white;
 

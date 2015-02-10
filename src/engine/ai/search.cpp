@@ -81,6 +81,7 @@ pos_t LookNAIPlayer::play(Board& board) {
 				eat=think.play(p);
 				assert(eat>0);
 			}
+
 //			log_status(think);
 			if (history.size()<depth && !think.game_over()) { // 不满足终止条件
 				State next(think);
