@@ -42,6 +42,7 @@ void Board::mirror_xy() {
 			swap(data[pos], data[MIRROR_XY(pos)]);
 		}
 	}
+	init_board_hash();
 }
 
 void Board::mirror_ldru() {
@@ -55,11 +56,33 @@ void Board::mirror_ldru() {
 			swap(data[pos], data[MIRROR_IJ(pos)]);
 		}
 	}
+	init_board_hash();
 }
 
 void Board::mirror_ldru_xy() {
-	mirror_ldru();
-	mirror_xy();
+	for_n(x, 8)
+	{
+		for_n(y, 8)
+		{
+			if (x + y >= 7)
+				continue;
+			pos_t pos = POS(x, y);
+			swap(data[pos], data[MIRROR_IJ(pos)]);
+		}
+	}
+
+	for_n(x, 8)
+	{
+		for_n(y, 8)
+		{
+			if (x >= y)
+				continue;
+			pos_t pos = POS(x, y);
+			swap(data[pos], data[MIRROR_XY(pos)]);
+		}
+	}
+
+	init_board_hash();
 }
 
 void Board::set(pos_t pos, color c) {

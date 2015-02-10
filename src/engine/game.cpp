@@ -76,6 +76,9 @@ bool Game::start_one_opening(const string& opening, book_t& book) {
 		assert(board.mobility()!=0);
 		assert(board.is_active(move.pos));
 
+//		log_status(board);
+//		log_status("board_hash="<<board.get_hash());
+
 		vector<Board> mirror_boards(4, board);//拷贝4份
 		mirror_boards[1].mirror_xy();
 		mirror_boards[2].mirror_ldru();
@@ -109,8 +112,12 @@ bool Game::start_one_opening(const string& opening, book_t& book) {
 //					moves.insert(the_move);
 //				}
 
-			book[the_board.get_hash()][the_move]=1;
+			hash_t board_hash=the_board.get_hash();
+//			log_status("board_hash="<<board_hash);
+			book[board_hash][the_move]=1;
 		}
+
+//		getchar();
 
 		uint eat=board.play(move.pos);
 		assert(eat>0);

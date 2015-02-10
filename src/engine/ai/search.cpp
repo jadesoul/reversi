@@ -14,8 +14,11 @@ pos_t LookNAIPlayer::play(Board& board) {
 	log_debug(board);
 	assert(board.mobility()>=2);//如果自己只有一种走法，应该已经在Game中直接走掉了
 
-//	pos_t pos=OpeningBookPlayer::play(board);
-//	if (pos!=PASS) return pos;
+	//如果空格数不多了，不要走开局
+	if (board.empty_cnt()+10>60) {
+		pos_t pos=OpeningBookPlayer::play(board);
+		if (pos!=PASS) return pos;
+	}
 
 	//深度优先搜索
 	uchar self=board.turn();

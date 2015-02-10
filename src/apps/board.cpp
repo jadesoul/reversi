@@ -46,7 +46,6 @@ public:
 };
 
 int main () {
-	init_board_hash_table();
 	BoardTest test;
 }
 

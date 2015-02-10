@@ -17,6 +17,7 @@
 OpeningBook openings;
 
 OpeningBook::OpeningBook() {
+	init_board_hash_table();
 	load("/Users/jadesoul/git/reversi/data/openingslarge.txt");
 	load("/Users/jadesoul/git/reversi/data/openings.txt");
 }
@@ -36,17 +37,18 @@ void OpeningBook::load(const char* fp) {
 	}
 
 	uint total_moves;
-	for (map<Board, Choices>::iterator it = book.begin(); it != book.end();
-			++it) {
+	for (book_t::iterator it = book.begin(); it != book.end(); ++it) {
 		total_moves += it->second.size();
 	}
-	log_status("loaded opening book: "<<cnt<<" openings, now "<<book.size()<<" boards, "<<total_moves<<" moves");
+	log_status("loaded opening book: "<<cnt<<" openings, now "<<book.size()<<" boards, "<<total_moves<<" moves in total");
 	fin.close();
 }
 
 pos_t OpeningBook::lookup(const Board& board) const {
 	book_t::const_iterator it = book.find(board.get_hash());
+//	log_status("in OpeningBook::lookup(const Board& board)"<<board);
 	if (it == book.end()) {
+		log_status("found noting in openings book");
 		return PASS;
 	} else {
 

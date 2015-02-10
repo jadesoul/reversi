@@ -140,29 +140,28 @@ void NeuralNetwork::train() {
 			}
 		}
 	}
-
-	bool train_with_opennings=false;
-	if (train_with_opennings) {
-		map<Board, Choices>& book = openings->book;
-		uint total = book.size();
-		uint cnt = 0;
-		for (pair<const Board, Choices>& entry : book) {
-			++cnt;
-			if (cnt % 10000 == 0)
-				log_warn("trained: "<<cnt<<"/"<<total<<"="<<(float(cnt)/total));
-
-			const Board& board = entry.first;
-			Choices& choices = entry.second;
-
-			log_debug(board);
-
-			for (pair<const pos_t, double>& choice : choices) {
-				pos_t pos = choice.first;
-				++trained;
-				train_one_move(board, pos);
-			}
-		}
-	}
+//
+//	bool train_with_opennings=false;
+//	if (train_with_opennings) {
+//		book_t& book = openings.book;
+//		uint total = book.size();
+//		uint cnt = 0;
+//		for (pair<hash_t, Choices>& entry : book) {
+//			++cnt;
+//			if (cnt % 10000 == 0)
+//				log_warn("trained: "<<cnt<<"/"<<total<<"="<<(float(cnt)/total));
+//
+//			const hash_t& board_hash = entry.first;
+//			Choices& choices = entry.second;
+//
+//
+//			for (pair<const pos_t, double>& choice : choices) {
+//				pos_t pos = choice.first;
+//				++trained;
+//				train_one_move(board, pos);
+//			}
+//		}
+//	}
 
 	log_warn("NeuralNetwork finished training");
 }

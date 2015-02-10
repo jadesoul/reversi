@@ -26,8 +26,6 @@ public:
 };
 
 int main () {
-	init_board_hash_table();
-
 	NeuralNetworkTest a;
 
 	return 0;
