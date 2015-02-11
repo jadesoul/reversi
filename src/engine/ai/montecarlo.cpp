@@ -15,10 +15,14 @@ pos_t MonteCarloAIPlayer::play(Board& board) {
 	log_debug(board);
 	assert(board.mobility()>=2);
 
-	pos_t pos=OpeningBookPlayer::play(board);
-	if (pos!=PASS) return pos;
+	if (board.played_cnt()<10) {
+		pos_t pos=OpeningBookPlayer::play(board);
+		if (pos!=PASS) return pos;
+	}
 
-	RandomAIPlayer player;//用于推演时随机下棋
+//	RandomAIPlayer player;//用于推演时随机下棋
+	RandomWithEndingSearchAIPlayer player;//用于推演时随机下棋
+
 	map<pos_t, int> predict;//统计每个下子位置最终的总赢子数
 
 	for (pos_t pos = FIRST; pos < LAST; ++pos) {
@@ -34,7 +38,7 @@ pos_t MonteCarloAIPlayer::play(Board& board) {
 			int summary=0;
 
 			//利用蒙特卡罗思想，开始随机下棋若干次
-			for_n(i, 10000) {
+			for_n(i, 100) {
 				Game game(player, player, think);//举办一场比赛
 				Score score=game.start();
 				int diff=score.diff();//黑子数减去白子数之差

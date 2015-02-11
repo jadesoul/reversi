@@ -15,6 +15,7 @@
 #include "engine/openings.h"
 #include "book.h"
 #include "random.h"
+#include "random_with_ending_search.h"
 
 //利用蒙特卡罗搜索算法找出赢棋概率最大的走法
 //基本思想:

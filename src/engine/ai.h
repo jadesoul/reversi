@@ -23,5 +23,6 @@
 #include "ai/search.h"
 #include "ai/compound.h"
 #include "ai/neuralnet.h"
+#include "ai/random_with_ending_search.h"
 
 #endif /* AI_H_1372368194_48 */

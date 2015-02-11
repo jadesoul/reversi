@@ -29,7 +29,14 @@ public:
 	inline bool is_active(uint x, uint y) const { return is_active(POS(x, y)); }
 	inline bool is_active(pos_t pos) const { return BOARD(pos)==ACTIVE; }
 
+	//获取历史上已经下的某一步
 	inline Move get_history_move(int i) const { return history[i]; }
+
+	//除去开局时棋盘的4颗固定子，到目前为止玩家一共下了几颗子
+	inline size_t played_cnt() const { return 60-total[EMPTY]; }
+
+	//到目前为止，棋盘一共有多少黑子和白子
+	inline size_t stone_cnt() const { return 64-total[EMPTY]; }
 
 	//获取棋盘局面哈希
 	inline hash_t get_hash() const { return hash; }
