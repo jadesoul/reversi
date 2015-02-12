@@ -19,7 +19,7 @@ pos_t RandomWithEndingSearchAIPlayer::play(Board& board) {
 		if (pos!=PASS) return pos;
 	}
 
-	if (board.empty_cnt()<=10) {
+	if (board.empty_cnt()<=10-4) {
 		return LookNAIPlayer::play(board);
 	} else {
 		return random.play(board);

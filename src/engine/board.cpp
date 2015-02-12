@@ -126,6 +126,11 @@ pos_t Board::get_first_move() const {
 	return PASS;
 }
 
+size_t Board::try_to_play(pos_t pos) {
+
+	return 0;
+}
+
 size_t Board::play(pos_t pos) {
 //	uint i = I(pos), j = J(pos);
 	color s = turn();	//自己的颜色

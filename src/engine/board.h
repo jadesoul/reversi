@@ -79,6 +79,10 @@ public:
 	inline size_t play(uint x, uint y) { return play(POS(x, y)); }
 	inline size_t play(const Move& move) { assert(move.turn==turn()); return play(move.pos); }
 
+	//试着在指定的位置下子，（不更新mobility也支持）
+	//若不合法则返回0，否则返回吃子数，吃子数一定不是0
+	size_t try_to_play(pos_t pos);
+
 	//撤销上一个Move
 	void undo();
 

@@ -89,6 +89,11 @@ typedef map<hash_t, Choices> book_t;
 #define EE(pos)			((pos) + 2 * E)
 #define	DELTA_8			N, N+E, E, S+E, S, S+W, W, N+W
 
+//棋盘左上角第一颗子的坐标
+#define A1				POS(0, 0)
+//棋盘右下角最后一颗子的坐标
+#define H8				POS(BOARD_LEN-1, BOARD_LEN-1)
+
 #define ON_BOARD2(i, j)	((unsigned)(i)<BOARD_LEN and (unsigned)(j)<BOARD_LEN)
 #define ON_BOARD(pos)	ON_BOARD2(I(pos), J(pos))
 
