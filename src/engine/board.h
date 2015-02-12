@@ -62,7 +62,7 @@ public:
 	//将64个棋子的状态按照左下-右上对角线镜像变换，同时按照xy夹角对应的对角线镜像变换
 	void mirror_ldru_xy();
 
-	//设置指定位置的棋子颜色，本函数仅用于布局
+	//设置指定位置的棋子颜色，本函数仅用于布局(基本上没啥用)
 	void set(pos_t pos, color c);
 	inline void set(uint x, uint y, color c) { set(POS(x, y), c); }
 

@@ -46,14 +46,14 @@ const char* server(const char* s) {
 //	RandomAIPlayer black;
 //	RandomAIPlayer white;
 
-	MonteCarloAIPlayer black;
-	MonteCarloAIPlayer white;
+//	MonteCarloAIPlayer black;
+//	MonteCarloAIPlayer white;
 
 //	CachedMonteCarloAIPlayer black;
 //	CachedMonteCarloAIPlayer white;
 
-//	LookNAIPlayer black;
-//	LookNAIPlayer white;
+	LookNAIPlayer black;
+	LookNAIPlayer white;
 
 //	NeuralNetworkAIPlayer black;
 //	NeuralNetworkAIPlayer white;

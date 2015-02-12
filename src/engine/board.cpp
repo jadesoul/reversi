@@ -127,7 +127,6 @@ pos_t Board::get_first_move() const {
 }
 
 size_t Board::try_to_play(pos_t pos) {
-
 	return 0;
 }
 
