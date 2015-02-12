@@ -15,8 +15,10 @@ pos_t Look2AIPlayer::play(Board& board) {
 	log_debug(board);
 	assert(board.mobility()>=2);
 
-	pos_t pos=OpeningBookPlayer::play(board);
-	if (pos!=PASS) return pos;
+	if (board.played_cnt()<10) {
+		pos_t pos=OpeningBookPlayer::play(board);
+		if (pos!=PASS) return pos;
+	}
 
 	pos_t best_pos=PASS;
 

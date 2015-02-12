@@ -10,9 +10,12 @@
 
 #include "state.h"
 
-State::State(const Board& board) {
+State::State(const Board& board, int alpha, int beta):
+	board(board),
+	alpha(alpha),
+	beta(beta)
+{
 	moves.reserve(24);
-	this->board = board;
 	size_t mobility = board.mobility();
 	if (mobility == 0) {
 		moves.push_back(PASS);
@@ -32,10 +35,23 @@ State::State(const Board& board) {
 	best = PASS;
 }
 
-void State::update_score(double child_score) { //根据某个孩子状态的分数更新当前状态的分数
-	if (child_score > score) {
-		score = child_score;
+void State::update_score(double child_win) { //根据某个孩子状态的分数更新当前状态的分数
+	double father_win= -child_win;//孩子赢多少自己就输多少 neg_max
+
+	//alpha-beta剪枝
+	if (father_win>beta) {
+		score = father_win;
 		best = this->get_move_pos();
+		skip_all();
+		return;
+	}
+
+	if (father_win > score) {
+		score = father_win;
+		best = this->get_move_pos();
+		if (father_win>alpha) {
+			alpha=father_win;
+		}
 	}
 
 //	if (child_score>score) score=(score+child_score)/2;

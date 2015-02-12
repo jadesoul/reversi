@@ -20,8 +20,10 @@ public:
 	double			score;	//当前节点的分数，代表在所有可能性中自己最多赢多少子
 	pos_t			best;	//当孩子更新上来的分数取最大值时的下子位置，即最好的孩子位置
 
+	int				alpha;//搜索估值下限
+	int				beta;//搜索估值上限
 public:
-	State(const Board& board);
+	State(const Board& board, int alpha=-64, int beta=64);
 
 	//根据某个孩子状态的分数更新当前状态的分数
 	void update_score(double child_score);
@@ -29,6 +31,9 @@ public:
 	inline bool end() { return !(index < moves.size()); }
 
 	inline void next() { ++index; }
+
+	//直接将index设置到end，跳过所有后续可能性
+	inline void skip_all() { index=moves.size(); }
 
 	inline pos_t get_move_pos() {
 //		log_status("debug:"<<board);

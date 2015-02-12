@@ -24,8 +24,8 @@ pos_t LookNAIPlayer::play(Board& board) {
 	uchar self=board.turn();
 //	log_status(board);
 
-	uint depth=5; //最多的搜索层数
-	if (board.empty_cnt()<=10) depth=16;//当游戏快结束时，多搜索几层
+	uint depth=7; //最多的搜索层数
+	if (board.empty_cnt()<=16) depth=16;//当游戏快结束时，多搜索几层
 //	if (board.empty_cnt()<=8) depth=16;//当游戏快结束时，多搜索几层
 
 	uint total_searched_nodes=0;
@@ -87,23 +87,24 @@ pos_t LookNAIPlayer::play(Board& board) {
 
 //			log_status(think);
 			if (history.size()<depth && !think.game_over()) { // 不满足终止条件
-				State next(think);
+				State next(think, - current.beta, - current.alpha);
 				history.push_back(next);
 			} else { // 满足终止条件
+				double win;
 				if (think.game_over()) { //游戏结束了
 					++total_end_game;
 					Score score(think);
-					int win=score.win(think.turn());
-					current.update_score(- win);
+					win=score.win(think.turn());//*100
+					current.update_score(win);
 					log_debug("game over, win="<<win);
 //					if (think.black_cnt()==0 or think.white_cnt()==0) {
 //						log_warn(think);
 //					}
 				} else { //搜索深度达到了
 					++total_meet_depth;
-					double score=think.evaluate_and_predict_win_score();
+					win=think.evaluate_and_predict_win_score();
 //					current.update_score(self==think.turn() ? score : -score);
-					current.update_score(-score);//父节点应该尽量选择子节点赢子数少或输的最多的位置下子
+					current.update_score(win);//父节点应该尽量选择子节点赢子数少或输的最多的位置下子
 //					log_status("meet depth, evaluate score="<<score);
 				}
 			}
@@ -115,7 +116,7 @@ pos_t LookNAIPlayer::play(Board& board) {
 //				log_status("current="<<current);
 //				root=history[0];
 			} else if (n>1) { //搜集当前节点的评分到父节点
-				history[n-2].update_score(- history[n-1].score);
+				history[n-2].update_score(history[n-1].score);
 //				if (n==2) {
 //					log_status("current="<<current<<" update="<< -history[n-1].score);
 //				}

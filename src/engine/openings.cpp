@@ -53,6 +53,7 @@ pos_t OpeningBook::lookup(const Board& board) const {
 	} else {
 
 		const Choices& moves = it->second;
+
 		uint n = moves.size();
 		assert(n > 0);
 		log_status(board);
@@ -66,6 +67,8 @@ pos_t OpeningBook::lookup(const Board& board) const {
 			if (score > max_score) {
 				max_score = score;
 				move = it2->first;
+
+//				return move;//直接返回第一种下法
 			}
 			++cnt;
 			log_status("found opening "<<cnt<<" : "<<Move(board.turn(), it2->first));
