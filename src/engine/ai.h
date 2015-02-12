@@ -1,4 +1,4 @@
-﻿#ifndef AI_H_1372368194_48
+#ifndef AI_H_1372368194_48
 #define AI_H_1372368194_48
 /**
  * File: ai.h
