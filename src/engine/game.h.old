@@ -1,5 +1,5 @@
-#ifndef GAME_H_1423708056_26
-#define GAME_H_1423708056_26
+﻿#ifndef GAME_H_1371896260_1
+#define GAME_H_1371896260_1
 /**
  * File: game.h
  * Description: 
@@ -20,7 +20,7 @@ private:
 	Player& black;
 	Player& white;
 	Board board;
-
+	
 public:
 	Game(Player& self):
 		black(self), white(self) {}
@@ -28,7 +28,7 @@ public:
 		black(black), white(white) {}
 	Game(Player& black, Player& white, Board& board):
 		black(black), white(white), board(board) {}
-
+	
 	inline Board& get_board() { return board; }
 
 	//游戏是否结束
@@ -47,4 +47,6 @@ public:
 	//返回下子的位置坐标 (2个字符)，下标均是从1开始计算
 	string deal(const string& query);
 };
-#endif /* GAME_H_1423708056_26 */
+
+#endif /* GAME_H_1371896260_1 */
+

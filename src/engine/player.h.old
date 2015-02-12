@@ -1,5 +1,5 @@
-#ifndef PLAYER_H_1423708062_68
-#define PLAYER_H_1423708062_68
+﻿#ifndef PLAYER_H_1371915057_31
+#define PLAYER_H_1371915057_31
 /**
  * File: player.h
  * Description: 
@@ -29,4 +29,4 @@ public:
 //optimized here:
 typedef Player AIPlayer;
 
-#endif /* PLAYER_H_1423708062_68 */
+#endif /* PLAYER_H_1371915057_31 */
