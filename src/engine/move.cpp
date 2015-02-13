@@ -11,7 +11,8 @@
 #include "move.h"
 
 Move::Move(const char two_bytes[2]) :
-		turn(EMPTY), pos(ERROR_POS) {
+		turn(EMPTY), pos(ERROR_POS), win(0)
+{
 	char h = two_bytes[0]; //水平方向
 	char v = two_bytes[1]; //垂直方向
 	if (v >= '1' and v <= '8') {
@@ -33,5 +34,5 @@ ostream& Move::dump(ostream& o) const {
 	char base = (turn == BLACK ? 'A' : 'a');
 	char h = base + J(pos);
 	char v = '1' + I(pos);
-	return o << h << v;
+	return o << h << v <<"("<<win<<")";
 }

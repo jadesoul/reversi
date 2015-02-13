@@ -14,10 +14,11 @@
 
 //一步棋，包括落子位置，轮谁下等
 struct Move {
-	color turn;
-	int pos;
+	color turn;//谁下
+	int pos;//落子位置
+	double win;//估值
 
-	Move(color turn=BLACK, int pos=PASS):turn(turn), pos(pos) {}
+	Move(color turn=BLACK, int pos=PASS):turn(turn), pos(pos), win(0) {}
 	Move(const char two_bytes[2]);
 	Move(const string& s):Move(s.c_str()) {}
 

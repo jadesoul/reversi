@@ -13,20 +13,28 @@
 #include "board.h"
 #include "game.h"
 
-#define HIDDEN_SIZE 64	//隐藏层的节点个数
+#define INPUT_SIZE 128	//输入层的节点个数
+#define HIDDEN_SIZE 256	//隐藏层的节点个数
+#define OUTPUT_SIZE 129	//输入层的节点个数
 typedef float real;
 
 #define EXP_TABLE_SIZE 1000			//sigmoid缓存表大小
 #define MAX_EXP 6					//sigmoid函数的输入小于-6时，值接近0，大于6时，值接近1，在这个范围内的输入缓存起来，超过范围直接给出取值
 
+//输入棋盘64黑+64白，128bits，多个0和1，经过隐藏层，输出当前局面的评分[-64, 63], 129 bits，只有1位是1，其他都是0
 class NeuralNetwork {
 private:
-	color X[64]; //输入层，对应棋盘上的64个棋子，各个棋子的取值可以是BLACK,WHITE,EMPTY
-	real XH[64][HIDDEN_SIZE]; //输入层到隐藏层的权重矩阵XH[i][j]代表weight(X[i], H[j])
+//	color X[64]; //输入层，对应棋盘上的64个棋子，各个棋子的取值可以是BLACK,WHITE,EMPTY
+	uint X[INPUT_SIZE];//X[0:64]代表每个位置上是否有黑子，X[64:128]代表每个位置上是否有子白
+
+	real XH[INPUT_SIZE][HIDDEN_SIZE]; //输入层到隐藏层的权重矩阵XH[i][j]代表weight(X[i], H[j])
 	real H[HIDDEN_SIZE]; //隐藏层节点的取值
 	real H_ERR[HIDDEN_SIZE]; //隐藏层节点的误差
-	real HY[HIDDEN_SIZE][64]; //输入层到隐藏层的权重矩阵HY[j][k]代表weight(H[j], Y[k])
-	real Y[64]; //输出层，对应棋盘上64个棋子，在各个位置下子的得分
+	real HY[HIDDEN_SIZE][OUTPUT_SIZE]; //输入层到隐藏层的权重矩阵HY[j][k]代表weight(H[j], Y[k])
+
+//	real Y[64]; //输出层，对应棋盘上64个棋子，在各个位置下子的得分
+	uint Y[OUTPUT_SIZE];//输出当前局面的评分[-64, 63], 129 bits，Y[64]==1代表平局
+
 	real alpha; //学习率
 	real expTable[EXP_TABLE_SIZE];	//存放预先计算出的sigmoid函数值
 
@@ -46,7 +54,7 @@ public:
 	friend inline istream& operator>>(istream& i, NeuralNetwork& n) { return n.from(i); }
 
 protected:
-	inline void read_input(const Board& board) { for_n(i, 64) X[i]=board.get_stone_color(POS(i/8, i%8)); }
+	void read_input(const Board& board);
 
 	void reset();
 	void train_one_move(const Board& board, pos_t pos);

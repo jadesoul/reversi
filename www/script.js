@@ -462,23 +462,54 @@ function initGUI() {
 
 var game;
 
-$(function (){
+function ai_vs_ai() {
+	initGUI();
+	
+	game=new Game.Reversi(
+		new Player.ComputerPlayer('深蓝', GridState.BLACK), 
+		new Player.ComputerPlayer('浅绿', GridState.WHITE)
+	);
+
+	game.start();
+}
+
+function ai_vs_human() {
 	initGUI();
 	
 	game=new Game.Reversi(
 		new Player.ComputerPlayer('深蓝', GridState.BLACK), 
 		new Player.HumanPlayer('游客', GridState.WHITE)
 	);
-
-//	game=new Game.Reversi(
-//		new Player.ComputerPlayer('深蓝', GridState.BLACK), 
-//		new Player.ComputerPlayer('浅绿', GridState.WHITE)
-//	);
-	
-//	game=new Game.Reversi(
-//		new Player.HumanPlayer('游客', GridState.BLACK), 
-//		new Player.ComputerPlayer('深蓝', GridState.WHITE)
-//	);
 	
 	game.start();
+}
+
+function human_vs_ai() {
+	initGUI();
+	
+	game=new Game.Reversi(
+		new Player.HumanPlayer('游客', GridState.BLACK), 
+		new Player.ComputerPlayer('深蓝', GridState.WHITE)
+	);
+
+	game.start();
+}
+
+function human_vs_human() {
+	initGUI();
+	
+	game=new Game.Reversi(
+		new Player.HumanPlayer('游客', GridState.BLACK), 
+		new Player.HumanPlayer('路人', GridState.WHITE)
+	);
+
+	game.start();
+}
+
+
+
+$(function (){
+	initGUI();
+	
+	ai_vs_ai();
 })

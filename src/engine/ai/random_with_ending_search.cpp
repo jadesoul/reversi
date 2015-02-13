@@ -26,3 +26,4 @@ pos_t RandomWithEndingSearchAIPlayer::play(Board& board) {
 	}
 }
 
+

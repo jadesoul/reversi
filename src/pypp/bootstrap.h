@@ -189,6 +189,9 @@
 
 //namespaces
 // using namespace std;
+
+#include <array>
+using std::array;
     
 using std::max;
 using std::min;

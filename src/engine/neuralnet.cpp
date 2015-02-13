@@ -32,7 +32,7 @@ void NeuralNetwork::train_one_move(const Board& board, pos_t pos) {
 	for_n(j, HIDDEN_SIZE)
 	{
 		H[j] = 0;
-		for_n(i, 64)
+		for_n(i, INPUT_SIZE)
 		{
 			H[j] += X[i] * XH[i][j];
 		}
@@ -40,7 +40,7 @@ void NeuralNetwork::train_one_move(const Board& board, pos_t pos) {
 
 	// H -> Y : 每个输出层节点的值等于隐藏节点向量 点乘 对应的权重向量
 	log_debug("H -> Y");
-	for_n(k, 64)
+	for_n(k, OUTPUT_SIZE)
 	{
 		real label;
 
@@ -79,7 +79,7 @@ void NeuralNetwork::train_one_move(const Board& board, pos_t pos) {
 
 		//H -> X: 误差向量累加到输入到隐藏层权重向量
 		log_debug("H -> X");
-		for_n(i, 64)
+		for_n(i, INPUT_SIZE)
 		{
 			for_n(j, HIDDEN_SIZE)
 			{
@@ -140,28 +140,6 @@ void NeuralNetwork::train() {
 			}
 		}
 	}
-//
-//	bool train_with_opennings=false;
-//	if (train_with_opennings) {
-//		book_t& book = openings.book;
-//		uint total = book.size();
-//		uint cnt = 0;
-//		for (pair<hash_t, Choices>& entry : book) {
-//			++cnt;
-//			if (cnt % 10000 == 0)
-//				log_warn("trained: "<<cnt<<"/"<<total<<"="<<(float(cnt)/total));
-//
-//			const hash_t& board_hash = entry.first;
-//			Choices& choices = entry.second;
-//
-//
-//			for (pair<const pos_t, double>& choice : choices) {
-//				pos_t pos = choice.first;
-//				++trained;
-//				train_one_move(board, pos);
-//			}
-//		}
-//	}
 
 	log_warn("NeuralNetwork finished training");
 }
@@ -308,5 +286,23 @@ real NeuralNetwork::sigmoid(real x) {
 	if (x > MAX_EXP)
 		return 1;
 	return expTable[(uint) (((x) + MAX_EXP) * (EXP_TABLE_SIZE / MAX_EXP / 2))];
+}
+
+void NeuralNetwork::read_input(const Board& board) {
+	for_n(i, 64) {
+		color c=board.get_stone_color(POS(i/8, i%8));
+		uint& b=X[i];
+		uint& w=X[i+64];
+		if (c==BLACK) {
+			b=1;
+			w=0;
+		} else if (c==WHITE) {
+			b=0;
+			w=1;
+		} else {
+			b=0;
+			w=0;
+		}
+	}
 }
 
