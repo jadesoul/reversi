@@ -46,21 +46,25 @@ void OpeningBook::load(const char* fp) {
 
 pos_t OpeningBook::lookup(const Board& board) const {
 	book_t::const_iterator it = book.find(board.get_hash());
-//	log_status("in OpeningBook::lookup(const Board& board)"<<board);
+//	log_debug("in OpeningBook::lookup(const Board& board)"<<board);
 	if (it == book.end()) {
-		log_status("found noting in openings book");
+		log_debug("found noting in openings book");
 		return PASS;
 	} else {
-
 		const Choices& moves = it->second;
 
 		uint n = moves.size();
 		assert(n > 0);
-		log_status(board);
+		log_debug(board);
 
 		pos_t move = PASS;
 		uint cnt = 0;
 		double max_score = INT32_MIN;
+
+//#define OPENING_LOOKUP_ALGO_FIND_MAX
+#ifdef OPENING_LOOKUP_ALGO_FIND_MAX
+
+
 		for (Choices::const_iterator it2 = moves.begin(); it2 != moves.end();
 				++it2) {
 			double score = it2->second;
@@ -73,19 +77,21 @@ pos_t OpeningBook::lookup(const Board& board) const {
 			++cnt;
 			log_status("found opening "<<cnt<<" : "<<Move(board.turn(), it2->first));
 		}
+#else //OPENING_LOOKUP_ALGO_RANDOM_SELECT
 
-//			if (n==1) {//只有1种方案
-//				move= moves.begin()->first;
-//			} else {//多种方案，随机选择一个结果
-//				uint index=random.randindex(cnt);
-//				Choices::const_iterator it3=moves.begin();
-//				while (index-- > 0) {
-//					++it3;
-//				}
-//				move= it3->first;
-//			}
+		uint index=random.randindex(n);
+		Choices::const_iterator it3=moves.begin();
 
-		log_status("found "<<n<<" opening moves in opening book, choose move: "<<Move(board.turn(), move)<<", score="<<max_score);
+		while (index > 0) {
+			++it3;
+			--index;
+		}
+
+		move= it3->first;
+		max_score=it3->second;
+
+#endif
+		log_debug("found "<<n<<" opening moves in opening book, choose move: "<<Move(board.turn(), move)<<", score="<<max_score);
 		return move;
 	}
 	return PASS;

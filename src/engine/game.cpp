@@ -29,7 +29,8 @@ Score Game::start() {
 			pos_t p=board.get_first_move();
 			assert(p!=PASS);
 //			log_status(COLOR(turn)<<" Player, can only play at "<<Move(turn, p));
-			board.play(p);
+			double last_win=board.get_last_win();
+			board.play(p, -last_win);
 		} else {
 			player.play(board);
 		}
@@ -41,7 +42,7 @@ Score Game::start() {
 	log_info("Game Over!!");
 
 //	log_debug(board);
-//	log_status(board);
+	log_status(board);
 
 	Score score(board);
 //	log_status(score);

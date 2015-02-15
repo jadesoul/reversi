@@ -34,5 +34,5 @@ ostream& Move::dump(ostream& o) const {
 	char base = (turn == BLACK ? 'A' : 'a');
 	char h = base + J(pos);
 	char v = '1' + I(pos);
-	return o << h << v <<"("<<win<<")";
+	return o << h << v <<" "<<win;
 }

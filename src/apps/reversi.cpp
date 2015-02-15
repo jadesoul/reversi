@@ -50,8 +50,8 @@ void AI_vs_AI() {
 //	CachedMonteCarloAIPlayer black;
 //	CachedMonteCarloAIPlayer white;
 
-	LookNAIPlayer black;
-	LookNAIPlayer white;
+//	LookNAIPlayer black;
+//	LookNAIPlayer white;
 
 //	NeuralNetworkAIPlayer black;
 //	NeuralNetworkAIPlayer white;
@@ -59,7 +59,10 @@ void AI_vs_AI() {
 //	CompoundAIPlayer black;
 //	CompoundAIPlayer white;
 
-	uint total = 1 / TOTAL_THREADS;
+	RandomWithEndingSearchAIPlayer black;
+	RandomWithEndingSearchAIPlayer white;
+
+	uint total = 10000 / TOTAL_THREADS;
 //	cin>>total;
 	log_warn("start "<<total<<" games ...");
 	uint win[4] = { 0, 0, 0, 0 };

@@ -75,8 +75,9 @@ public:
 
 	//在指定的位置放置指定颜色的棋子，检查是否合法
 	//若不合法则返回0，否则返回吃子数，吃子数一定不是0
-	size_t play(pos_t pos);
-	inline size_t play(uint x, uint y) { return play(POS(x, y)); }
+	//如果不指定当前下法的估值win，将自动使用上一步棋的估值的负值
+	size_t play(pos_t pos, double win=WIN_UNDEFINED);
+//	inline size_t play(uint x, uint y) { return play(POS(x, y)); }
 	inline size_t play(const Move& move) { assert(move.turn==turn()); return play(move.pos); }
 
 	//试着在指定的位置下子，（不更新mobility也支持）
@@ -93,6 +94,9 @@ public:
 	color get_current_turn() const;
 	inline color turn() const { return this->get_current_turn(); }
 
+	//根据历史数组获取上一手棋对手的赢子的估值
+	double get_last_win() const;
+
 	//从包含65字节的字符串初始化, 棋盘(64字节)，下子方(1字节)
 	//为游戏引擎提供此接口
 	void init_from_str(const string& query);
@@ -105,6 +109,12 @@ public:
 
 	//计算局面上指定颜色的稳定子与对手稳定子个数之差
 //	int get_stable_stones_size_diff(color s) const;
+
+	//输出棋盘内容
+	ostream& dump(ostream& o=cout) const;
+
+	//输出棋盘历史，带分数
+	ostream& dump_history(ostream& o=cout) const;
 
 protected:
 	//开局时，初始化棋盘
@@ -120,10 +130,6 @@ protected:
 
 	//初始化棋盘局面哈希
 	void init_board_hash();
-
-	//输出棋盘内容
-	ostream& dump(ostream& o=cout) const;
-
 private:
 	//存放64个棋子状态，以及周边的3面墙
 	color data[MAP_SIZE];

@@ -22,14 +22,14 @@ public:
 	void playTest() {
 		init_board_map();
 		dump();
-		cout<<"b.play(2, 3)="<<play(2, 3)<<endl;
+		cout<<"b.play(2, 3)="<<play(POS(2, 3))<<endl;
 		dump();
-		cout<<"b.play(2, 4)="<<play(2, 4)<<endl;
+		cout<<"b.play(2, 4)="<<play(POS(2, 4))<<endl;
 		dump();
-		cout<<"b.play(4, 5)="<<play(4, 5)<<endl;
+		cout<<"b.play(4, 5)="<<play(POS(4, 5))<<endl;
 		dump();
 
-		cout<<"b.play(0, 0)="<<play(0, 0)<<endl;
+		cout<<"b.play(0, 0)="<<play(POS(0, 0))<<endl;
 		dump();
 	}
 

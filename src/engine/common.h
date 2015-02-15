@@ -33,6 +33,8 @@ typedef map<hash_t, Choices> book_t;
 #define PASS	4//代表无子可下
 #define WALL	4//墙壁，用于判断棋子出界
 
+#define WIN_UNDEFINED	INT32_MIN
+
 //给定自己棋子的颜色，获取对手的颜色
 #define OPPO(c) (BLACK+WHITE-(c))
 

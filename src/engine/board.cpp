@@ -130,7 +130,7 @@ size_t Board::try_to_play(pos_t pos) {
 	return 0;
 }
 
-size_t Board::play(pos_t pos) {
+size_t Board::play(pos_t pos, double win) {
 //	uint i = I(pos), j = J(pos);
 	color s = turn();	//自己的颜色
 	assert(s==BLACK or s==WHITE);
@@ -199,6 +199,14 @@ size_t Board::play(pos_t pos) {
 	history[pointer].pos=pos;
 	history[pointer].turn=s;
 
+	if (float_equal(win, WIN_UNDEFINED)) {
+		win=0;
+		if (pointer>=1) {
+			win= - (history[pointer-1].win);
+		}
+	}
+	history[pointer].win=win;
+
 	return eat;
 }
 
@@ -248,6 +256,16 @@ color Board::get_current_turn() const {
 		turn=(total[PASS] % 2 == 1) ? history[pointer].turn : OPPO(history[pointer].turn);	//上一手的对手
 	}
 	return turn;
+}
+
+double Board::get_last_win() const {
+	double win=0;
+	int pointer = (60 - 1) - total[EMPTY];	//指向历史中的最后一个有效元素
+	if (pointer >= 0) {
+		win=history[pointer].win;
+		if (total[PASS] % 2 == 1) win=-win;
+	}
+	return win;
 }
 
 double Board::evaluate_and_predict_win_score() const {
@@ -586,11 +604,25 @@ ostream& Board::dump(ostream& o) const {
 	o << " win=" << evaluate_and_predict_win_score();
 	o << endl;
 
-	o << "history=";
-	for_n(i, pointer+1) o<<history[i]<<' ';
+//	o << "history=";
+//	for_n(i, pointer+1) o<<history[i]<<' ';
+
+	o << "history="<<endl;
+	for_n(i, pointer+1) {
+		o<< i+1 <<":\t";
+		if (history[i].turn==WHITE) o<<"\t\t";
+		o<<history[i];
+		o<<endl;
+	}
+
 	o << endl;
 
 	return o << "--------------------------------------------" << endl;
 }
 
+ostream& Board::dump_history(ostream& o) const {
+	int pointer = (60 - 1) - total[EMPTY];	//指向历史中的最后一个有效元素
+	for_n(i, pointer+1) o<<history[i]<<' ';
+	return o<<endl;
+}
 
