@@ -41,7 +41,11 @@ private:
 public:
 	NeuralNetwork();
 
+	//自动组织比赛，根据结果动态产生训练数据进行训练
 	void train();
+
+	//从文件中读取已经生成好的比赛结果，进行训练
+	void train(const string& fp);
 
 	pos_t predict(const Board& board);
 

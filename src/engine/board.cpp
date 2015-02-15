@@ -626,3 +626,16 @@ ostream& Board::dump_history(ostream& o) const {
 	return o<<endl;
 }
 
+istream& Board::from(istream& i) {
+	init_board_map();
+	Move move;
+	i>>move;
+	while (move.is_legal_move()) {
+		if (mobility()==0) {
+			pass();
+		}
+		play(move);
+		i>>move;
+	}
+	return i;
+}

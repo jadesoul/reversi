@@ -78,7 +78,7 @@ public:
 	//如果不指定当前下法的估值win，将自动使用上一步棋的估值的负值
 	size_t play(pos_t pos, double win=WIN_UNDEFINED);
 //	inline size_t play(uint x, uint y) { return play(POS(x, y)); }
-	inline size_t play(const Move& move) { assert(move.turn==turn()); return play(move.pos); }
+	inline size_t play(const Move& move) { assert(move.turn==turn()); return play(move.pos, move.win); }
 
 	//试着在指定的位置下子，（不更新mobility也支持）
 	//若不合法则返回0，否则返回吃子数，吃子数一定不是0
@@ -115,6 +115,10 @@ public:
 
 	//输出棋盘历史，带分数
 	ostream& dump_history(ostream& o=cout) const;
+
+	//根据历史棋步输入一个棋盘
+	istream& from(istream& i=cin);
+	friend inline istream& operator>>(istream& i, Board& b) { return b.from(i); }
 
 protected:
 	//开局时，初始化棋盘

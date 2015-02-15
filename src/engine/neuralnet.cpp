@@ -89,6 +89,65 @@ void NeuralNetwork::train_one_move(const Board& board, pos_t pos) {
 	}
 }
 
+void NeuralNetwork::train(const string& fp) {
+	log_warn("NeuralNetwork start training ...");
+
+	uint trained=0;
+	timer previous;
+	string line;
+	ifstream fin(fp.c_str());
+
+	while (getline(fin, line)) {
+		istringstream iss(line);
+
+
+	}
+	for_n(cnt, total) {
+		if (cnt % 10 == 0) {
+			double gap=previous.elapsed();
+			log_status("games: "<<cnt<<"/"<<total<<"="<<(float(cnt)/total)
+					<<" trained="<<trained
+					<<" time="<<gap
+					<<" speed="<<(0.001*trained/gap)<<"KB/s"
+					);
+		}
+
+		Game game(black, white);
+		Score score = game.start();
+		int diff = score.diff();
+		Board& finished=game.get_board();
+
+		Board board;
+		int pointer=0;
+		while (!board.game_over()) {
+			uchar mobility=board.mobility();
+
+			if (mobility==0) {
+				board.pass();
+			} else {
+				Move move=finished.get_history_move(pointer);
+				color turn=board.get_current_turn();
+//				if (move.turn!=turn) {
+//					log_warn("why:"<<board);
+//				}
+				assert(move.turn==turn);
+				pos_t pos=move.pos;
+
+				if (turn==score.winner) {
+					++trained;
+					train_one_move(board, pos);
+				}
+
+				board.play(pos);
+				++pointer;
+			}
+		}
+	}
+	fin.close();
+
+	log_warn("NeuralNetwork finished training");
+}
+
 void NeuralNetwork::train() {
 	log_warn("NeuralNetwork start training ...");
 

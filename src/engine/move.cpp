@@ -10,9 +10,28 @@
 
 #include "move.h"
 
-Move::Move(const char two_bytes[2]) :
-		turn(EMPTY), pos(ERROR_POS), win(0)
-{
+ostream& Move::dump(ostream& o) const {
+	if (pos == PASS)
+		return o << (turn == BLACK ? "PASS" : "pass");
+	char base = (turn == BLACK ? 'A' : 'a');
+	char h = base + J(pos);
+	char v = '1' + I(pos);
+	return o << h << v <<" "<<win;
+}
+
+istream& Move::from(istream& i) {
+	string s;
+	double w;
+	i>>s>>w;
+	init(s.c_str(), w);
+	return i;
+}
+
+void Move::init(const char two_bytes[2], double win) {
+	turn=EMPTY;
+	pos=ERROR_POS;
+	this->win=win;
+
 	char h = two_bytes[0]; //水平方向
 	char v = two_bytes[1]; //垂直方向
 	if (v >= '1' and v <= '8') {
@@ -26,13 +45,4 @@ Move::Move(const char two_bytes[2]) :
 		}
 		pos = POS(x, y);
 	}
-}
-
-ostream& Move::dump(ostream& o) const {
-	if (pos == PASS)
-		return o << (turn == BLACK ? "PASS" : "pass");
-	char base = (turn == BLACK ? 'A' : 'a');
-	char h = base + J(pos);
-	char v = '1' + I(pos);
-	return o << h << v <<" "<<win;
 }
