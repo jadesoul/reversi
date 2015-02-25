@@ -11,18 +11,48 @@
 #include "neuralnet.h"
 #include "ai.h"
 
+#if defined(TRAIN_MODE_WITH_WIN) || defined(TRAIN_MODE_WITH_WIN_ONE)
+NeuralNetwork g_network("/Users/jadesoul/git/reversi/model/trained3.model");
+#endif
+
 NeuralNetwork::NeuralNetwork() {
 	alpha = 0.025;
 	srand((int) time(NULL)); //初始化随机数种子
 	reset();
 	fill_sigmoid_table();
+
+//	for_n(i, 121) {
+//		real x=double(int(i)-60)/10;
+//		real y=sigmoid(x);
+//		log_status("sigmoid("<<x<<")="<<y);
+//	}
+//	getchar();
 }
 
-void NeuralNetwork::train_one_move(const Board& board, pos_t pos) {
+NeuralNetwork::NeuralNetwork(const string& fp):NeuralNetwork() {
+	load_model(fp);
+}
+
+void NeuralNetwork::train_one_move(const Board& board, const Move& move) {
+	pos_t pos=move.pos;
+	color turn=board.get_current_turn();
+	assert(move.turn==turn);
+	int win=move.win;//[-64, +64]
+	if (turn==WHITE) win=-win;//转换为黑子的赢子数
 	read_input(board);
 
+#ifdef TRAIN_MODE_WITH_POS
 	uint kk = I(pos) * 8 + J(pos);
 	log_debug("train nwetwork from move:"<<Move(pos, board.turn)<<", score="<<score);
+#elif defined TRAIN_MODE_WITH_WIN
+	if (win<-64) win=-64;
+	if (win==64) win=63;
+	uchar bits=((uchar)(win+64)) & 0x7F;
+	log_debug("train nwetwork from move:"<<move<<", win="<<win<<", bits=0x"<<std::hex<<(uint)bits<<std::dec);
+#elif defined TRAIN_MODE_WITH_WIN_ONE
+	uint kk=win+64;
+//	log_status("win="<<win<<", kk="<<kk);
+#endif
 
 	//将当前棋步作为训练数据
 	reset_hidden();
@@ -44,6 +74,7 @@ void NeuralNetwork::train_one_move(const Board& board, pos_t pos) {
 	{
 		real label;
 
+#ifdef TRAIN_MODE_WITH_POS
 		if (k == kk) {	//正样本
 			label = 1;
 		} else {	//负样本
@@ -52,6 +83,22 @@ void NeuralNetwork::train_one_move(const Board& board, pos_t pos) {
 			else
 				continue;
 		}
+#elif defined TRAIN_MODE_WITH_WIN
+		label= ((bits>>k) & 0x01) ? 1 : 0;
+//		log_status("k="<<k<<", label="<<label);
+//		getchar();
+#elif defined TRAIN_MODE_WITH_WIN_ONE
+		if (k == kk) {	//正样本
+			label = 1;
+		}
+		else {	//负样本
+//			continue;
+			if ((rand() / (real) RAND_MAX) < 0.01)
+				label = 0;
+			else
+				continue;
+		}
+#endif
 
 		Y[k] = 0;
 		for_n(j, HIDDEN_SIZE)
@@ -61,8 +108,8 @@ void NeuralNetwork::train_one_move(const Board& board, pos_t pos) {
 
 		//计算梯度
 		real f = sigmoid(Y[k]);
-		double g = alpha * (label - f);
-		log_debug("caculate label="<<label<<", f="<<f<<", g="<<g<<", alpha="<<alpha<<", move="<<Pos(move));
+		real g = alpha * (label - f);
+//		log_status("caculate label="<<label<<", Y[k]="<<Y[k]<<", f="<<f<<", g="<<g<<", alpha="<<alpha<<", move="<<move);
 
 		//Y -> H: 计算误差向量,后向传播误差
 		log_debug("Y -> H");
@@ -87,35 +134,74 @@ void NeuralNetwork::train_one_move(const Board& board, pos_t pos) {
 			}
 		}
 	}
+
+//#define DO_WEIGHT_NOR
+#ifdef DO_WEIGHT_NOR
+	//权重归一化
+
+	for_n(i, INPUT_SIZE)
+	{
+		real square_sum = 0;
+		for_n(j, HIDDEN_SIZE)
+		{
+			square_sum += XH[i][j] * XH[i][j];
+		}
+
+		square_sum = sqrt(square_sum);
+		for_n(j, HIDDEN_SIZE)
+		{
+			XH[i][j] /=square_sum;
+		}
+	}
+
+	for_n(j, HIDDEN_SIZE)
+	{
+		real square_sum = 0;
+		for_n(k, OUTPUT_SIZE)
+		{
+			square_sum += HY[j][k] * HY[j][k];
+		}
+
+		square_sum = sqrt(square_sum);
+		for_n(k, OUTPUT_SIZE)
+		{
+			HY[j][k] /=square_sum;
+		}
+	}
+#endif
+
+//	pos_t p=this->predict(board);
+//	log_status("train="<<win<<" predict="<<int((char)p));
 }
 
 void NeuralNetwork::train(const string& fp) {
-	log_warn("NeuralNetwork start training ...");
+	log_warn("NeuralNetwork start training from file: "<<fp<<" ...");
 
 	uint trained=0;
 	timer previous;
 	string line;
 	ifstream fin(fp.c_str());
 
+	uint cnt=0;
 	while (getline(fin, line)) {
-		istringstream iss(line);
-
-
-	}
-	for_n(cnt, total) {
+		if (cnt>2000) break;
 		if (cnt % 10 == 0) {
 			double gap=previous.elapsed();
-			log_status("games: "<<cnt<<"/"<<total<<"="<<(float(cnt)/total)
+			real avg=get_avg_weight();
+			log_status("games="<<cnt
 					<<" trained="<<trained
 					<<" time="<<gap
 					<<" speed="<<(0.001*trained/gap)<<"KB/s"
+					<<" avg="<<avg
+					<<" std="<<get_weight_square(avg)
 					);
 		}
-
-		Game game(black, white);
-		Score score = game.start();
-		int diff = score.diff();
-		Board& finished=game.get_board();
+		++cnt;
+//		log_status(line);
+		istringstream iss(line);
+		Board finished;
+		iss>>finished;
+//		log_status(finished);
 
 		Board board;
 		int pointer=0;
@@ -126,23 +212,19 @@ void NeuralNetwork::train(const string& fp) {
 				board.pass();
 			} else {
 				Move move=finished.get_history_move(pointer);
-				color turn=board.get_current_turn();
-//				if (move.turn!=turn) {
-//					log_warn("why:"<<board);
-//				}
-				assert(move.turn==turn);
-				pos_t pos=move.pos;
 
-				if (turn==score.winner) {
+				if (board.empty_cnt()<=12) {
+//				if (true or board.empty_cnt()>12) {
 					++trained;
-					train_one_move(board, pos);
+					train_one_move(board, move);
 				}
 
-				board.play(pos);
+				board.play(move);
 				++pointer;
 			}
 		}
 	}
+
 	fin.close();
 
 	log_warn("NeuralNetwork finished training");
@@ -214,7 +296,7 @@ pos_t NeuralNetwork::predict(const Board& board) {
 	for_n(j, HIDDEN_SIZE)
 	{
 		H[j] = 0;
-		for_n(i, 64)
+		for_n(i, INPUT_SIZE)
 		{
 			H[j] += X[i] * XH[i][j];
 		}
@@ -223,6 +305,7 @@ pos_t NeuralNetwork::predict(const Board& board) {
 	// H -> Y : 每个输出层节点的值等于隐藏节点向量 点乘 对应的权重向量
 	log_debug("H -> Y");
 
+#ifdef TRAIN_MODE_WITH_POS
 	real max_score = INT32_MIN;
 	uint best;
 
@@ -243,7 +326,53 @@ pos_t NeuralNetwork::predict(const Board& board) {
 			best = k;
 		}
 	}
-	return POS(best / 8, best % 8);
+	pos_t pos=POS(best / 8, best % 8);}
+	return pos;
+#elif defined TRAIN_MODE_WITH_WIN
+	uchar bits=0;
+	for_n(k, OUTPUT_SIZE)
+	{
+		Y[k] = 0;
+		for_n(j, HIDDEN_SIZE)
+		{
+			Y[k] += H[j] * HY[j][k];
+		}
+		real f = sigmoid(Y[k]);
+//		log_status("f="<<f);
+
+		uchar label=0;
+		if (f >= 0.5) {
+			label=1;
+		}
+		bits |= (label << k);
+	}
+//	if (bits>1)
+//		log_status("bits="<<(uint(bits)));
+	bits= bits & 0x7F;
+
+	return board.get_current_turn()==BLACK ? bits : 127 - bits;
+#elif defined TRAIN_MODE_WITH_WIN_ONE
+	real max_score = INT32_MIN;
+	uint best_k;
+
+	for_n(k, OUTPUT_SIZE)
+	{
+		Y[k] = 0;
+		for_n(j, HIDDEN_SIZE)
+		{
+			Y[k] += H[j] * HY[j][k];
+		}
+		if (Y[k] > max_score) {
+			log_status("change best: score:"<<max_score<<" -> "<<Y[k]<<" best_k:"<<best_k<<" -> "<<k);
+			max_score = Y[k];
+			best_k = k;
+		}
+	}
+
+	return board.get_current_turn()==BLACK ? best_k : 128 - best_k;
+//	int win= int(best_k) - 64;
+//	return win;
+#endif
 }
 
 void NeuralNetwork::save_model(const string& fp) const {
@@ -305,28 +434,74 @@ istream& NeuralNetwork::from(istream& in) {
 	return in;
 }
 
+real NeuralNetwork::get_avg_weight() const {
+	real sum=0;
+	for_n(i, INPUT_SIZE)
+	{
+		for_n(j, HIDDEN_SIZE)
+		{
+			sum += XH[i][j];
+		}
+	}
+	for_n(j, HIDDEN_SIZE)
+	{
+		for_n(k, OUTPUT_SIZE)
+		{
+			sum += HY[j][k];
+		}
+	}
+
+	return sum / (INPUT_SIZE * HIDDEN_SIZE + HIDDEN_SIZE * OUTPUT_SIZE);
+}
+
+real NeuralNetwork::get_weight_square(real avg) const {
+	real sum=0;
+	for_n(i, INPUT_SIZE)
+	{
+		for_n(j, HIDDEN_SIZE)
+		{
+			sum += (XH[i][j] - avg) * (XH[i][j] - avg);
+		}
+	}
+	for_n(j, HIDDEN_SIZE)
+	{
+		for_n(k, OUTPUT_SIZE)
+		{
+			sum += (HY[j][k] - avg) * (HY[j][k] - avg);
+		}
+	}
+
+	return sqrt(sum);
+}
+
+
 void NeuralNetwork::reset() {
 	log_debug("reset network");
 	//空子
-	for_n(i, 64)
+	for_n(i, OUTPUT_SIZE)
 	{
-//		X[i]=EMPTY;
 		Y[i] = 0;
 	}
 
 	//随机初始化权重
-	for_n(i, 64)
+	for_n(i, INPUT_SIZE)
 	{
 		for_n(j, HIDDEN_SIZE)
 		{
 			XH[i][j] = (rand() / (real) RAND_MAX - 0.5) / HIDDEN_SIZE;
-			//可以初始化为0，这样前期的训练快
-			//HY[j][i]=0;//(rand() / (real)RAND_MAX - 0.5) / HIDDEN_SIZE;
-			//也可以随机初始化
-			HY[j][i] = (rand() / (real) RAND_MAX - 0.5) / HIDDEN_SIZE;
 		}
 	}
-
+	for_n(j, HIDDEN_SIZE)
+	{
+		for_n(k, OUTPUT_SIZE)
+		{
+			//可以初始化为0，这样前期的训练快
+//			HY[j][k]=0;
+			//也可以随机初始化
+			HY[j][k] = (rand() / (real) RAND_MAX - 0.5) / HIDDEN_SIZE;
+//			HY[j][k] = (rand() / (real) RAND_MAX - 0.5) / OUTPUT_SIZE;
+		}
+	}
 	reset_hidden();
 }
 
@@ -341,9 +516,9 @@ void NeuralNetwork::fill_sigmoid_table() {
 
 real NeuralNetwork::sigmoid(real x) {
 	if (x < -MAX_EXP)
-		return 0;
+		return 0.001;
 	if (x > MAX_EXP)
-		return 1;
+		return 0.999;
 	return expTable[(uint) (((x) + MAX_EXP) * (EXP_TABLE_SIZE / MAX_EXP / 2))];
 }
 
@@ -352,15 +527,22 @@ void NeuralNetwork::read_input(const Board& board) {
 		color c=board.get_stone_color(POS(i/8, i%8));
 		uint& b=X[i];
 		uint& w=X[i+64];
+		uint& e=X[i+64*2];
+		uint& a=X[i+64*3];
 		if (c==BLACK) {
 			b=1;
-			w=0;
+			w=e=a=0;
 		} else if (c==WHITE) {
-			b=0;
+			b=e=a=0;
 			w=1;
+		} else if (c==ACTIVE) {
+			b=w=0;
+			a=e=1;
+		} else if (c==EMPTY) {
+			b=w=a=0;
+			e=1;
 		} else {
-			b=0;
-			w=0;
+			assert(false);
 		}
 	}
 }

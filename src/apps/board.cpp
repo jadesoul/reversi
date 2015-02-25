@@ -48,4 +48,3 @@ public:
 int main () {
 	BoardTest test;
 }
-

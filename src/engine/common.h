@@ -12,6 +12,10 @@
 
 #include "pypp/bootstrap.h"
 
+//#define TRAIN_MODE_WITH_POS
+#define TRAIN_MODE_WITH_WIN 	//每个bit都需要起作用，整体代表一个2进制数字
+//#define TRAIN_MODE_WITH_WIN_ONE //只有1个bit是1
+
 typedef uchar color;//颜色
 typedef uchar pos_t;//位置
 typedef pos_t move_t;

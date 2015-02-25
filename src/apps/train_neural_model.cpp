@@ -15,13 +15,19 @@ public:
 	NeuralNetwork network;
 
 	NeuralNetworkTest() {
-//		network.save_model("model/init.model");
+		network.save_model("model/init.model");
 
 //		network.train();
-//		network.save_model("model/trained.model");
+		network.train("data/train_data.txt");
+//		network.train("data/gold.games");
 
-		network.load_model("model/trained.model");
-		network.save_model("model/trained2.model");
+//		log_status("network after train_one_move:"<< network);
+//		getchar();
+
+		network.save_model("model/trained3.model");
+
+//		network.load_model("model/trained.model");
+//		network.save_model("model/trained2.model");
 	}
 };
 

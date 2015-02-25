@@ -16,8 +16,9 @@ clean:
 test: all
 	bin/reversi
 
-gen_train_data:
-	nohup bin/reversi > data/rand_with_ending_search.txt 2>&1 &
+gentrain:
+	#nohup bin/reversi > data/rand_with_ending_search.txt 2>&1 &
+	bin/gen_train_data > data/train_data.txt
 
 server: all
 	cd src/apps/pyreversi; bash start_server.sh

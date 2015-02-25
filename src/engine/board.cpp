@@ -9,6 +9,7 @@
  */
 
 #include "board.h"
+#include "neuralnet.h"
 
 Board::Board() {
 	init_board_map();
@@ -269,6 +270,18 @@ double Board::get_last_win() const {
 }
 
 double Board::evaluate_and_predict_win_score() const {
+
+#ifdef TRAIN_MODE_WITH_POS
+
+#elif defined TRAIN_MODE_WITH_WIN1
+	uchar bits=g_network.predict(*this);
+	int win=int(bits)-64;
+	return win;
+#elif defined TRAIN_MODE_WITH_WIN_ONE
+	double win=double(g_network.predict(*this))-64;
+	return win;
+#endif
+
 	double m=mobility();
 //    return m;
 	color s = turn();
@@ -601,7 +614,7 @@ ostream& Board::dump(ostream& o) const {
 
 	o << "black_stable=" << get_stable_stones_size(BLACK);
 	o << " white_stable=" << get_stable_stones_size(WHITE);
-	o << " win=" << evaluate_and_predict_win_score();
+	o << " eval=" << evaluate_and_predict_win_score();
 	o << endl;
 
 //	o << "history=";

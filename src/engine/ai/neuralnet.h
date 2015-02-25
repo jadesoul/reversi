@@ -12,12 +12,14 @@
 
 #include "book.h"
 #include "engine/neuralnet.h"
+#include "search.h"
 
 //class NeuralNetwork;
 
 class NeuralNetworkAIPlayer : public OpeningBookPlayer {
 private:
 	NeuralNetwork network;
+	LookNAIPlayer lookn;
 
 public:
 	NeuralNetworkAIPlayer();

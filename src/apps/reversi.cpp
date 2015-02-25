@@ -39,7 +39,7 @@ void AI_vs_AI() {
 //	Look1AIPlayer white;
 
 //	Look2AIPlayer black;
-//	Look2AIPlayer white;
+	Look2AIPlayer white;
 
 //	RandomAIPlayer black;
 //	RandomAIPlayer white;
@@ -50,7 +50,7 @@ void AI_vs_AI() {
 //	CachedMonteCarloAIPlayer black;
 //	CachedMonteCarloAIPlayer white;
 
-//	LookNAIPlayer black;
+	LookNAIPlayer black;
 //	LookNAIPlayer white;
 
 //	NeuralNetworkAIPlayer black;
@@ -59,10 +59,10 @@ void AI_vs_AI() {
 //	CompoundAIPlayer black;
 //	CompoundAIPlayer white;
 
-	RandomWithEndingSearchAIPlayer black;
-	RandomWithEndingSearchAIPlayer white;
+//	RandomWithEndingSearchAIPlayer black;
+//	RandomWithEndingSearchAIPlayer white;
 
-	uint total = 10000 / TOTAL_THREADS;
+	uint total = 1 / TOTAL_THREADS;
 //	cin>>total;
 	log_warn("start "<<total<<" games ...");
 	uint win[4] = { 0, 0, 0, 0 };

@@ -45,7 +45,7 @@ extern const char* fmtstr_ulong;
 #elif defined(OS_OSX)
 
 #include <stdint.h>
-typedef unsigned long ulong;
+typedef unsigned long long ulong;
 
 extern const char* fmtstr_ulong;
 

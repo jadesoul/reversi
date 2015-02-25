@@ -35,7 +35,7 @@ Score Game::start() {
 			player.play(board);
 		}
 
-//		log_status(board);
+		log_status(board);
 //		getchar();
 	}
 

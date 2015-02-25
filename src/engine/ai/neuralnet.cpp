@@ -37,11 +37,4 @@ pos_t NeuralNetworkAIPlayer::play(Board& board) {
 //			b.play(opening_move);
 //			return opening_move;
 //		}
-
-	pos_t best_move=network.predict(board);
-
-	assert(best_move!=PASS);
-	log_info(COLOR(self)<<" NeuralNetworkAIPlayer, play at "<<Move(self, best_move));
-	board.play(best_move);
-	return best_move;
 }

@@ -15,7 +15,7 @@ int main() {
 	RandomWithEndingSearchAIPlayer black;
 	RandomWithEndingSearchAIPlayer white;
 
-	uint total = 100;
+	uint total = 100000;
 	for_n(i, total)
 	{
 		if (i%10==0) log_warn("progress: "<<i<<"/"<<total);
