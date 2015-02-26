@@ -11,20 +11,23 @@
  */
 
 #include "pypp/bootstrap.h"
+#include <limits>
+#include <bitset>
 
-typedef uint color;//颜色
-typedef uint pos;//位置
-typedef uint64_t ulong;
-typedef ulong hash;
+typedef uint color_t;//颜色
+typedef uint pos_t;//位置
+typedef uint64_t ulong;//64bits
+typedef ulong hash_t;//哈希
+typedef ulong mask_t;//掩码
 
 //代表在当前局面下，在每个位置下一步棋，当前下子方最终赢得棋子数的期望(大于0赢棋，小于0输棋)
-typedef map<pos, int> choices;
+typedef map<pos_t, int> Choices;
 
 //开局库数据格式，一个局面hash，对应若干个带分数的下法
-typedef map<hash, choices> book;
+typedef map<hash_t, Choices> Book;
 
 //棋谱树
-typedef map<hash, book> tree;
+typedef map<hash_t, Book> Tree;
 
 //棋盘边长
 #define LEN								8
@@ -53,18 +56,22 @@ typedef map<hash, book> tree;
 #define SOUTH							LEN
 #define WEST							(-1)
 #define EAST							1
+
 #define TO_SOUTH(pos)					((pos) + SOUTH)
 #define TO_NORTH(pos)					((pos) + NORTH)
 #define TO_WEST(pos)					((pos) + WEST)
 #define TO_EAST(pos)					((pos) + EAST)
+
 #define SOUTH_WEST(pos)					((pos) + SOUTH + WEST)
 #define SOUTH_EAST(pos)					((pos) + SOUTH + EAST)
 #define NORTH_WEST(pos)					((pos) + NORTH + WEST)
 #define NORTH_EAST(pos)					((pos) + NORTH + EAST)
+
 #define SOUTH_SOUTH(pos)				((pos) + 2 * SOUTH)
 #define NORTH_NORTH(pos)				((pos) + 2 * NORTH)
 #define WEST_WEST(pos)					((pos) + 2 * WEST)
 #define EAST_EAST(pos)					((pos) + 2 * EAST)
+
 
 //直接邻居
 #define DIRECT_NEIGHBORS(pos1, pos2)		\
@@ -79,6 +86,15 @@ typedef map<hash, book> tree;
 			|| (pos1) == NW(pos2)			\
 			|| (pos1) == NE(pos2)			\
 			|| (pos1) == SE(pos2))
+
+
+#include "mask.h"
+
+#include "log2.h"
+
+
+// 还可以把二进制字符串转换为整数
+//cout << bitset<100>(string("100010110")).to_ulong() << endl;
 
 #ifdef ENABLE_THIS
 #define IS_COLOR(pos, color)	(BOARD(pos)==(color))
