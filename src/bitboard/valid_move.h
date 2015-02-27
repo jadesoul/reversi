@@ -11,8 +11,224 @@
  * Written In: Alibaba-inc, Hangzhou, China
  */
 
-#include "mask.h"
-#include "functor.h"
+#include "common.h"
+
+//8个方向
+#define RIGHT		0
+#define RIGHT_DOWN	1
+#define DOWN		2
+#define LEFT_DOWN	3
+#define LEFT		4
+#define LEFT_UP		5
+#define UP			6
+#define RIGHT_UP	7
+
+template<int DIRECTION>
+class NextPosMaskChanger {
+public:
+	inline mask_t operator ()(const mask_t& pos_mask) {
+		return pos_mask;
+	}
+};
+
+#define GEN_NEXT_POS_MASK_CHANGER(MY_DIRECTION, MASK_CONV) 	\
+template<int DIRECTION>										\
+class NextPosMaskChanger<MY_DIRECTION> {						\
+public:														\
+	inline mask_t operator ()(const mask_t& pos_mask) {		\
+		return MASK_CONV(pos_mask);							\
+	}														\
+};															\
+
+GEN_NEXT_POS_MASK_CHANGER(RIGHT, 		MASK_EAST);
+GEN_NEXT_POS_MASK_CHANGER(RIGHT_DOWN, 	MASK_SOUTH_EAST);
+GEN_NEXT_POS_MASK_CHANGER(DOWN, 		MASK_SOUTH);
+GEN_NEXT_POS_MASK_CHANGER(LEFT_DOWN, 	MASK_SOUTH_WEST);
+GEN_NEXT_POS_MASK_CHANGER(LEFT, 		MASK_WEST);
+GEN_NEXT_POS_MASK_CHANGER(LEFT_UP, 		MASK_NORTH_WEST);
+GEN_NEXT_POS_MASK_CHANGER(UP, 			MASK_NORTH);
+GEN_NEXT_POS_MASK_CHANGER(RIGHT_UP, 	MASK_NORTH_EAST);
+
+typedef NextPosMaskChanger<0> Right;
+typedef NextPosMaskChanger<1> RightDown;
+typedef NextPosMaskChanger<2> Down;
+typedef NextPosMaskChanger<3> LeftDown;
+typedef NextPosMaskChanger<4> Left;
+typedef NextPosMaskChanger<5> LeftUp;
+typedef NextPosMaskChanger<6> Up;
+typedef NextPosMaskChanger<7> RightUp;
+
+class Dummy;
+
+template<class PosMaskChanger, int LOOK_N, class NextChecker>
+class ValidMoveFromPosChecker {
+public:
+	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask) {
+		return false;
+	}
+};
+
+template<class PosMaskChanger, int LOOK_N, class NextChecker>
+class ValidMoveFromPosChecker<Dummy, 0, Dummy> {
+public:
+	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask) {
+		return false;
+	}
+};
+
+template<class PosMaskChanger, int LOOK_N, class NextChecker>
+class ValidMoveFromPosChecker<PosMaskChanger, 0, NextChecker> {
+public:
+	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask) {
+		return NextChecker()(my, op, pmask);
+	}
+};
+
+template<class PosMaskChanger, int LOOK_N, class NextChecker>
+class ValidMoveFromPosChecker<PosMaskChanger, 1, NextChecker> {
+public:
+	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask) {
+		return NextChecker()(my, op, pmask);
+	}
+};
+
+template<class PosMaskChanger, int LOOK_N, class NextChecker>
+class ValidMoveFromPosChecker<PosMaskChanger, 2, NextChecker> {
+public:
+	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask) {
+		PosMaskChanger next_pos_mask;
+		mask_t pm = next_pos_mask(pmask);
+
+		if ((pm & op) and (next_pos_mask(pm) & my)) return true;
+		return NextChecker()(my, op, pmask);
+	}
+};
+
+template<class PosMaskChanger, int LOOK_N, class NextChecker>
+class ValidMoveFromPosChecker<PosMaskChanger, 3, NextChecker> {
+public:
+	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask) {
+		PosMaskChanger next_pos_mask;
+		mask_t pm = next_pos_mask(pmask);
+
+		if (pm & op) {
+			pm = next_pos_mask(pm);
+			if (pm & my) return true;
+			if ((pm & op) and (next_pos_mask(pm) & my)) return true;
+		}
+
+		return NextChecker()(my, op, pmask);
+	}
+};
+
+template<class PosMaskChanger, int LOOK_N, class NextChecker>
+class ValidMoveFromPosChecker<PosMaskChanger, 4, NextChecker> {
+public:
+	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask) {
+		PosMaskChanger next_pos_mask;
+		mask_t pm = next_pos_mask(pmask);
+
+		if (pm & op) {
+			pm = next_pos_mask(pm);
+			if (pm & my) return true;
+			if (pm & op) {
+				pm = next_pos_mask(pm);
+				if (pm & my) return true;
+				if ((pm & op) and (next_pos_mask(pm) & my)) return true;
+			}
+		}
+
+		return NextChecker()(my, op, pmask);
+	}
+};
+
+template<class PosMaskChanger, int LOOK_N, class NextChecker>
+class ValidMoveFromPosChecker<PosMaskChanger, 5, NextChecker> {
+public:
+	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask) {
+		PosMaskChanger next_pos_mask;
+		mask_t pm = next_pos_mask(pmask);
+
+		if (pm & op) {
+			pm = next_pos_mask(pm);
+			if (pm & my) return true;
+			if (pm & op) {
+				pm = next_pos_mask(pm);
+				if (pm & my) return true;
+				if (pm & op) {
+					pm = next_pos_mask(pm);
+					if (pm & my) return true;
+					if ((pm & op) and (next_pos_mask(pm) & my)) return true;
+				}
+			}
+		}
+
+		return NextChecker()(my, op, pmask);
+	}
+};
+
+template<class PosMaskChanger, int LOOK_N, class NextChecker>
+class ValidMoveFromPosChecker<PosMaskChanger, 6, NextChecker> {
+public:
+	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask) {
+		PosMaskChanger next_pos_mask;
+		mask_t pm = next_pos_mask(pmask);
+
+		if (pm & op) {
+			pm = next_pos_mask(pm);
+			if (pm & my) return true;
+			if (pm & op) {
+				pm = next_pos_mask(pm);
+				if (pm & my) return true;
+				if (pm & op) {
+					pm = next_pos_mask(pm);
+					if (pm & my) return true;
+					if (pm & op) {
+						pm = next_pos_mask(pm);
+						if (pm & my) return true;
+						if ((pm & op) and (next_pos_mask(pm) & my)) return true;
+					}
+				}
+			}
+		}
+
+		return NextChecker()(my, op, pmask);
+	}
+};
+
+template<class PosMaskChanger, int LOOK_N, class NextChecker>
+class ValidMoveFromPosChecker<PosMaskChanger, 7, NextChecker> {
+public:
+	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask) {
+		PosMaskChanger next_pos_mask;
+		mask_t pm = next_pos_mask(pmask);
+
+		if (pm & op) {
+			pm = next_pos_mask(pm);
+			if (pm & my) return true;
+			if (pm & op) {
+				pm = next_pos_mask(pm);
+				if (pm & my) return true;
+				if (pm & op) {
+					pm = next_pos_mask(pm);
+					if (pm & my) return true;
+					if (pm & op) {
+						pm = next_pos_mask(pm);
+						if (pm & my) return true;
+						if (pm & op) {
+							pm = next_pos_mask(pm);
+							if (pm & my) return true;
+							if ((pm & op) and (next_pos_mask(pm) & my)) return true;
+						}
+					}
+				}
+			}
+		}
+
+		return NextChecker()(my, op, pmask);
+	}
+};
+
 
 //check valid move from grid(x, y), pos(x-1, y-1)
 //i, j starts from 0

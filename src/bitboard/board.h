@@ -12,10 +12,13 @@
  */
 
 #include "common.h"
-#include "functor.h"
+
 #include "pos.h"
 #include "mask.h"
 #include "log2.h"
+
+//#include "valid_move.h"
+#include "make_move.h"
 
 /**
 black=		01111101110...
@@ -139,7 +142,19 @@ public:
 	bool valid_move(ulong& my_bits, ulong& op_bits, const uint& pos) {
 		mask_t pos_mask= 0x01 << pos;
 		if (my_bits & pos_mask) return false;
-		return valid_move_from_pos_functions[pos](my_bits, op_bits, pos_mask);
+//		return valid_move_from_pos_functions[pos](my_bits, op_bits, pos_mask);
+		return false;
+	}
+
+	mask_t make_move(ulong& my_bits, ulong& op_bits, const uint& pos) {
+		eat_key key;
+		mask_t rice=move_maker.rice_table[pos];
+		key.my_rice = my_bits & rice;
+		key.op_rice = op_bits & rice;
+		key.pos = pos;
+		eat_table_t::iterator it = move_maker.eat_table.find(key);
+		if (it == move_maker.eat_table.end()) return 0;
+		return it->second.eat_mask;
 	}
 
 	void init_bit_board() {

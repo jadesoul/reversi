@@ -12,7 +12,10 @@
 #include "bitboard/board.h"
 
 int main() {
-	init_valid_move_byte_table();
+//	init_valid_move_byte_table();
+
+	move_maker.test();
+
 	return 0;
 }
 
