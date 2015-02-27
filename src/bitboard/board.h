@@ -148,7 +148,7 @@ public:
 
 	mask_t make_move(ulong& my_bits, ulong& op_bits, const uint& pos) {
 		eat_key key;
-		mask_t rice=move_maker.rice_table[pos];
+		mask_t rice=move_maker.cross_table[pos];
 		key.my_rice = my_bits & rice;
 		key.op_rice = op_bits & rice;
 		key.pos = pos;
