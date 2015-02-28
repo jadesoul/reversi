@@ -12,12 +12,7 @@
  */
 
 #include "common.h"
-
-#include "pos.h"
-#include "mask.h"
-#include "log2.h"
-
-//#include "valid_move.h"
+#include "valid_move.h"
 #include "make_move.h"
 
 /**
@@ -127,52 +122,76 @@ void init_valid_move_byte_table() {
 
 class BitBoard {
 public:
-	BitBoard() {
-		init_bit_board();
+	BitBoard() { init_bit_board(); }
+
+	//test color at pos : [0, 63]
+	inline bool is_black(uint pos) const { return BIT_EXIST(black_bits, pos); }
+	inline bool is_white(uint pos) const { return BIT_EXIST(white_bits, pos); }
+	inline bool is_empty(ulong b, ulong w, uint pos) const { return BIT_NOT_EXIST((b | w), pos); }
+	inline bool is_empty(uint pos) const { return BIT_NOT_EXIST((black_bits | white_bits), pos); }
+	inline bool is_stone(uint pos) const { return is_black(pos) or is_white(pos); }
+
+	//set color at pos
+	inline void set_black(uint pos) { SET_BIT(black_bits, pos); CLEAR_BIT(white_bits, pos); }
+	inline void set_white(uint pos) { CLEAR_BIT(black_bits, pos); SET_BIT(white_bits, pos); }
+	inline void set_empty(uint pos) { CLEAR_BIT(black_bits, pos); CLEAR_BIT(white_bits, pos); }
+
+	//flip color at pos
+	inline void flip(uint pos) { assert(is_stone(pos)); FLIP_BIT(black_bits, pos); FLIP_BIT(white_bits, pos); }
+
+	//test if we can make move at pos
+	inline bool valid_move(const ulong& my, const ulong& op, const uint& pos) { return check_valid_move(my, op, pos); }
+
+	//test if game is over
+	inline bool game_over() { return empty_cnt==0 or pass_cnt>=2; }
+
+	//you can call valid_move before this or not
+	//using eat_table to cache the previous eating mask
+	//if we can make move, return true
+	inline bool make_move(ulong& my, ulong& op, const uint& pos) {
+		assert(is_empty(my, op, pos));
+
+		eat_val val;
+
+		//if exist move in db
+		if (! move_db.find(my, op, pos, val)) {
+			//begin find move
+			if (! move_maker.make_move(my, op, pos, val)) return false;
+
+			//save new move into db
+			move_db.add(my, op, pos, val);
+		}
+
+		//backup last my/op or last eat_mask
+		//TODO
+
+		//play move
+		op ^= val.eat_mask;
+		my ^= val.eat_mask;
+		SET_BIT(my, pos);
+
+		return true;
 	}
 
-	//pos : [0, 63]
-	inline bool is_black_stone(uint pos) const { return BIT_EXIST(black_bits, pos); }
-	inline bool is_white_stone(uint pos) const { return BIT_EXIST(white_bits, pos); }
-
-	inline void set_black_stone(uint pos) { SET_BIT(black_bits, pos); }
-	inline void set_white_stone(uint pos) { SET_BIT(white_bits, pos); }
-
-	//验证是否可以下子，pos:下子位置
-	bool valid_move(ulong& my_bits, ulong& op_bits, const uint& pos) {
-		mask_t pos_mask= 0x01 << pos;
-		if (my_bits & pos_mask) return false;
-//		return valid_move_from_pos_functions[pos](my_bits, op_bits, pos_mask);
+	bool undo_move() {
+		//recover from last
+		//TODO
 		return false;
 	}
 
-	mask_t make_move(ulong& my_bits, ulong& op_bits, const uint& pos) {
-		eat_key key;
-		mask_t rice=move_maker.cross_table[pos];
-		key.my_rice = my_bits & rice;
-		key.op_rice = op_bits & rice;
-		key.pos = pos;
-		eat_table_t::iterator it = move_maker.eat_table.find(key);
-		if (it == move_maker.eat_table.end()) return 0;
-		return it->second.eat_mask;
-	}
-
 	void init_bit_board() {
-		black_bits=0;
-		set_black_stone(D4);
-		set_black_stone(E5);
-
-		white_bits=0;
-		set_white_stone(D5);
-		set_white_stone(E4);
+		black_bits=INITIAL_BLACK_BITS;
+		white_bits=INITIAL_WHITE_BITS;
 
 		black_cnt=2;
 		white_cnt=2;
+		empty_cnt=60;
+		pass_cnt=0;
 
 		total_move=0;
 	}
 
-private:
+public:
 	//board map
 	ulong black_bits;
 	ulong white_bits;
@@ -180,6 +199,8 @@ private:
 	//counters
 	uint black_cnt;
 	uint white_cnt;
+	uint empty_cnt;
+	uint pass_cnt;
 
 	//play history
 //	Move move_history[64];

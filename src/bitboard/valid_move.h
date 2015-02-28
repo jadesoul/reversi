@@ -27,13 +27,13 @@ template<int DIRECTION>
 class NextPosMaskChanger {
 public:
 	inline mask_t operator ()(const mask_t& pos_mask) {
-		return pos_mask;
+		return (pos_mask << (DIRECTION * 0));
 	}
 };
 
-#define GEN_NEXT_POS_MASK_CHANGER(MY_DIRECTION, MASK_CONV) 	\
-template<int DIRECTION>										\
-class NextPosMaskChanger<MY_DIRECTION> {						\
+#define GEN_NEXT_POS_MASK_CHANGER(DIRECTION, MASK_CONV) 	\
+template<>													\
+class NextPosMaskChanger<DIRECTION> {						\
 public:														\
 	inline mask_t operator ()(const mask_t& pos_mask) {		\
 		return MASK_CONV(pos_mask);							\
@@ -68,7 +68,8 @@ public:
 	}
 };
 
-template<class PosMaskChanger, int LOOK_N, class NextChecker>
+//template<class PosMaskChanger, int LOOK_N, class NextChecker>
+template<>
 class ValidMoveFromPosChecker<Dummy, 0, Dummy> {
 public:
 	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask) {
@@ -241,8 +242,6 @@ bool valid_move_checker(const ulong& my, const ulong& op, const mask_t& pmask) {
 	typedef ValidMoveFromPosChecker<Up, x-1, B> 		C;
 	typedef ValidMoveFromPosChecker<Down, 8-x, C> 		D;
 
-#define MIN(x, y) ((x)<(y)?(x):(y))
-
 	typedef ValidMoveFromPosChecker<LeftUp, MIN(y-1, x-1), D> 		E;
 	typedef ValidMoveFromPosChecker<LeftDown, MIN(y-1, 8-x), E> 	F;
 	typedef ValidMoveFromPosChecker<RightUp, MIN(8-y, x-1), F> 		G;
@@ -266,5 +265,20 @@ ValidMoveFromPosFunction valid_move_from_pos_functions[64]={
 	VM(7,1), VM(7,2), VM(7,3), VM(7,4), VM(7,5), VM(7,6), VM(7,7), VM(7,8),
 	VM(8,1), VM(8,2), VM(8,3), VM(8,4), VM(8,5), VM(8,6), VM(8,7), VM(8,8),
 };
+
+class ValidMoveChecker {
+public:
+	inline bool operator()(ulong& my_bits, ulong& op_bits, const uint& pos) {
+		mask_t pos_mask= static_cast<mask_t>(0x01) << pos;
+		if (my_bits & pos_mask) return false;
+		if (op_bits & pos_mask) return false;
+		return valid_move_from_pos_functions[pos](my_bits, op_bits, pos_mask);
+	}
+};
+
+ValidMoveChecker check_valid_move;
+
+
+
 
 #endif /* BITBOARD_VALID_MOVE_H_ */

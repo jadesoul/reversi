@@ -96,6 +96,10 @@ typedef map<hash_t, Book> Tree;
 // 还可以把二进制字符串转换为整数
 //cout << bitset<100>(string("100010110")).to_ulong() << endl;
 
+#define ABS(x) ((x) < 0 ? -(x) : (x))
+#define MIN(a, b) ((a)<(b) ? (a) : (b))
+#define MAX(a, b) ((a)<(b) ? (b) : (a))
+
 #ifdef ENABLE_THIS
 #define IS_COLOR(pos, color)	(BOARD(pos)==(color))
 #define IS_WALL(pos)			IS_COLOR(pos, WALL)
@@ -208,9 +212,7 @@ typedef map<hash_t, Book> Tree;
 
 
 
-#define ABS(x) ((x) < 0 ? -(x) : (x))
-#define MIN(a, b) ((a)<(b) ? (a) : (b))
-#define MAX(a, b) ((a)<(b) ? (b) : (a))
+
 
 //8个方向
 #define RIGHT		1
@@ -231,9 +233,6 @@ typedef map<hash_t, Book> Tree;
 
 #endif
 
-//位操作
-#define BIT_EXIST(bits, offset)			(((bits) >> (offset)) & 0x01)
-#define SET_BIT(bits, offset)			((bits) |= (0x01 << (offset)))
-//#define CLEAR_BIT(bits, offset)		((bits) &= (0x00 << (offset)))
+#include "bitop.h"
 
 #endif /* COMMON_H_1421849265_74 */

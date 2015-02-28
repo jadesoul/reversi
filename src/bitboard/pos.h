@@ -95,5 +95,7 @@
 #define G8				GRID(8, 7)
 #define H8				GRID(8, 8)
 
+#define INITIAL_BLACK_BITS		(D4 | E5)
+#define INITIAL_WHITE_BITS		(D5 | E4)
 
 #endif /* BITBOARD_POS_H_ */
