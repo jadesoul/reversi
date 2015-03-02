@@ -25,4 +25,6 @@
 #define FLIP_BIT(bits, offset)			( bits ^= (ONE << offset) )
 #define REVERSE_BITS(bits)				( bits ^= ALLONE )
 
+#define IS_EMPTY(my, op, pos)			BIT_NOT_EXIST((my | op), pos)
+
 #endif /* BITBOARD_BITOP_H_ */

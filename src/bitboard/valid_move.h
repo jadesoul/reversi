@@ -29,25 +29,31 @@ public:
 	inline mask_t operator ()(const mask_t& pos_mask) {
 		return (pos_mask << (DIRECTION * 0));
 	}
+	friend ostream& operator <<(ostream& o, NextPosMaskChanger& c) {
+		return o<<"UndefinedNextPosMaskChanger";
+	}
 };
 
-#define GEN_NEXT_POS_MASK_CHANGER(DIRECTION, MASK_CONV) 	\
-template<>													\
-class NextPosMaskChanger<DIRECTION> {						\
-public:														\
-	inline mask_t operator ()(const mask_t& pos_mask) {		\
-		return MASK_CONV(pos_mask);							\
-	}														\
-};															\
+#define GEN_NEXT_POS_MASK_CHANGER(DIRECTION, MASK_CONV, NAME) 			\
+template<>																\
+class NextPosMaskChanger<DIRECTION> {									\
+public:																	\
+	inline mask_t operator ()(const mask_t& pos_mask) {					\
+		return MASK_CONV(pos_mask);										\
+	}																	\
+	friend ostream& operator <<(ostream& o, NextPosMaskChanger& c) {	\
+		return o<< #NAME ;												\
+	}																	\
+};																		\
 
-GEN_NEXT_POS_MASK_CHANGER(RIGHT, 		MASK_EAST);
-GEN_NEXT_POS_MASK_CHANGER(RIGHT_DOWN, 	MASK_SOUTH_EAST);
-GEN_NEXT_POS_MASK_CHANGER(DOWN, 		MASK_SOUTH);
-GEN_NEXT_POS_MASK_CHANGER(LEFT_DOWN, 	MASK_SOUTH_WEST);
-GEN_NEXT_POS_MASK_CHANGER(LEFT, 		MASK_WEST);
-GEN_NEXT_POS_MASK_CHANGER(LEFT_UP, 		MASK_NORTH_WEST);
-GEN_NEXT_POS_MASK_CHANGER(UP, 			MASK_NORTH);
-GEN_NEXT_POS_MASK_CHANGER(RIGHT_UP, 	MASK_NORTH_EAST);
+GEN_NEXT_POS_MASK_CHANGER(RIGHT, 		MASK_EAST,			Right);
+GEN_NEXT_POS_MASK_CHANGER(RIGHT_DOWN, 	MASK_SOUTH_EAST,	RightDown);
+GEN_NEXT_POS_MASK_CHANGER(DOWN, 		MASK_SOUTH,			Down);
+GEN_NEXT_POS_MASK_CHANGER(LEFT_DOWN, 	MASK_SOUTH_WEST,	LeftDown);
+GEN_NEXT_POS_MASK_CHANGER(LEFT, 		MASK_WEST,			Left);
+GEN_NEXT_POS_MASK_CHANGER(LEFT_UP, 		MASK_NORTH_WEST,	LeftUp);
+GEN_NEXT_POS_MASK_CHANGER(UP, 			MASK_NORTH,			Up);
+GEN_NEXT_POS_MASK_CHANGER(RIGHT_UP, 	MASK_NORTH_EAST,	RightUp);
 
 typedef NextPosMaskChanger<0> Right;
 typedef NextPosMaskChanger<1> RightDown;
@@ -58,46 +64,63 @@ typedef NextPosMaskChanger<5> LeftUp;
 typedef NextPosMaskChanger<6> Up;
 typedef NextPosMaskChanger<7> RightUp;
 
-class Dummy;
+class Dummy {
+public:
+	Dummy() {}
+
+	friend ostream& operator <<(ostream& o, Dummy& d) {
+		return o<<"Dummy";
+	}
+};
 
 template<class PosMaskChanger, int LOOK_N, class NextChecker>
 class ValidMoveFromPosChecker {
 public:
 	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask) {
-		return false;
+//		log_status("in ValidMoveFromPosChecker: " << "Undefiend" << " LookN=" << LOOK_N );
+		return NextChecker()(my, op, pmask);
 	}
 };
 
-//template<class PosMaskChanger, int LOOK_N, class NextChecker>
 template<>
 class ValidMoveFromPosChecker<Dummy, 0, Dummy> {
 public:
 	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask) {
+//		log_status("in ValidMoveFromPosChecker: " << "Dummy" << " LookN=" << 0 );
+
 		return false;
 	}
 };
 
-template<class PosMaskChanger, int LOOK_N, class NextChecker>
+template<class PosMaskChanger, class NextChecker>
 class ValidMoveFromPosChecker<PosMaskChanger, 0, NextChecker> {
 public:
 	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask) {
+
+//		PosMaskChanger next_pos_mask;
+//		log_status("in ValidMoveFromPosChecker: "<<next_pos_mask<<" LookN="<<0);
+
 		return NextChecker()(my, op, pmask);
 	}
 };
 
-template<class PosMaskChanger, int LOOK_N, class NextChecker>
+template<class PosMaskChanger, class NextChecker>
 class ValidMoveFromPosChecker<PosMaskChanger, 1, NextChecker> {
 public:
 	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask) {
+//		PosMaskChanger next_pos_mask;
+//		log_status("in ValidMoveFromPosChecker: "<<next_pos_mask<<" LookN="<<1);
+
 		return NextChecker()(my, op, pmask);
 	}
 };
 
-template<class PosMaskChanger, int LOOK_N, class NextChecker>
+template<class PosMaskChanger, class NextChecker>
 class ValidMoveFromPosChecker<PosMaskChanger, 2, NextChecker> {
 public:
 	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask) {
 		PosMaskChanger next_pos_mask;
+//		log_status("in ValidMoveFromPosChecker: "<<next_pos_mask<<" LookN="<<2);
 		mask_t pm = next_pos_mask(pmask);
 
 		if ((pm & op) and (next_pos_mask(pm) & my)) return true;
@@ -105,11 +128,12 @@ public:
 	}
 };
 
-template<class PosMaskChanger, int LOOK_N, class NextChecker>
+template<class PosMaskChanger, class NextChecker>
 class ValidMoveFromPosChecker<PosMaskChanger, 3, NextChecker> {
 public:
 	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask) {
 		PosMaskChanger next_pos_mask;
+//		log_status("in ValidMoveFromPosChecker: "<<next_pos_mask<<" LookN="<<3);
 		mask_t pm = next_pos_mask(pmask);
 
 		if (pm & op) {
@@ -122,11 +146,12 @@ public:
 	}
 };
 
-template<class PosMaskChanger, int LOOK_N, class NextChecker>
+template<class PosMaskChanger, class NextChecker>
 class ValidMoveFromPosChecker<PosMaskChanger, 4, NextChecker> {
 public:
 	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask) {
 		PosMaskChanger next_pos_mask;
+//		log_status("in ValidMoveFromPosChecker: "<<next_pos_mask<<" LookN="<<4);
 		mask_t pm = next_pos_mask(pmask);
 
 		if (pm & op) {
@@ -143,11 +168,12 @@ public:
 	}
 };
 
-template<class PosMaskChanger, int LOOK_N, class NextChecker>
+template<class PosMaskChanger, class NextChecker>
 class ValidMoveFromPosChecker<PosMaskChanger, 5, NextChecker> {
 public:
 	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask) {
 		PosMaskChanger next_pos_mask;
+//		log_status("in ValidMoveFromPosChecker: "<<next_pos_mask<<" LookN="<<5);
 		mask_t pm = next_pos_mask(pmask);
 
 		if (pm & op) {
@@ -168,11 +194,12 @@ public:
 	}
 };
 
-template<class PosMaskChanger, int LOOK_N, class NextChecker>
+template<class PosMaskChanger, class NextChecker>
 class ValidMoveFromPosChecker<PosMaskChanger, 6, NextChecker> {
 public:
 	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask) {
 		PosMaskChanger next_pos_mask;
+//		log_status("in ValidMoveFromPosChecker: "<<next_pos_mask<<" LookN="<<6);
 		mask_t pm = next_pos_mask(pmask);
 
 		if (pm & op) {
@@ -197,12 +224,13 @@ public:
 	}
 };
 
-template<class PosMaskChanger, int LOOK_N, class NextChecker>
+template<class PosMaskChanger, class NextChecker>
 class ValidMoveFromPosChecker<PosMaskChanger, 7, NextChecker> {
 public:
 	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask) {
 		PosMaskChanger next_pos_mask;
 		mask_t pm = next_pos_mask(pmask);
+//		log_status("in ValidMoveFromPosChecker: "<<next_pos_mask<<" LookN="<<7);
 
 		if (pm & op) {
 			pm = next_pos_mask(pm);
@@ -230,22 +258,23 @@ public:
 	}
 };
 
-
 //check valid move from grid(x, y), pos(x-1, y-1)
 //i, j starts from 0
 //x, y starts from 1
 template<uint x, uint y>
 bool valid_move_checker(const ulong& my, const ulong& op, const mask_t& pmask) {
-	typedef ValidMoveFromPosChecker<Dummy, 0, Dummy> 	End;
-	typedef ValidMoveFromPosChecker<Right, 8-y, End> 	A;
-	typedef ValidMoveFromPosChecker<Left, y-1, A> 		B;
-	typedef ValidMoveFromPosChecker<Up, x-1, B> 		C;
-	typedef ValidMoveFromPosChecker<Down, 8-x, C> 		D;
 
-	typedef ValidMoveFromPosChecker<LeftUp, MIN(y-1, x-1), D> 		E;
-	typedef ValidMoveFromPosChecker<LeftDown, MIN(y-1, 8-x), E> 	F;
-	typedef ValidMoveFromPosChecker<RightUp, MIN(8-y, x-1), F> 		G;
-	typedef ValidMoveFromPosChecker<RightDown, MIN(8-y, 8-x), G> 	H;
+//	log_status("in valid_move_checker, x="<<x<<", y="<<y);
+
+	typedef ValidMoveFromPosChecker<Dummy, 0, Dummy> 					End;
+	typedef ValidMoveFromPosChecker<RightUp, MIN(8-y, x-1), End> 		A;
+	typedef ValidMoveFromPosChecker<Up, x-1, A> 						B;
+	typedef ValidMoveFromPosChecker<LeftUp, MIN(y-1, x-1), B> 			C;
+	typedef ValidMoveFromPosChecker<Left, y-1, C> 						D;
+	typedef ValidMoveFromPosChecker<LeftDown, MIN(y-1, 8-x), D> 		E;
+	typedef ValidMoveFromPosChecker<Down, 8-x, E> 						F;
+	typedef ValidMoveFromPosChecker<RightDown, MIN(8-y, 8-x), F> 		G;
+	typedef ValidMoveFromPosChecker<Right, 8-y, G> 						H;
 
 	return H()(my, op, pmask);
 }
@@ -268,10 +297,9 @@ ValidMoveFromPosFunction valid_move_from_pos_functions[64]={
 
 class ValidMoveChecker {
 public:
-	inline bool operator()(ulong& my_bits, ulong& op_bits, const uint& pos) {
-		mask_t pos_mask= static_cast<mask_t>(0x01) << pos;
-		if (my_bits & pos_mask) return false;
-		if (op_bits & pos_mask) return false;
+	inline bool operator()(const ulong& my_bits, const ulong& op_bits, const uint& pos) {
+		assert(IS_EMPTY(my_bits, op_bits, pos));
+		mask_t pos_mask= ONE << pos;
 		return valid_move_from_pos_functions[pos](my_bits, op_bits, pos_mask);
 	}
 };

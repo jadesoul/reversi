@@ -22,6 +22,24 @@
 #define MASK_SOUTH_EAST(pos_mask)		((pos_mask) << 9)
 #define MASK_SOUTH_WEST(pos_mask)		((pos_mask) << 7)
 
+class Mask {
+public:
+	mask_t mask;
 
+	Mask(mask_t mask): mask(mask) {}
+
+	friend inline ostream& operator<<(ostream& o, const Mask& m) { m.dump(o); return o; }
+
+	void dump(ostream& o) const {
+		mask_t m=mask;
+		for_n(i, 64) {
+			if (i%8==0) o<< "\n";
+			o<< ((m & 0x01) ? '1' : '.');
+			o<<' ';
+			m >>= 1;
+		}
+		o<< "\n\n";
+	}
+};
 
 #endif /* BITBOARD_MASK_H_ */

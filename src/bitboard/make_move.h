@@ -12,6 +12,7 @@
  */
 
 #include "common.h"
+#include "valid_move.h"
 
 /*
 
@@ -100,22 +101,33 @@ struct eat_key {
 	bool operator < (const eat_key& r) const {
 		return my_rice < r.my_rice or op_rice < r.op_rice or pos < r.pos;
 	}
+
+	bool operator ==(const eat_key& r) const {
+		return my_rice == r.my_rice and op_rice == r.op_rice and pos == r.pos;
+	}
 };
 
+template<>
+struct std::hash<eat_key> {
+	size_t operator() (const eat_key& key) const {
+		return (key.my_rice * 1313131 + key.op_rice) * 1313131 + key.pos;
+	}
+};
+
+//	typedef map<eat_key, uint> eat_table_t;
+typedef hash_map<eat_key, uint> eat_table_t;//TODO
+
 struct eat_val {
-	mask_t 		eat_mask;
-	uint		total;
+	mask_t 		eat_mask;//holding the bits for fliping
+	mask_t 		gard_mask;//my border stones that make the eating possible
+	uint		total_eat;//total eating stones
 	hash_t		eat_zobbrist_hash;
 	//...
 
-	eat_val():eat_mask(0), total(0), eat_zobbrist_hash(0) {}
+	eat_val():eat_mask(0), gard_mask(0), total_eat(0), eat_zobbrist_hash(0) {}
 };
 
 class MoveDatabase {
-public:
-	typedef map<eat_key, uint> eat_table_t;
-	//typedef hash_map<eat_key, uint> eat_table_t;//TODO
-
 public:
 	mask_t 				heng[8], shu[8], pie[15], nar[15];//for generating corss
 	mask_t 				cross_table[64];//cross for each eating position
@@ -124,20 +136,30 @@ public:
 
 public:
 	//dynamic: use pre-generated database
-	MoveDatabase(bool dynamic=true) {
+//	MoveDatabase(bool dynamic=true) {
+	MoveDatabase() {
 		init_heng_shu_pie_nar();
 		init_cross_table();
+//		const size_t n=UINT32_MAX/4 + 1000000;
+//		eat_table.resize(n * 11 / 7);
+//		eat_val_list.reserve(n);
 //		init_eat_table();
 	}
 
-	void test() {
-//		for_n(i, 15) print(pie[i]);
-//		for_n(i, 15) print(nar[i]);
+	inline size_t table_size() const { return eat_table.size(); }
+	inline size_t list_size() const { return eat_val_list.size(); }
 
+	friend inline ostream& operator<<(ostream& o, const MoveDatabase& d) { d.dump(o); return o; }
+
+	void dump(ostream& o) const {
+		o<<"MoveDatabase { table="<<table_size()<<" list="<<list_size()<<" }";
+	}
+
+	void test() {
 		for_n(i, 64) {
 			system("clear");
 			cout<<"i="<<i<<", rice mask="<<endl;
-			print(cross_table[i]);
+			cout<<Mask(cross_table[i])<<endl;
 			getchar();
 		}
 	}
@@ -152,16 +174,24 @@ public:
 		cout<< "\n\n";
 	}
 
-	bool find(const mask_t& my, const mask_t& op, const pos_t& pos, eat_val& val) {
+	bool find(const ulong& my, const ulong& op, const pos_t& pos, eat_val& val) {
+		return false;
+
 		mask_t cross=cross_table[pos];
 		eat_key key(my & cross, op & cross, pos);
 		eat_table_t::iterator it = eat_table.find(key);
 		if (it == eat_table.end()) return false;
 		val = eat_val_list[it->second];//use index in list
+//		log_status("found move in database: "<<BITS_TEXT(val.eat_mask));
 		return true;
 	}
 
-	void add(const mask_t& my, const mask_t& op, const pos_t& pos, const eat_val& val) {
+	void add(const ulong& my, const ulong& op, const pos_t& pos, const eat_val& val) {
+		return;
+		mask_t cross=cross_table[pos];
+		eat_key key(my & cross, op & cross, pos);
+		eat_table[key]=eat_val_list.size();
+		eat_val_list.push_back(val);
 	}
 protected:
 	void init_heng_shu_pie_nar() {
@@ -196,10 +226,6 @@ protected:
 		log_status("i="<<i<<", j="<<j);
 		mask_t pos_mask = static_cast<mask_t>(0x01) << pos;
 		mask_t m;
-
-		//for debug
-//		mask_t cross=cross_table[pos];
-//		print(cross);
 
 		mask_t pms[8][7];//at most 7 pms for each direction
 		uint len[8];//len for each direction
@@ -310,11 +336,7 @@ EM: do nothing
 			log_status("n="<<n);
 			for_n(j, n) {
 				m |= pms[i][j];
-//				print(pms[i][j]);
 			}
-//			system("clear");
-//			print(m);
-//			getchar();
 		}
 */
 
@@ -334,19 +356,329 @@ EM: do nothing
 
 MoveDatabase move_db;
 
-class MoveMaker {
+template<class PosMaskChanger, int LOOK_N, class NextMaker>
+class MoveFromPosMaker {
 public:
-	MoveMaker() {}
-
-	bool make_move(const mask_t& my, const mask_t& op, const pos_t& pos, eat_val& val) {
-
+	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask, eat_val& val) {
+		return false;
 	}
 };
 
-MoveMaker move_maker;
+template<>
+class MoveFromPosMaker<Dummy, 0, Dummy> {
+public:
+	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask, eat_val& val) {
+		return val.total_eat > 0;
+	}
+};
+
+template<class PosMaskChanger, class NextMaker>
+class MoveFromPosMaker<PosMaskChanger, 0, NextMaker> {
+public:
+	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask, eat_val& val) {
+		return NextMaker()(my, op, pmask, val);
+	}
+};
+
+template<class PosMaskChanger, class NextMaker>
+class MoveFromPosMaker<PosMaskChanger, 1, NextMaker> {
+public:
+	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask, eat_val& val) {
+		return NextMaker()(my, op, pmask, val);
+	}
+};
+
+template<class PosMaskChanger, class NextMaker>
+class MoveFromPosMaker<PosMaskChanger, 2, NextMaker> {
+public:
+	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask, eat_val& val) {
+		PosMaskChanger next_pos_mask;
+		mask_t pm1 = next_pos_mask(pmask);
+		mask_t pm2 = next_pos_mask(pm1);
+
+		if ((pm1 & op) and (pm2 & my)) {
+			val.eat_mask |= pm1;
+			val.gard_mask |= pm2;
+			val.total_eat +=1;
+		}
+		return NextMaker()(my, op, pmask, val);
+	}
+};
+
+template<class PosMaskChanger, class NextMaker>
+class MoveFromPosMaker<PosMaskChanger, 3, NextMaker> {
+public:
+	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask, eat_val& val) {
+		PosMaskChanger next_pos_mask;
+		mask_t pm = next_pos_mask(pmask);
+		mask_t eat_mask=0;//tmp eat mask for this direction
+
+		if (pm & op) {
+			eat_mask |= pm;
+			pm = next_pos_mask(pm);
+			if (pm & my) {
+				val.eat_mask |= eat_mask;
+				val.gard_mask |= pm;
+				val.total_eat +=1;
+			} else if (pm & op) {
+				eat_mask |= pm;
+				pm = next_pos_mask(pm);
+				if (pm & my) {
+					val.eat_mask |= eat_mask;
+					val.gard_mask |= pm;
+					val.total_eat +=2;
+				}
+			}
+		}
+		return NextMaker()(my, op, pmask, val);
+	}
+};
+
+
+template<class PosMaskChanger, class NextMaker>
+class MoveFromPosMaker<PosMaskChanger, 4, NextMaker> {
+public:
+	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask, eat_val& val) {
+		PosMaskChanger next_pos_mask;
+		mask_t pm = next_pos_mask(pmask);
+		mask_t eat_mask=0;//tmp eat mask for this direction
+
+		if (pm & op) {
+			eat_mask |= pm;
+			pm = next_pos_mask(pm);
+			if (pm & my) {
+				val.eat_mask |= eat_mask;
+				val.gard_mask |= pm;
+				val.total_eat +=1;
+			} else if (pm & op) {
+				eat_mask |= pm;
+				pm = next_pos_mask(pm);
+				if (pm & my) {
+					val.eat_mask |= eat_mask;
+					val.gard_mask |= pm;
+					val.total_eat +=2;
+				} else if (pm & op) {
+					eat_mask |= pm;
+					pm = next_pos_mask(pm);
+					if (pm & my) {
+						val.eat_mask |= eat_mask;
+						val.gard_mask |= pm;
+						val.total_eat +=3;
+					}
+				}
+			}
+		}
+		return NextMaker()(my, op, pmask, val);
+	}
+};
+
+
+template<class PosMaskChanger, class NextMaker>
+class MoveFromPosMaker<PosMaskChanger, 5, NextMaker> {
+public:
+	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask, eat_val& val) {
+		PosMaskChanger next_pos_mask;
+		mask_t pm = next_pos_mask(pmask);
+		mask_t eat_mask=0;//tmp eat mask for this direction
+
+		if (pm & op) {
+			eat_mask |= pm;
+			pm = next_pos_mask(pm);
+			if (pm & my) {
+				val.eat_mask |= eat_mask;
+				val.gard_mask |= pm;
+				val.total_eat +=1;
+			} else if (pm & op) {
+				eat_mask |= pm;
+				pm = next_pos_mask(pm);
+				if (pm & my) {
+					val.eat_mask |= eat_mask;
+					val.gard_mask |= pm;
+					val.total_eat +=2;
+				} else if (pm & op) {
+					eat_mask |= pm;
+					pm = next_pos_mask(pm);
+					if (pm & my) {
+						val.eat_mask |= eat_mask;
+						val.gard_mask |= pm;
+						val.total_eat +=3;
+					} else if (pm & op) {
+						eat_mask |= pm;
+						pm = next_pos_mask(pm);
+						if (pm & my) {
+							val.eat_mask |= eat_mask;
+							val.gard_mask |= pm;
+							val.total_eat +=4;
+						}
+					}
+				}
+			}
+		}
+		return NextMaker()(my, op, pmask, val);
+	}
+};
+
+template<class PosMaskChanger, class NextMaker>
+class MoveFromPosMaker<PosMaskChanger, 6, NextMaker> {
+public:
+	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask, eat_val& val) {
+		PosMaskChanger next_pos_mask;
+		mask_t pm = next_pos_mask(pmask);
+		mask_t eat_mask=0;//tmp eat mask for this direction
+
+		if (pm & op) {
+			eat_mask |= pm;
+			pm = next_pos_mask(pm);
+			if (pm & my) {
+				val.eat_mask |= eat_mask;
+				val.gard_mask |= pm;
+				val.total_eat +=1;
+			} else if (pm & op) {
+				eat_mask |= pm;
+				pm = next_pos_mask(pm);
+				if (pm & my) {
+					val.eat_mask |= eat_mask;
+					val.gard_mask |= pm;
+					val.total_eat +=2;
+				} else if (pm & op) {
+					eat_mask |= pm;
+					pm = next_pos_mask(pm);
+					if (pm & my) {
+						val.eat_mask |= eat_mask;
+						val.gard_mask |= pm;
+						val.total_eat +=3;
+					} else if (pm & op) {
+						eat_mask |= pm;
+						pm = next_pos_mask(pm);
+						if (pm & my) {
+							val.eat_mask |= eat_mask;
+							val.gard_mask |= pm;
+							val.total_eat +=4;
+						} else if (pm & op) {
+							eat_mask |= pm;
+							pm = next_pos_mask(pm);
+							if (pm & my) {
+								val.eat_mask |= eat_mask;
+								val.gard_mask |= pm;
+								val.total_eat +=5;
+							}
+						}
+					}
+				}
+			}
+		}
+		return NextMaker()(my, op, pmask, val);
+	}
+};
+
+template<class PosMaskChanger, class NextMaker>
+class MoveFromPosMaker<PosMaskChanger, 7, NextMaker> {
+public:
+	inline bool operator ()(const ulong& my, const ulong& op, const mask_t& pmask, eat_val& val) {
+		PosMaskChanger next_pos_mask;
+		mask_t pm = next_pos_mask(pmask);
+		mask_t eat_mask=0;//tmp eat mask for this direction
+
+		if (pm & op) {
+			eat_mask |= pm;
+			pm = next_pos_mask(pm);
+			if (pm & my) {
+				val.eat_mask |= eat_mask;
+				val.gard_mask |= pm;
+				val.total_eat +=1;
+			} else if (pm & op) {
+				eat_mask |= pm;
+				pm = next_pos_mask(pm);
+				if (pm & my) {
+					val.eat_mask |= eat_mask;
+					val.gard_mask |= pm;
+					val.total_eat +=2;
+				} else if (pm & op) {
+					eat_mask |= pm;
+					pm = next_pos_mask(pm);
+					if (pm & my) {
+						val.eat_mask |= eat_mask;
+						val.gard_mask |= pm;
+						val.total_eat +=3;
+					} else if (pm & op) {
+						eat_mask |= pm;
+						pm = next_pos_mask(pm);
+						if (pm & my) {
+							val.eat_mask |= eat_mask;
+							val.gard_mask |= pm;
+							val.total_eat +=4;
+						} else if (pm & op) {
+							eat_mask |= pm;
+							pm = next_pos_mask(pm);
+							if (pm & my) {
+								val.eat_mask |= eat_mask;
+								val.gard_mask |= pm;
+								val.total_eat +=5;
+							} else if (pm & op) {
+								eat_mask |= pm;
+								pm = next_pos_mask(pm);
+								if (pm & my) {
+									val.eat_mask |= eat_mask;
+									val.gard_mask |= pm;
+									val.total_eat +=6;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return NextMaker()(my, op, pmask, val);
+	}
+};
+
+//make move from grid(x, y), pos(x-1, y-1)
+//i, j starts from 0
+//x, y starts from 1
+template<uint x, uint y>
+bool make_move_from_pos(const ulong& my, const ulong& op, const mask_t& pmask, eat_val& val) {
+	typedef MoveFromPosMaker<Dummy, 0, Dummy> 					End;
+	typedef MoveFromPosMaker<RightUp, MIN(8-y, x-1), End> 		A;
+	typedef MoveFromPosMaker<Up, x-1, A> 						B;
+	typedef MoveFromPosMaker<LeftUp, MIN(y-1, x-1), B> 			C;
+	typedef MoveFromPosMaker<Left, y-1, C> 						D;
+	typedef MoveFromPosMaker<LeftDown, MIN(y-1, 8-x), D> 		E;
+	typedef MoveFromPosMaker<Down, 8-x, E> 						F;
+	typedef MoveFromPosMaker<RightDown, MIN(8-y, 8-x), F> 		G;
+	typedef MoveFromPosMaker<Right, 8-y, G> 					H;
+
+	return H()(my, op, pmask, val);
+}
+
+typedef bool (* MakeMoveFromPosFunction) \
+		(const ulong& my_bits, const ulong& op_bits, const mask_t& pos_mask, eat_val& val);
+
+#define MM(x, y) make_move_from_pos<x, y>
+
+MakeMoveFromPosFunction make_move_from_pos_functions[64]={
+	MM(1,1), MM(1,2), MM(1,3), MM(1,4), MM(1,5), MM(1,6), MM(1,7), MM(1,8),
+	MM(2,1), MM(2,2), MM(2,3), MM(2,4), MM(2,5), MM(2,6), MM(2,7), MM(2,8),
+	MM(3,1), MM(3,2), MM(3,3), MM(3,4), MM(3,5), MM(3,6), MM(3,7), MM(3,8),
+	MM(4,1), MM(4,2), MM(4,3), MM(4,4), MM(4,5), MM(4,6), MM(4,7), MM(4,8),
+	MM(5,1), MM(5,2), MM(5,3), MM(5,4), MM(5,5), MM(5,6), MM(5,7), MM(5,8),
+	MM(6,1), MM(6,2), MM(6,3), MM(6,4), MM(6,5), MM(6,6), MM(6,7), MM(6,8),
+	MM(7,1), MM(7,2), MM(7,3), MM(7,4), MM(7,5), MM(7,6), MM(7,7), MM(7,8),
+	MM(8,1), MM(8,2), MM(8,3), MM(8,4), MM(8,5), MM(8,6), MM(8,7), MM(8,8),
+};
+
+class FastMoveMaker {
+public:
+	inline bool operator()(const ulong& my, const ulong& op, const pos_t& pos, eat_val& val) {
+		assert(IS_EMPTY(my, op, pos));
+		mask_t pos_mask= ONE << pos;
+		return make_move_from_pos_functions[pos](my, op, pos_mask, val);
+	}
+};
+
+FastMoveMaker try_make_move;
+
+
 
 #endif /* BITBOARD_MAKE_MOVE_H_ */
-
-
 
 

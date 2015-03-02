@@ -12,17 +12,16 @@
  */
 
 //给定二维坐标，获取一维坐标，都是从0开始
-#define POS(i, j)						((i)*LEN + (j))
+#define POS(i, j)		((i)*LEN + (j))
 
 //给定一维坐标，获取二维坐标，都是从0开始
-#define I(pos)							((pos) / LEN)
-#define J(pos)							((pos) % LEN)
+#define I(pos)			((pos) / LEN)
+#define J(pos)			((pos) % LEN)
 
 //给定二维坐标（从1开始），获取一维坐标，（从0开始）
 #define GRID(x, y)		POS((x-1), (y-1))
 
 //定义棋盘上的各个位置符号
-
 #define A1				GRID(1, 1)
 #define B1				GRID(1, 2)
 #define C1				GRID(1, 3)
@@ -95,7 +94,9 @@
 #define G8				GRID(8, 7)
 #define H8				GRID(8, 8)
 
-#define INITIAL_BLACK_BITS		(D4 | E5)
-#define INITIAL_WHITE_BITS		(D5 | E4)
+#define OPEN_BLACK		((ONE << D4) | (ONE << E5))
+#define OPEN_WHITE		((ONE << D5) | (ONE << E4))
+
+#define TEXT(pos)		char('A'+J(pos)) << char('1'+I(pos))
 
 #endif /* BITBOARD_POS_H_ */

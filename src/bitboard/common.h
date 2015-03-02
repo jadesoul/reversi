@@ -14,7 +14,7 @@
 #include <limits>
 #include <bitset>
 
-typedef uint color_t;//颜色
+typedef uint color;//颜色
 typedef uint pos_t;//位置
 typedef uint64_t ulong;//64bits
 typedef ulong hash_t;//哈希
@@ -29,6 +29,9 @@ typedef map<hash_t, Choices> Book;
 //棋谱树
 typedef map<hash_t, Book> Tree;
 
+typedef bitset<8> byte_bitset;
+typedef bitset<64> ulong_bitset;
+
 //棋盘边长
 #define LEN								8
 //总棋格数
@@ -36,10 +39,13 @@ typedef map<hash_t, Book> Tree;
 
 //棋子的颜色状态
 #define DRAW							0//平局
-#define EMPTY							0//空格
-#define WHITE							1//白子 0b01
-#define BLACK							2//黑子	0b10
+#define BLACK							0//黑子
+#define WHITE							1//白子
+#define EMPTY							2//空格
 #define PASS							SIZE//代表无子可下
+
+#define COLOR(turn) 					((turn)==BLACK?"BLACK":"WHITE")
+#define BITS_TEXT(mask)					Mask(mask)
 
 //给定自己棋子的颜色，获取对手的颜色
 #define OPPO(c)							(BLACK+WHITE-(c))
@@ -131,7 +137,7 @@ typedef map<hash_t, Book> Tree;
 #define MIRROR_IY(pos)			POS(BOARD_LEN - 1 - I(pos), BOARD_LEN - 1 - J(pos))
 
 #define END (uchar)(-1)
-#define COLOR(turn) ((turn)==BLACK?"BLACK":"WHITE")
+
 
 #define M		(BOARD_LEN-1)
 #define LU		POS(0,0)
