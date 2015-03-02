@@ -110,7 +110,7 @@ struct eat_key {
 template<>
 struct std::hash<eat_key> {
 	size_t operator() (const eat_key& key) const {
-		return (key.my_rice * 1313131 + key.op_rice) * 1313131 + key.pos;
+		return (key.my_rice * 1313 + key.op_rice) * 1313 + key.pos;
 	}
 };
 
