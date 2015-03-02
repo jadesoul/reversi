@@ -1,0 +1,123 @@
+mtd
+-----------------------------------
+[STATS] 6 levels, using 3.5e-05s
+12
+[STATS] 7 levels, using 4e-05s
+-12
+[STATS] 8 levels, using 3.9e-05s
+14
+[STATS] 9 levels, using 6e-05s
+-14
+[STATS] 10 levels, using 6.1e-05s
+14
+[STATS] 11 levels, using 0.000137s
+-14
+[STATS] 12 levels, using 0.000438s
+20
+[STATS] 13 levels, using 0.002447s
+-20
+[STATS] 14 levels, using 0.006238s
+20
+[STATS] 15 levels, using 0.009212s
+-12
+[STATS] 16 levels, using 0.032256s
+12
+[STATS] 17 levels, using 0.053944s
+33
+[STATS] 18 levels, using 0.160907s
+-33
+[STATS] 19 levels, using 0.127889s
+33
+[STATS] 20 levels, using 0.490658s
+-33
+[STATS] 21 levels, using 0.456751s
+34
+[STATS] 22 levels, using 2.37551s
+2
+[STATS] 23 levels, using 21.6704s
+0
+[STATS] 24 levels, using 39.2164s
+14
+[STATS] 25 levels, using 302.025s
+
+
+pvs 
+--------------------------------
+[STATS] 7 levels, using 3.7e-05s
+-12
+[STATS] 8 levels, using 3.8e-05s
+14
+[STATS] 9 levels, using 5.2e-05s
+-14
+[STATS] 10 levels, using 5.7e-05s
+14
+[STATS] 11 levels, using 0.000122s
+-14
+[STATS] 12 levels, using 0.000197s
+20
+[STATS] 13 levels, using 0.001586s
+-20
+[STATS] 14 levels, using 0.002583s
+20
+[STATS] 15 levels, using 0.004941s
+-12
+[STATS] 16 levels, using 0.027626s
+12
+[STATS] 17 levels, using 0.039795s
+33
+[STATS] 18 levels, using 0.170683s
+-33
+[STATS] 19 levels, using 0.169609s
+33
+[STATS] 20 levels, using 0.50565s
+-33
+[STATS] 21 levels, using 0.500128s
+34
+[STATS] 22 levels, using 1.60793s
+2
+[STATS] 23 levels, using 31.782s
+0
+[STATS] 24 levels, using 60.1464s
+14
+[STATS] 25 levels, using 146.309s
+
+alpha-beta
+------------------------
+[STATS] 7 levels, using 2.4e-05s
+-12
+[STATS] 8 levels, using 2.6e-05s
+14
+[STATS] 9 levels, using 3.5e-05s
+-14
+[STATS] 10 levels, using 4.2e-05s
+14
+[STATS] 11 levels, using 0.000106s
+-14
+[STATS] 12 levels, using 0.000201s
+20
+[STATS] 13 levels, using 0.001138s
+-20
+[STATS] 14 levels, using 0.003094s
+20
+[STATS] 15 levels, using 0.006002s
+-12
+[STATS] 16 levels, using 0.036391s
+12
+[STATS] 17 levels, using 0.054954s
+33
+[STATS] 18 levels, using 0.190187s
+-33
+[STATS] 19 levels, using 0.18761s
+33
+[STATS] 20 levels, using 0.864591s
+-33
+[STATS] 21 levels, using 0.863898s
+34
+[STATS] 22 levels, using 2.67985s
+2
+[STATS] 23 levels, using 28.9915s
+0
+[STATS] 24 levels, using 58.8722s
+14
+[STATS] 25 levels, using 232.2s
+
