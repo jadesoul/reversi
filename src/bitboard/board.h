@@ -459,6 +459,23 @@ public:
 		return g;
 	}
 
+	//迭代加深搜索
+	int deepening(int seconds=60) {
+		timer now;
+		int value = 0;
+		// 初始搜索深度
+		int depth = 1;
+		do {
+			// 进行常规的MTD(f)算法
+			value = mtd(value, depth);
+			// 增加搜索深度
+			++depth;
+			log_status("depth="<<depth<<", seconds="<<now.elapsed());
+		// 直到时间用完
+		} while (now.elapsed() < seconds) ;
+		return value;
+	}
+
 	inline void pass_move() {
 		swap_turn();
 	}

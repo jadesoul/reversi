@@ -121,3 +121,22 @@ alpha-beta
 14
 [STATS] 25 levels, using 232.2s
 
+
+depening mtd
+------------
+[STATS] depth=2, seconds=8.3e-05
+[STATS] depth=3, seconds=0.000127
+[STATS] depth=4, seconds=0.000174
+[STATS] depth=5, seconds=0.000269
+[STATS] depth=6, seconds=0.000387
+[STATS] depth=7, seconds=0.000839
+[STATS] depth=8, seconds=0.001517
+[STATS] depth=9, seconds=0.00445
+[STATS] depth=10, seconds=0.009215
+[STATS] depth=11, seconds=0.026001
+[STATS] depth=12, seconds=0.076835
+[STATS] depth=13, seconds=0.202755
+[STATS] depth=14, seconds=0.629356
+[STATS] depth=15, seconds=1.84286
+[STATS] depth=16, seconds=7.9548
+[STATS] depth=17, seconds=20.2367

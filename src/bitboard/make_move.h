@@ -140,9 +140,10 @@ public:
 	MoveDatabase() {
 		init_heng_shu_pie_nar();
 		init_cross_table();
-//		const size_t n=UINT32_MAX/4 + 1000000;
-//		eat_table.resize(n * 11 / 7);
-//		eat_val_list.reserve(n);
+//		const size_t n=UINT32_MAX/8;
+		const size_t n=1000000;
+		eat_table.resize(n * 11 / 7);
+		eat_val_list.reserve(n);
 //		init_eat_table();
 	}
 
@@ -175,7 +176,7 @@ public:
 	}
 
 	bool find(const ulong& my, const ulong& op, const pos_t& pos, eat_val& val) {
-		return false;
+//		return false;
 
 		mask_t cross=cross_table[pos];
 		eat_key key(my & cross, op & cross, pos);
@@ -187,7 +188,7 @@ public:
 	}
 
 	void add(const ulong& my, const ulong& op, const pos_t& pos, const eat_val& val) {
-		return;
+//		return;
 		mask_t cross=cross_table[pos];
 		eat_key key(my & cross, op & cross, pos);
 		eat_table[key]=eat_val_list.size();

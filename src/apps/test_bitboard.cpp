@@ -23,7 +23,7 @@ void test_undo() {
 	BitBoard board;
 	log_status(board);
 	log_status(move_db);
-//	cout<<board.get_mobility()<<endl;
+	cout<<board.get_mobility()<<endl;
 
 	cout<<board.search()<<endl;
 	log_status(board);
@@ -38,9 +38,7 @@ void test_undo() {
 	cout<<board.get_mobility()<<endl;
 }
 
-int main() {
-//	init_valid_move_byte_table();
-
+void test_search() {
 	for_n(j, 64) {
 		timer now;
 		BitBoard board;
@@ -56,7 +54,20 @@ int main() {
 //		log_status(move_db);
 		log_status(i<<" levels, using "<<now.elapsed()<<"s");
 	}
+}
 
+void test_depening() {
+	BitBoard board;
+	cout<<board.deepening()<<endl;
+}
+
+int main() {
+//	init_valid_move_byte_table();
+
+//	test_game();
+//	test_undo();
+//	test_search();
+	test_depening();
 	return 0;
 }
 
