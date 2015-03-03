@@ -99,23 +99,27 @@ struct eat_key {
 		my_rice(my), op_rice(op), pos(pos) {}
 
 	bool operator < (const eat_key& r) const {
-		return my_rice < r.my_rice or op_rice < r.op_rice or pos < r.pos;
+//		return my_rice < r.my_rice or op_rice < r.op_rice or pos < r.pos;
+		return memcmp(this, &r, sizeof(*this))<0;
 	}
 
 	bool operator ==(const eat_key& r) const {
-		return my_rice == r.my_rice and op_rice == r.op_rice and pos == r.pos;
+//		return my_rice == r.my_rice and op_rice == r.op_rice and pos == r.pos;
+		return memcmp(this, &r, sizeof(*this))==0;
 	}
 };
 
 template<>
 struct std::hash<eat_key> {
 	size_t operator() (const eat_key& key) const {
-		return (key.my_rice * 1313 + key.op_rice) * 1313 + key.pos;
+		return (key.my_rice * 13131 + key.op_rice) * 13131 + key.pos;
+//		return key.my_rice ^ key.op_rice ^ key.pos;
 	}
 };
 
-//	typedef map<eat_key, uint> eat_table_t;
-typedef hash_map<eat_key, uint> eat_table_t;//TODO
+//typedef map<eat_key, uint> eat_table_t;
+//typedef hash_map<eat_key, uint> eat_table_t;//TODO
+typedef unordered_map<eat_key, uint> eat_table_t;//TODO
 
 struct eat_val {
 	mask_t 		eat_mask;//holding the bits for fliping
@@ -141,9 +145,12 @@ public:
 		init_heng_shu_pie_nar();
 		init_cross_table();
 //		const size_t n=UINT32_MAX/8;
-		const size_t n=1000000;
-		eat_table.resize(n * 11 / 7);
-		eat_val_list.reserve(n);
+		const size_t n=0x01 << 30;
+
+//		eat_table.resize(n);
+		eat_table.reserve(n);
+
+		eat_val_list.reserve(2*n);
 //		init_eat_table();
 	}
 

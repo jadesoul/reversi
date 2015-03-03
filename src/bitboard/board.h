@@ -195,13 +195,15 @@ public:
 
 		eat_val val;
 
-//		if (! move_db.find(my, op, pos, val)) {//if exist move in db
-//			if (! try_make_move(my, op, pos, val)) return false;//begin find move
-//			move_db.add(my, op, pos, val);//save new move into db
-//		}
-
+//#define USING_MOVE_DB
+#ifdef USING_MOVE_DB
+		if (! move_db.find(my, op, pos, val)) {//if exist move in db
+			if (! try_make_move(my, op, pos, val)) return false;//begin find move
+			move_db.add(my, op, pos, val);//save new move into db
+		}
+#else
 		if (! try_make_move(my, op, pos, val)) return false;//begin find move
-
+#endif
 		//backup last my/op and last eat_mask
 		Move& move = history[played_cnt];
 		move.turn = turn;
@@ -230,11 +232,9 @@ public:
 	uint get_mobility() {
 		uint mobility=0;
 		for (pos_t pos=A1; pos<=H8; ++pos) {
-			if (is_empty(pos)) {
-				if (valid_move(pos)) {
-					++mobility;
-					log_status("found valid move from "<< TEXT(pos));
-				}
+			if (valid_move(pos)) {
+				++mobility;
+//				log_status("found valid move from "<< TEXT(pos));
 			}
 		}
 		return mobility;
@@ -470,9 +470,9 @@ public:
 			value = mtd(value, depth);
 			// 增加搜索深度
 			++depth;
-			log_status("depth="<<depth<<", seconds="<<now.elapsed());
+			log_status("depth="<<depth<<", seconds="<<now.elapsed()<<", "<<move_db);
 		// 直到时间用完
-		} while (now.elapsed() < seconds) ;
+		} while (now.elapsed() < seconds and depth<=empty_cnt) ;
 		return value;
 	}
 
@@ -580,6 +580,88 @@ public:
 
 		played_cnt=0;
 		win=0;
+	}
+
+	//从包含65字节的字符串初始化, 棋盘(64字节)，下子方(1字节)
+	//为游戏引擎提供此接口
+	void init_from_str(const string& query) {
+		assert(query.size() == 65);
+		bits[BLACK]=0;
+		bits[WHITE]=0;
+		empty_cnt = 0;
+		total[BLACK] = 0;
+		total[WHITE] = 0;
+		pass_cnt = 0;
+		for_n(x, 8)
+		{
+			for_n(y, 8)
+			{
+				int pos=POS(x, y);
+				char c = query[pos];
+				if (c == '0') {
+					set_empty(pos);
+					empty_cnt += 1;
+				} else if (c == '1') {	//代表 BLACK
+					set_black(pos);
+					total[BLACK] += 1;
+				} else if (c == '2') {	//代表 WHITE
+					set_white(pos);
+					total[WHITE] += 1;
+				} else
+					assert(false);
+			}
+		}
+		played_cnt = 60-empty_cnt;
+		turn = (query[64] == '1') ? BLACK : WHITE;
+		win=0;
+	}
+
+	//用于游戏引擎，给定字符串（64字符的游戏局面和1个字符的turn）
+	//返回下子的位置坐标 (2个字符)，下标均是从1开始计算
+	string deal(const string& query) {
+		init_from_str(query);
+
+//		int mob = get_mobility();
+//		if (mob==0) return "00";//表示PASS
+//
+//		int avg_think_time = 3.0 / mob;
+
+		int depth = empty_cnt<=18 ? empty_cnt : 10;
+		// 当前最佳估值，预设为负无穷大
+		int best_value = INT32_MIN;
+		int best_pos = PASS;
+		// 尝试每个下棋位置
+		for (pos_t pos=A1; pos<=H8; ++pos) {
+			// 试着下这步棋，如果棋步合法
+			if (make_move(pos)) {
+				// 对所形成的局面进行评估
+
+//				int value = -deepening(avg_think_time);
+				int value = - mtd(0, depth-1);
+
+				// 恢复原来的局面
+				undo_move();
+				// 如果这步棋更好
+				if (value > best_value) {
+					// 保存更好的结果
+					best_value = value;
+					best_pos = pos;
+				}
+			}
+		}
+
+		if (best_pos==PASS) {
+			return "00";//表示PASS
+		}
+
+		int x=I(best_pos), y=J(best_pos);
+		char s[3];
+		s[0]='1'+x;//从1开始编号
+		s[1]='1'+y;
+		s[2]=0;
+
+		log_status("played="<<played_cnt<<", empty="<<empty_cnt<<", depth="<<depth<<", pos="<<TEXT(best_pos) <<", win="<<(turn==BLACK?best_value:-best_value)<<", turn="<<COLOR(turn));
+		return s;
 	}
 
 	friend inline ostream& operator<<(ostream& o, const BitBoard& b) { b.dump(o); return o; }

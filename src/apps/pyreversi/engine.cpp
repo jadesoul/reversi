@@ -226,7 +226,7 @@ void __Pyx_call_destructor(T* x) {
 #include <math.h>
 #define __PYX_HAVE__engine
 #define __PYX_HAVE_API__engine
-#include "engine/engine.h"
+#include "bitboard/engine.h"
 #ifdef _OPENMP
 #include <omp.h>
 #endif /* _OPENMP */
@@ -515,7 +515,7 @@ static char __pyx_k_test[] = "__test__";
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_n_s_test;
 
-/* "engine.pyx":4
+/* "engine.pyx":5
  *     const char* server(const char*)
  * 
  * cpdef reversi(x):             # <<<<<<<<<<<<<<
@@ -533,20 +533,20 @@ static PyObject *__pyx_f_6engine_reversi(PyObject *__pyx_v_x, CYTHON_UNUSED int 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("reversi", 0);
 
-  /* "engine.pyx":5
+  /* "engine.pyx":6
  * 
  * cpdef reversi(x):
  *     return server(x)             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyObject_AsString(__pyx_v_x); if (unlikely((!__pyx_t_1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 5; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_2 = __Pyx_PyBytes_FromString(server(__pyx_t_1)); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 5; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_AsString(__pyx_v_x); if (unlikely((!__pyx_t_1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 6; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyBytes_FromString(server(__pyx_t_1)); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 6; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "engine.pyx":4
+  /* "engine.pyx":5
  *     const char* server(const char*)
  * 
  * cpdef reversi(x):             # <<<<<<<<<<<<<<
@@ -586,7 +586,7 @@ static PyObject *__pyx_pf_6engine_reversi(CYTHON_UNUSED PyObject *__pyx_self, Py
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("reversi", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_6engine_reversi(__pyx_v_x, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 4; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_f_6engine_reversi(__pyx_v_x, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 5; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -735,9 +735,9 @@ PyMODINIT_FUNC PyInit_engine(void)
   /*--- Execution code ---*/
 
   /* "engine.pyx":1
- * cdef extern from "engine/engine.h":             # <<<<<<<<<<<<<<
+ * # cdef extern from "engine/engine.h":             # <<<<<<<<<<<<<<
+ * cdef extern from "bitboard/engine.h":
  *     const char* server(const char*)
- * 
  */
   __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);

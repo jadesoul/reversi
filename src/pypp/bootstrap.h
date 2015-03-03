@@ -44,7 +44,7 @@
 #include <iterator>
 #include <exception>
 #include <numeric>
-// #include <unordered_map>
+#include <unordered_map>
 
 
 #ifdef OS_WIN32
@@ -207,7 +207,7 @@ using std::ostream;
 using std::istream;
 using std::boolalpha;
 using std::accumulate;
-// using std::unordered_map;
+ using std::unordered_map;
 
 // using std::set;
 // using std::list;
