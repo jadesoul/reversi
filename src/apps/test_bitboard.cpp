@@ -44,12 +44,13 @@ void test_search() {
 		BitBoard board;
 		int i=j+1;
 		board.rand_play(64-i);
+
+		int win=board.mtd(0, i);
 //		cout<<board.negamax(i)<<endl;
 
 //		cout<<board.alpha_beta(-64, 64, i)<<endl;
 //		cout<<board.pvs(-64, 64, i)<<endl;
-		cout<<board.mtd(0, i)<<endl;
-
+		cout<<(board.get_turn()==BLACK ? win : -win)<<endl;
 
 //		log_status(move_db);
 		log_status(i<<" levels, using "<<now.elapsed()<<"s");
@@ -66,8 +67,8 @@ int main() {
 
 //	test_game();
 //	test_undo();
-//	test_search();
-	test_depening();
+	test_search();
+//	test_depening();
 	return 0;
 }
 

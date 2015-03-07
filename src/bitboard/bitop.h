@@ -27,4 +27,12 @@
 
 #define IS_EMPTY(my, op, pos)			BIT_NOT_EXIST((my | op), pos)
 
+uchar reverse_byte(uchar c)
+{
+	c = ( c & 0x55 ) << 1 | ( c & 0xAA ) >> 1;
+	c = ( c & 0x33 ) << 2 | ( c & 0xCC ) >> 2;
+	c = ( c & 0x0F ) << 4 | ( c & 0xF0 ) >> 4;
+	return c;
+}
+
 #endif /* BITBOARD_BITOP_H_ */

@@ -40,7 +40,6 @@ mtd
 14
 [STATS] 25 levels, using 302.025s
 
-
 pvs 
 --------------------------------
 [STATS] 7 levels, using 3.7e-05s
@@ -121,22 +120,24 @@ alpha-beta
 14
 [STATS] 25 levels, using 232.2s
 
-
 depening mtd
 ------------
-[STATS] depth=2, seconds=8.3e-05
-[STATS] depth=3, seconds=0.000127
-[STATS] depth=4, seconds=0.000174
-[STATS] depth=5, seconds=0.000269
-[STATS] depth=6, seconds=0.000387
-[STATS] depth=7, seconds=0.000839
-[STATS] depth=8, seconds=0.001517
-[STATS] depth=9, seconds=0.00445
-[STATS] depth=10, seconds=0.009215
-[STATS] depth=11, seconds=0.026001
-[STATS] depth=12, seconds=0.076835
-[STATS] depth=13, seconds=0.202755
-[STATS] depth=14, seconds=0.629356
-[STATS] depth=15, seconds=1.84286
-[STATS] depth=16, seconds=7.9548
-[STATS] depth=17, seconds=20.2367
+[STATS] depth=1, seconds=9e-05, value=3
+[STATS] depth=2, seconds=0.000138, value=0
+[STATS] depth=3, seconds=0.000197, value=3
+[STATS] depth=4, seconds=0.00029, value=-2
+[STATS] depth=5, seconds=0.000418, value=3
+[STATS] depth=6, seconds=0.0008, value=-2
+[STATS] depth=7, seconds=0.001398, value=5
+[STATS] depth=8, seconds=0.00374, value=-2
+[STATS] depth=9, seconds=0.008027, value=5
+[STATS] depth=10, seconds=0.024365, value=-2
+[STATS] depth=11, seconds=0.075323, value=3
+[STATS] depth=12, seconds=0.199518, value=-2
+[STATS] depth=13, seconds=0.621392, value=5
+[STATS] depth=14, seconds=1.82326, value=-2
+[STATS] depth=15, seconds=7.87496, value=3
+[STATS] depth=16, seconds=20.0575, value=-2
+[STATS] depth=17, seconds=81.7853, value=3
+
+

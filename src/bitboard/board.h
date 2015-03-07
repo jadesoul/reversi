@@ -15,108 +15,6 @@
 #include "valid_move.h"
 #include "make_move.h"
 
-/**
-black=		01111101110...
-white=		00000010001...
-mask=		10000000000...
-
-mask-1=		01111111111
-
----
-black=		01111110
-white=		00000001
-mask=		10000000
-mask-1=		01111111
-
----
-black=		01111100
-white=		00000011
-mask=		10000000
-mask-1=		01111111
-
----
-black=		01101100
-white=		00000011
-mask=		00010000
-mask-1=		00001111
-
- */
-
-uchar reverse_byte(uchar c)
-{
-	c = ( c & 0x55 ) << 1 | ( c & 0xAA ) >> 1;
-	c = ( c & 0x33 ) << 2 | ( c & 0xCC ) >> 2;
-	c = ( c & 0x0F ) << 4 | ( c & 0xF0 ) >> 4;
-	return c;
-}
-
-//判断棋盘上某一行对应的位字节能否构成吃子(下子点右侧)
-bool valid_move_byte_right(uchar my_byte, uchar op_byte, uchar pos/*[0, 8)*/) {
-#ifdef ALGO1
-	uchar pos_mask_byte = 0x01 << pos;
-
-	//没子了
-	if (my_byte==0 or op_byte==0) return false;
-
-	//是否合法: 下子不能有交集
-	if ((my_byte & op_byte) !=0) return false;
-
-	//要求下子处是空格
-	if ((my_byte & pos_mask_byte) != 0) return false;
-	if ((op_byte & pos_mask_byte) != 0) return false;
-
-	//右侧能否吃子
-	uchar right_enable_mask = pos_mask_byte - 1;
-	uchar right_my_byte = my_byte & right_enable_mask;
-	int right = fast_log2_u8_table[right_my_byte];
-	uchar right_eat_bits = (right_enable_mask >> right) << right;
-	bool right_can_eat = (op_byte & right_eat_bits) == right_eat_bits;
-	if (right_can_eat) return right_can_eat;
-
-	//反转字节
-	my_byte=reverse_byte(my_byte);
-	op_byte=reverse_byte(op_byte);
-	pos_mask_byte=0x01 << (7-pos);
-
-	//左侧能否吃子
-	uchar left_enable_mask = pos_mask_byte - 1;
-	uchar left_my_byte = my_byte & left_enable_mask;
-	int left = fast_log2_u8_table[left_my_byte];
-	uchar left_eat_bits = (left_enable_mask >> left) << left;
-	bool left_can_eat = (op_byte & left_eat_bits) == left_eat_bits;
-	return left_can_eat;
-#else
-	return false;
-#endif
-}
-
-//快速判断一行上是否能吃子
-//预先存放256*256*8个bits，指示对应的可能性是否能吃子：共256*256个字节 my_byte * op_byte
-static uchar valid_move_byte_table[256*256];
-
-void init_valid_move_byte_table() {
-	for_n(my_byte, 256) {
-		for_n(op_byte, 256) {
-			uint index=(my_byte << 8) + op_byte;
-			valid_move_byte_table[index]=0;
-			for_n(pos, 8) {
-				uchar pos_mask_byte=0x01 << pos;
-
-				if (valid_move_byte_right(my_byte, op_byte, pos)) {
-					valid_move_byte_table[index] |= pos_mask_byte;
-					log_status(byte_bitset(my_byte)<<" , "<<byte_bitset(op_byte)<<" : "<<byte_bitset(pos_mask_byte)<<" = 1");
-				} else {
-					log_status(byte_bitset(my_byte)<<" , "<<byte_bitset(op_byte)<<" : "<<byte_bitset(pos_mask_byte)<<" = 0");
-				}
-			}
-			log_status(byte_bitset(my_byte)<<" , "<<byte_bitset(op_byte)<<"\t=\t"<<byte_bitset(valid_move_byte_table[index]));
-		}
-	}
-}
-
-#define VALID_MOVE_BYTE(my_byte, op_byte, pos_mask_byte) \
-	(valid_move_byte_table[(my_byte << 8) + op_byte] & pos_mask_byte)
-
 struct Move {
 public:
 	color 	turn;//who play
@@ -145,8 +43,8 @@ public:
 
 	//get turn
 	inline color get_turn() { return turn; }
-	inline color next_turn() { return OPPO(turn); }
-	inline void swap_turn() { turn=OPPO(turn); }
+	inline color get_oppo() { return /*OPPO(turn);*/ oppo; }
+	inline void swap_turn() { /*turn=OPPO(turn);*/ swap(turn, oppo); }
 
 	//test color at pos : [0, 63]
 	inline bool is_color(uint pos, color c) const { return BIT_EXIST(bits[c], pos); }
@@ -168,7 +66,7 @@ public:
 
 	//test if we can make move at pos
 	inline bool valid_move(const pos_t& pos) {
-		color oppo = OPPO(turn);
+//		color oppo = OPPO(turn);
 		const ulong& my = bits[turn];
 		const ulong& op = bits[oppo];
 		if (! is_empty(my, op, pos)) return false;
@@ -185,7 +83,7 @@ public:
 	//using eat_table to cache the previous eating mask
 	//if we can make move, return true
 	inline bool make_move(const pos_t& pos) {
-		color oppo = OPPO(turn);
+//		color oppo = OPPO(turn);
 		ulong& my = bits[turn];
 		ulong& op = bits[oppo];
 		uint& my_cnt = total[turn];
@@ -237,6 +135,13 @@ public:
 //				log_status("found valid move from "<< TEXT(pos));
 			}
 		}
+		return mobility;
+	}
+
+	uint get_oppo_mobility() {
+		swap_turn();
+		uint mobility=get_mobility();
+		swap_turn();
 		return mobility;
 	}
 
@@ -468,9 +373,9 @@ public:
 		do {
 			// 进行常规的MTD(f)算法
 			value = mtd(value, depth);
+			log_status("depth="<<depth<<", seconds="<<now.elapsed()<<", value="<<value);
 			// 增加搜索深度
 			++depth;
-			log_status("depth="<<depth<<", seconds="<<now.elapsed()<<", "<<move_db);
 		// 直到时间用完
 		} while (now.elapsed() < seconds and depth<=empty_cnt) ;
 		return value;
@@ -513,12 +418,12 @@ public:
 	//return the exact score
 	int get_exact() {
 //		log_status("get_exact: "<< int(total[BLACK]-total[WHITE]));
-		return total[BLACK]-total[WHITE];
+		return total[turn]-total[oppo];
 	}
 
-	int evaluation(color c=EMPTY) {
-		if (c==EMPTY) c=turn;
-		win=total[c]-total[OPPO(c)];
+	int evaluation() {
+		win=total[turn]-total[oppo];
+//		win=get_mobility() - get_oppo_mobility();
 //		log_status("got evaluation: "<< win);
 		return win;
 	}
@@ -536,9 +441,9 @@ public:
 				}
 			}
 		}
-		evaluation(BLACK);
+		evaluation();
 //		log_status((*this)<<move_db);
-		return win;
+		return turn==BLACK ? win : -win;
 	}
 
 	bool undo_move() {
@@ -548,6 +453,7 @@ public:
 		--played_cnt;//decrement index in history
 		Move& last = history[played_cnt];//get last move
 		turn = last.turn;
+		oppo = OPPO(turn);
 		pos_t pos = last.pos;
 		win = last.win;
 		mask_t eat_mask = last.flip;
@@ -559,7 +465,7 @@ public:
 
 		//update counters
 		total[turn] -= last.eat + 1;
-		total[OPPO(turn)] += last.eat;
+		total[oppo] += last.eat;
 
 		++empty_cnt;
 		pass_cnt = 0;//TODO, should this be stored in Move
@@ -577,6 +483,7 @@ public:
 		pass_cnt=0;
 
 		turn=BLACK;
+		oppo=WHITE;
 
 		played_cnt=0;
 		win=0;
@@ -613,6 +520,7 @@ public:
 		}
 		played_cnt = 60-empty_cnt;
 		turn = (query[64] == '1') ? BLACK : WHITE;
+		oppo = OPPO(turn);
 		win=0;
 	}
 
@@ -631,13 +539,19 @@ public:
 		int best_value = INT32_MIN;
 		int best_pos = PASS;
 		// 尝试每个下棋位置
+
 		for (pos_t pos=A1; pos<=H8; ++pos) {
 			// 试着下这步棋，如果棋步合法
 			if (make_move(pos)) {
+//				if (depth==10 and rand()%7==1) {
+//					best_pos= pos;
+//					break;
+//				}
 				// 对所形成的局面进行评估
 
 //				int value = -deepening(avg_think_time);
-				int value = - mtd(0, depth-1);
+//				int value = - mtd(0, depth-1);
+				int value = - pvs(-64, 64, depth-1);
 
 				// 恢复原来的局面
 				undo_move();
@@ -744,6 +658,7 @@ public:
 
 	//for whose turn to play
 	color turn;
+	color oppo;
 
 	//current evaluate score
 	int win;
