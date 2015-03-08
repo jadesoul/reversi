@@ -109,6 +109,7 @@ struct eat_key {
 	}
 };
 
+/*
 template<>
 struct std::hash<eat_key> {
 	size_t operator() (const eat_key& key) const {
@@ -116,10 +117,11 @@ struct std::hash<eat_key> {
 //		return key.my_rice ^ key.op_rice ^ key.pos;
 	}
 };
+*/
 
-//typedef map<eat_key, uint> eat_table_t;
+typedef map<eat_key, uint> eat_table_t;
 //typedef hash_map<eat_key, uint> eat_table_t;//TODO
-typedef unordered_map<eat_key, uint> eat_table_t;//TODO
+//typedef unordered_map<eat_key, uint> eat_table_t;//TODO
 
 struct eat_val {
 	mask_t 		eat_mask;//holding the bits for fliping
