@@ -11,9 +11,6 @@
  * Written In: Alibaba-inc, Hangzhou, China
  */
 
-
-
-
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,19 +20,9 @@
 #include <time.h>
 #include <assert.h>
 
-#define TIME_START(timer)		clock_t timer=clock();
-#define TIME_ELASPED(timer)		(double(clock() - timer) / CLOCKS_PER_SEC)
-
-typedef uint32_t uint;
-typedef uint64_t ulong;//64bits
-typedef uint16_t ushort;
 typedef uint8_t uchar;
-
-//typedef uint color;//颜色
-//typedef uint pos_t;//位置
-
-//typedef ulong hash_t;//哈希
-//typedef ulong mask_t;//掩码
+typedef uint32_t uint;
+typedef uint64_t ulong;
 
 //棋盘边长
 #define LEN				8
@@ -50,10 +37,13 @@ typedef uint8_t uchar;
 #define PASS			SIZE//代表无子可下
 
 #define COLOR(turn) 	((turn)==BLACK?"BLACK":"WHITE")
-#define BITS_TEXT(mask)	Mask(mask)
 
 //给定自己棋子的颜色，获取对手的颜色
 #define OPPO(c)			(BLACK+WHITE-(c))
+
+//timer tools
+#define TIMER_START(timer)		clock_t timer=clock();
+#define TIMER_ELASPED(timer)	( (clock() - timer) * 1.0 / CLOCKS_PER_SEC )
 
 //basic macros
 #define ABS(x) 			((x) < 0 ? -(x) : (x))
@@ -145,8 +135,7 @@ typedef uint8_t uchar;
 #define G8				GRID(8, 7)
 #define H8				GRID(8, 8)
 
-#define TEXT(pos)		char('A'+J(pos)) << char('1'+I(pos))
-
+#define TEXT(pos)		'A'+J(pos), '1'+I(pos)
 
 //棋盘左上角第一颗子的坐标
 #define FIRST							A1
@@ -174,25 +163,9 @@ typedef uint8_t uchar;
 #define WEST_WEST(pos)					((pos) + 2 * WEST)
 #define EAST_EAST(pos)					((pos) + 2 * EAST)
 
-
-//直接邻居
-#define DIRECT_NEIGHBORS(pos1, pos2)		\
-			((pos1) == SOUTH(pos2)			\
-			|| (pos1) == WEST(pos2)			\
-			|| (pos1) == NORTH(pos2)		\
-			|| (pos1) == EAST(pos2))
-
-//对角邻居
-#define DIAGONAL_NEIGHBORS(pos1, pos2)		\
-			((pos1) == SW(pos2)				\
-			|| (pos1) == NW(pos2)			\
-			|| (pos1) == NE(pos2)			\
-			|| (pos1) == SE(pos2))
-
-
-//pos_mask代表一个下子点对应的64bits,只有对应的位置是1，如果mask变为0了，说明位置出界了
-#define MASK_EAST(pos_mask)				((pos_mask) << 1)//注意。。。
-#define MASK_WEST(pos_mask)				((pos_mask) >> 1)//注意，下一排的第一个会循环到上一排的最后一个
+//pos_mask代表一个下子点对应的64bits,只有对应的位置是1
+#define MASK_EAST(pos_mask)				((pos_mask) << 1)
+#define MASK_WEST(pos_mask)				((pos_mask) >> 1)
 #define MASK_NORTH(pos_mask)			((pos_mask) >> 8)
 #define MASK_SOUTH(pos_mask)			((pos_mask) << 8)
 
@@ -202,16 +175,15 @@ typedef uint8_t uchar;
 #define MASK_SOUTH_WEST(pos_mask)		((pos_mask) << 7)
 
 //64bit operations
-#define ONE								0x0000000000000001//仅最低位是1
-#define ALLONE							0xFFFFFFFFFFFFFFFF//所有的位全是1
+#define ONE								0x0000000000000001LU//仅最低位是1
+#define ALLONE							0xFFFFFFFFFFFFFFFFLU//所有的位全是1
 
-//#define BIT_EXIST(bits, offset)		( (bits >> offset) & 0x01 )
-#define BIT_EXIST(bits, offset)			( bits & (ONE << offset) )
-#define BIT_NOT_EXIST(bits, offset)		( ! BIT_EXIST(bits, offset) )
+#define BIT_EXIST(bits, pos)			( bits & (ONE << pos) )//( (bits >> offset) & 0x01 )
+#define BIT_NOT_EXIST(bits, pos)		( ! BIT_EXIST(bits, pos) )
 
-#define SET_BIT(bits, offset)			( bits |= (ONE << offset) )
-#define CLEAR_BIT(bits, offset)			( bits &= (ALLONE ^ (ONE << offset) ) )
-#define FLIP_BIT(bits, offset)			( bits ^= (ONE << offset) )
+#define SET_BIT(bits, pos)				( bits |= (ONE << pos) )
+#define CLEAR_BIT(bits, pos)			( bits &= (ALLONE ^ (ONE << pos) ) )
+#define FLIP_BIT(bits, pos)				( bits ^= (ONE << pos) )
 #define REVERSE_BITS(bits)				( bits ^= ALLONE )
 
 #define IS_EMPTY(my, op, pos)			BIT_NOT_EXIST((my | op), pos)
@@ -219,73 +191,10 @@ typedef uint8_t uchar;
 #define OPEN_BLACK						((ONE << D4) | (ONE << E5))
 #define OPEN_WHITE						((ONE << D5) | (ONE << E4))
 
-//global variables
-int turn, oppo;
-ulong my, op;
-int my_cnt, op_cnt;
-int pass_cnt, empty_cnt, played_cnt;
-
-//typedef struct move_t {
-//	int 	turn;//who play//no need for use pass
-//	int 	pos;//play at where// no need for undo_move(pos)
-//	int		win;//how is the play//no need
-//	ulong	eat;//flip which stones, used for unplay
-//	int		total;//total eat cnt
-//} move;
-
-typedef ulong move;
-
-move history[64];//played history, used for unplay
-int	sequence[64];//maintain played moves index in the head of this sequences
-
-#define MARK_SEQUENCE(pos)			SWAP(sequence[pos], sequence[played_cnt])
-#define UNDO_SEQUENCE(pos)			SWAP(sequence[pos], sequence[played_cnt])//TODO
-
-//get counters
-#define BLACK_CNT			(turn==BLACK ? my_cnt : op_cnt)
-#define WHITE_CNT			(turn==WHITE ? my_cnt : op_cnt)
-#define STONE_CNT(color)	(color==BLACK ? BLACK_CNT : WHITE_CNT)
-
-//get bits
-#define BLACK_BITS			(turn==BLACK ? my : op)
-#define WHITE_BITS			(turn==WHITE ? my : op)
-
-//swap turn
-#define SWAP_TURN(...)		SWAP(turn, oppo)
-
-//test color at pos
-#define is_my(pos)			(BIT_EXIST(my, pos))
-#define is_op(pos)			(BIT_EXIST(op, pos))
-#define is_black(pos)		(BIT_EXIST(BLACK_BITS, pos))
-#define is_white(pos)		(BIT_EXIST(WHITE_BITS, pos))
-#define is_stone(pos)		(is_black(pos) || is_white(pos))
-#define is_empty(pos)		(IS_EMPTY(my, op, pos))
-
-//get color at pos
-#define get_color(pos)		(is_black(pos) ? BLACK : (is_white(pos) ? WHITE : EMPTY))
-
-//set color at pos
-#define set_my(pos)			{ SET_BIT(my, pos); CLEAR_BIT(op, pos); }
-#define set_op(pos)			{ SET_BIT(op, pos); CLEAR_BIT(my, pos); }
-#define set_black(pos)		{ SET_BIT(BLACK_BITS, pos); CLEAR_BIT(WHITE_BITS, pos); }
-#define set_white(pos)		{ CLEAR_BIT(BLACK_BITS, pos); SET_BIT(WHITE_BITS, pos); }
-#define set_empty(pos)		{ CLEAR_BIT(my, pos); CLEAR_BIT(op, pos); }
-
-//flip color at pos
-//#define flip(pos)			{ if (is_stone(pos)) { FLIP_BIT(my, pos); FLIP_BIT(op, pos); } }
-
-//test if game is over
-#define game_over(...)		(empty_cnt==0 || pass_cnt>=2)
-
-//get mobility
-#define get_my_mobility(mobility) 	{for (int pos=A1; pos<=H8; ++pos) if (my_valid_move(pos)) ++mobility;}
-#define get_op_mobility(mobility) 	{for (int pos=A1; pos<=H8; ++pos) if (op_valid_move(pos)) ++mobility;}
-#define get_mobility(mobility)		get_my_mobility(mobility)
-
 //utility macros
-#define for_each_pos(p) 			for (int p=A1; p<=H8; ++p)
-#define for_each_index(i) 			for (int i=played_cnt; i<64; ++i)
-#define for_n(i, n) 				for (uint i=0; i<n; ++i)
+#define for_each_pos(p) 				for (int p=A1; p<=H8; ++p)
+#define for_each_index(i) 				for (int i=played_cnt; i<64; ++i)
+#define for_n(i, n) 					for (uint i=0; i<n; ++i)
 
 //utility functions
 uchar reverse_byte(uchar c) {
@@ -295,20 +204,56 @@ uchar reverse_byte(uchar c) {
 	return c;
 }
 
-//return the exact score
-#define get_exact() 		(my_cnt - op_cnt)
-//int get_exact() {
-//		log_status("get_exact: "<< int(total[BLACK]-total[WHITE]));
-//	return ;
-//}
+/*
+  BIT_REVERSE_32
+  Returns the bit-reverse of a 32-bit integer.
+*/
+unsigned int bit_reverse_32( unsigned int val ) {
+	val = ((val >>  1) & 0x55555555) | ((val <<  1) & 0xAAAAAAAA);
+	val = ((val >>  2) & 0x33333333) | ((val <<  2) & 0xCCCCCCCC);
+	val = ((val >>  4) & 0x0F0F0F0F) | ((val <<  4) & 0xF0F0F0F0);
+	val = ((val >>  8) & 0x00FF00FF) | ((val <<  8) & 0xFF00FF00);
+	val = ((val >> 16) & 0x0000FFFF) | ((val << 16) & 0xFFFF0000);
+	return val;
+}
 
-#define evaluation()		(my_cnt - op_cnt)
-//int evaluation() {
-//	win=;
-//		win=get_mobility() - get_oppo_mobility();
-//		log_status("got evaluation: "<< win);
-//	return win;
-//}
+/*
+  Counts the number of bits set in a 64-bit integer.
+  This is done using some bitfiddling tricks.
+*/
+uint non_iterative_popcount_32(uint n) {
+	n = n - ((n >> 1) & 0x55555555u);
+	n = (n & 0x33333333u) + ((n >> 2) & 0x33333333u);
+	n = (n + (n >> 4)) & 0x0F0F0F0Fu;
+	return (n * 0x01010101u) >> 24;
+}
+
+#define non_iterative_popcount_64(n) (non_iterative_popcount_32(n>>32)+non_iterative_popcount_32(n & 0xFFFFFFFF))
+
+/*
+  Counts the number of bits set in a 64-bit integer.
+  This is done using an iterative procedure which loops
+  a number of times equal to the number of bits set,
+  hence this function is fast when the number of bits
+  set is low.
+*/
+uint iterative_popcount_32(uint x) {
+	uint n = 0;
+	while (x != 0) {
+		++n;
+		x &= (x - 1);
+	}
+	return n;
+}
+
+uint iterative_popcount_64(ulong x) {
+	uint n=0;
+	while (x!=0) {
+		++n;
+		x &= (x-1);
+	}
+	return n;
+}
 
 
 #endif /* COMMON_H_ */

@@ -1,0 +1,67 @@
+mtd c, no dynamic total
+1 levels, using 0.000024 seconds, win=16
+2 levels, using 0.000008 seconds, win=28
+3 levels, using 0.000007 seconds, win=14
+4 levels, using 0.000016 seconds, win=20
+5 levels, using 0.000012 seconds, win=8
+6 levels, using 0.000041 seconds, win=14
+7 levels, using 0.000137 seconds, win=10
+8 levels, using 0.000185 seconds, win=10
+9 levels, using 0.001032 seconds, win=10
+10 levels, using 0.004044 seconds, win=14
+11 levels, using 0.012686 seconds, win=12
+12 levels, using 0.034025 seconds, win=22
+13 levels, using 0.074545 seconds, win=12
+14 levels, using 0.317192 seconds, win=33
+15 levels, using 0.289877 seconds, win=33
+16 levels, using 0.518659 seconds, win=33
+17 levels, using 0.485684 seconds, win=33
+18 levels, using 1.743730 seconds, win=34
+19 levels, using 15.341789 seconds, win=22
+20 levels, using 41.089752 seconds, win=24
+
++ exact=eval=0
+1 levels, using 0.000024 seconds, win=0
+2 levels, using 0.000007 seconds, win=0
+3 levels, using 0.000006 seconds, win=0
+4 levels, using 0.000007 seconds, win=0
+5 levels, using 0.000011 seconds, win=0
+6 levels, using 0.000025 seconds, win=0
+7 levels, using 0.000058 seconds, win=0
+8 levels, using 0.000077 seconds, win=0
+9 levels, using 0.000301 seconds, win=0
+10 levels, using 0.000551 seconds, win=0
+11 levels, using 0.001417 seconds, win=0
+12 levels, using 0.003726 seconds, win=0
+13 levels, using 0.007803 seconds, win=0
+14 levels, using 0.032277 seconds, win=0
+15 levels, using 0.049782 seconds, win=0
+16 levels, using 0.175296 seconds, win=0
+17 levels, using 0.333034 seconds, win=0
+18 levels, using 0.718304 seconds, win=0
+19 levels, using 1.534058 seconds, win=0
+20 levels, using 2.985530 seconds, win=0
+21 levels, using 16.365432 seconds, win=0
+
++ sequence
+1 levels, using 0.000028 seconds, win=0
+2 levels, using 0.000008 seconds, win=0
+3 levels, using 0.000005 seconds, win=0
+4 levels, using 0.000005 seconds, win=0
+5 levels, using 0.000004 seconds, win=0
+6 levels, using 0.000005 seconds, win=0
+7 levels, using 0.000008 seconds, win=0
+8 levels, using 0.000007 seconds, win=0
+9 levels, using 0.000013 seconds, win=0
+10 levels, using 0.000136 seconds, win=0
+11 levels, using 0.000316 seconds, win=0
+12 levels, using 0.001155 seconds, win=0
+13 levels, using 0.002916 seconds, win=0
+14 levels, using 0.000475 seconds, win=0
+15 levels, using 0.009060 seconds, win=0
+16 levels, using 0.012358 seconds, win=0
+17 levels, using 0.000610 seconds, win=0
+18 levels, using 0.041349 seconds, win=0
+19 levels, using 0.534257 seconds, win=0
+20 levels, using 2.105555 seconds, win=0
+21 levels, using 3.931723 seconds, win=0
