@@ -9,6 +9,10 @@ prepare:
 	
 install:
 	@cd build ; make -sj install
+	@cd pyreversi; python setup.py build_ext --inplace
 
 clean:
-	@rm -rf build lib bin
+	@rm -rf build lib bin pyreversi/engine.so pyreversi/build pyreversi/engine.c
+
+server: all
+	cd pyreversi; bash start_server.sh

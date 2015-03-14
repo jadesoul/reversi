@@ -61,13 +61,11 @@ int test() {
 int main() {
 	init_board();
 
-
 //	init_valid_move_byte_table();
 //	test_undo();
-//	test_depening();
+	test_depening();
 
-
-	test_game();
+//	test_game();
 //	test_search();
 
 	return 0;

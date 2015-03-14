@@ -17,7 +17,7 @@
 
 //global variables
 int turn, oppo;
-ulong my, op;
+ulong my, op, em;
 int my_cnt, op_cnt;
 int pass_cnt, empty_cnt, played_cnt;
 
@@ -51,8 +51,11 @@ int	sequence[64];//maintain played move pos
 #define is_op(pos)			(BIT_EXIST(op, pos))
 //#define is_black(pos)		(BIT_EXIST(BLACK_BITS, pos))
 //#define is_white(pos)		(BIT_EXIST(WHITE_BITS, pos))
-#define is_stone(pos)		(is_black(pos) || is_white(pos))
-#define is_empty(pos)		(IS_EMPTY(my, op, pos))
+//#define is_stone(pos)		(is_black(pos) || is_white(pos))
+
+//#define is_empty(pos)		(IS_EMPTY(my, op, pos))
+#define is_empty(pos)		(BIT_EXIST(em, pos))
+#define is_stone(pos)		(BIT_NOT_EXIST(em, pos))
 
 //get color at pos
 #define get_color(pos)		(is_my(pos) ? turn : (is_op(pos) ? oppo : EMPTY))
@@ -71,28 +74,56 @@ int	sequence[64];//maintain played move pos
 #define game_over(...)		(empty_cnt==0 || pass_cnt>=2)
 
 //get mobility
-#define get_my_mobility(mobility) 	{for (int pos=A1; pos<=H8; ++pos) if (my_valid_move(pos)) ++mobility;}
-#define get_op_mobility(mobility) 	{for (int pos=A1; pos<=H8; ++pos) if (op_valid_move(pos)) ++mobility;}
+#define get_my_mobility(mobility) 	{mobility=0; for (int pos=A1; pos<=H8; ++pos) if (my_valid_move(pos)) ++mobility;}
+#define get_op_mobility(mobility) 	{mobility=0; for (int pos=A1; pos<=H8; ++pos) if (op_valid_move(pos)) ++mobility;}
 #define get_mobility(mobility)		get_my_mobility(mobility)
 
 #define pass_move(...) swap_turn()
 #define unpass_move(...) swap_turn()
 
-#define diff_cnt(...)		(non_iterative_popcount_64(my)-non_iterative_popcount_64(op))
+#define diff_cnt(...)		(non_iterative_popcount_64(my) - non_iterative_popcount_64(op))
 //#define diff_cnt(...)		(my - op)
 
 //return the exact score
 //#define get_exact() 		(my_cnt - op_cnt)
-#define get_exact() 		diff_cnt()
+#define get_exact() 		( (op==0) ? 65 : (non_iterative_popcount_64(my) - non_iterative_popcount_64(op)) )
 //#define get_exact() 		0
 
-//#define evaluation()		(my_cnt - op_cnt)
-#define evaluation() 		diff_cnt()
-//#define evaluation() 		0
+int get_stable(ulong my, ulong op) {
+//	ulong e, se, s, sw, w, nw, n, ne;//in this direction, is the stone in pos linked with edge
+//	int cnt;
+//	for (int pos=A1; pos<=H8; ++pos) {
+//		int i=I(pos), j=J(pos);
+//		ulong m=ONE << pos;
+//		if (e & m || w & m) ++cnt;
+//		else if (s & m || n & m) ++cnt;
+//		else if (s & m || n & m) ++cnt;
+//		else if (s & m || n & m) ++cnt;
+//	}
+}
+
+int evaluation() {
+	if (op==0) return 65;
+	if (my==0) return -65;
+	if (em==0) return non_iterative_popcount_64(my) - non_iterative_popcount_64(op);
+	if (played_cnt<=10) {//opening
+		int m1, m2;
+		get_my_mobility(m1);
+		get_op_mobility(m2);
+		return m1-m2;
+	} else {//miidle game
+//		return get_stable(my, op)-get_stable(op, my);
+//		int a=non_iterative_popcount_32((my >> 56) | ((my & 0xFF) << 8));
+//		int b=non_iterative_popcount_32((op >> 56) | ((op & 0xFF) << 8));
+//		return a-b;
+		return non_iterative_popcount_64(my & 0xFF818181818181FFUL)-non_iterative_popcount_64(op & 0xFF818181818181FFUL);
+	}
+}
 
 void init_board() {
 	my=OPEN_BLACK;
 	op=OPEN_WHITE;
+	em=ALLONE ^ (OPEN_BLACK | OPEN_WHITE);
 
 	my_cnt=2;
 	op_cnt=2;
@@ -111,6 +142,9 @@ void print_board() {
 	int last_pos=PASS+1;
 	if (pointer>=4) last_pos=sequence[pointer];
 
+	int mobility;
+	get_mobility(mobility);
+
 	char h = (turn == BLACK ? 'A' : 'a');
 	printf("+ ");
 	for_n(j, 8) printf("%c ", (char)(h + j));
@@ -121,9 +155,11 @@ void print_board() {
 		for_n(j, 8)
 		{
 			int p=POS(i, j);
+
 			int c=get_color(p);
 			if (c == EMPTY)
-				printf("\033[0;35m.\033[0m");
+				if (valid_move(p)) printf("*");
+				else printf("\033[0;35m.\033[0m");
 			else if (c == BLACK)
 				printf("\033[0;31mX\033[0m");
 			else if (c == WHITE)
@@ -146,7 +182,7 @@ void print_board() {
 	op_cnt=non_iterative_popcount_64(op);
 	uint black_cnt= turn==BLACK ? my_cnt : op_cnt;
 	uint white_cnt= turn==WHITE ? my_cnt : op_cnt;
-	printf("black=%d white=%d empty=%d pass=%d turn=%s \n", black_cnt, white_cnt, empty_cnt, pass_cnt, COLOR(turn));
+	printf("black=%d white=%d played=%d empty=%d mobility=%d turn=%s \n", black_cnt, white_cnt, played_cnt, empty_cnt, mobility, COLOR(turn));
 
 //	o << "history=";
 //	for_n(i, pointer+1) o<<history[i]<<' ';
@@ -184,9 +220,10 @@ int make_move(int pos) {
 	sequence[played_cnt]=pos;
 
 	//play move
-	SET_BIT(my, pos);
+	ulong pm=1ul << pos;
+	my ^= flip | pm;
 	op ^= flip;
-	my ^= flip;
+	em ^= pm;
 
 	//update counters
 //	my_cnt += count1(flip) + 1;
@@ -219,9 +256,10 @@ int undo_move(int pos) {
 //	ulong eat_mask = last->flip;
 
 	//play move
-	CLEAR_BIT(my, pos);
-	my ^= flip;
+	ulong pm=1ul << pos;
+	my ^= flip | pm;
 	op ^= flip;
+	em ^= pm;
 
 	//update counters
 //	total[turn] -= last.eat + 1;
@@ -237,9 +275,9 @@ int start_game() {
 		print_board();
 		getchar();
 		for (int pos=A1; pos<=H8; ++pos) {
-			printf("pos=%d empty=%d \n", pos, empty_cnt);
+//			printf("pos=%d empty=%d \n", pos, empty_cnt);
 			if (make_move(pos)) {
-				printf("make move from %c%c, played=%d, empty=%d turn=%s \n", TEXT(pos), played_cnt, empty_cnt, COLOR(turn));
+//				printf("make move from %c%c, played=%d, empty=%d turn=%s \n", TEXT(pos), played_cnt, empty_cnt, COLOR(turn));
 				break;
 			}
 		}
@@ -248,107 +286,5 @@ int start_game() {
 	int win=evaluation();
 	return turn==BLACK ? win : -win;
 }
-
-//从包含65字节的字符串初始化, 棋盘(64字节)，下子方(1字节)
-//为游戏引擎提供此接口
-/*
-void init_from_str(const char* query) {
-	assert(strlen(query) == 65);
-	my=0;
-	op=0;
-	empty_cnt = 0;
-	my_cnt = 0;
-	op_cnt = 0;
-	pass_cnt = 0;
-
-	//assume the turn is BLACK
-	for_n(x, 8)
-	{
-		for_n(y, 8)
-		{
-			int pos=POS(x, y);
-			char c = query[pos];
-			if (c == '0') {
-				set_empty(pos);
-				empty_cnt += 1;
-			} else if (c == '1') {	// BLACK
-				set_black(pos);
-				my_cnt += 1;
-			} else if (c == '2') {	// WHITE
-				set_white(pos);
-				op_cnt += 1;
-			} else
-				assert(0);
-		}
-	}
-	played_cnt = 60-empty_cnt;
-	turn = (query[64] == '1') ? BLACK : WHITE;
-
-	//otherwise, swap
-	if (turn==WHITE) {
-		SWAP64(my, op);
-		SWAP(my_cnt, op_cnt);
-		oppo = OPPO(turn);
-	}
-
-	//change turn for oppo play
-	oppo = OPPO(turn);
-}
-
-//用于游戏引擎，给定字符串（64字符的游戏局面和1个字符的turn）
-//返回下子的位置坐标 (2个字符)，下标均是从1开始计算
-const char* deal(const char* query) {
-	init_from_str(query);
-
-//		int mob = get_mobility();
-//		if (mob==0) return "00";//表示PASS
-//
-//		int avg_think_time = 3.0 / mob;
-
-	int depth = empty_cnt<=18 ? empty_cnt : 10;
-	// 当前最佳估值，预设为负无穷大
-	int best_value = INT32_MIN;
-	int best_pos = PASS;
-	// 尝试每个下棋位置
-
-	for (int pos=A1; pos<=H8; ++pos) {
-		// 试着下这步棋，如果棋步合法
-		if (make_move(pos)) {
-//				if (depth==10 and rand()%7==1) {
-//					best_pos= pos;
-//					break;
-//				}
-			// 对所形成的局面进行评估
-
-//				int value = -deepening(avg_think_time);
-//				int value = - mtd(0, depth-1);
-			int value = - pvs(-64, 64, depth-1);
-
-			// 恢复原来的局面
-			undo_move(pos);
-			// 如果这步棋更好
-			if (value > best_value) {
-				// 保存更好的结果
-				best_value = value;
-				best_pos = pos;
-			}
-		}
-	}
-
-	if (best_pos==PASS) {
-		return "00";//表示PASS
-	}
-
-	int x=I(best_pos), y=J(best_pos);
-	char s[3];
-	s[0]='1'+x;//从1开始编号
-	s[1]='1'+y;
-	s[2]=0;
-
-//	log_status("played="<<played_cnt<<", empty="<<empty_cnt<<", depth="<<depth<<", pos="<<TEXT(best_pos) <<", win="<<(turn==BLACK?best_value:-best_value)<<", turn="<<COLOR(turn));
-	return s;
-}
-*/
-
 
 #endif /* BOARD_H_ */

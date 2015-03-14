@@ -190,6 +190,7 @@ int pvs(int alpha, int beta, int depth, int pass){
 		// 如果上一步也是弃着，表明对局结束
 		if (pass) {
 			// 计算出盘面的精确比分
+//			if (op==0) print_board();
 			return get_exact();
 		}
 		// 否则这步棋弃着
@@ -234,7 +235,7 @@ int mtd(int f, int depth){
 
 //迭代加深搜索
 int deepening(int seconds) {
-	TIMER_START(now1);
+	TIMER_START(now);
 	int value = 0;
 	// 初始搜索深度
 	int depth = 1;
@@ -242,12 +243,12 @@ int deepening(int seconds) {
 	do {
 		// 进行常规的MTD(f)算法
 		value = mtd(value, depth);
-		printf("depth=%d seconds=%f value=%d \n", depth, TIMER_ELASPED(now1), value);
+		elapsed=TIMER_ELASPED(now);
+		printf("depth=%d seconds=%f value=%d \n", depth, elapsed, value);
 		// 增加搜索深度
 		++depth;
-//		elapsed=TIME_ELASPED(now);
 	// 直到时间用完
-	} while (/*elapsed < seconds and */depth<=empty_cnt) ;
+	} while (elapsed < seconds && depth<=empty_cnt) ;
 	return value;
 }
 
