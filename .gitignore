@@ -14,10 +14,14 @@
 *.pyc
 
 build
-/bin/
-/cgi-bin/
-src/engine.cpp
+lib
+bin
+src/valid_move.h
+src/make_move.h
 .DS_Store
 .buildpath
 .settings
 model
+pyreversi/*.so
+pyreversi/engine.c
+*__pycache__/

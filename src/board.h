@@ -100,6 +100,7 @@ int get_stable(ulong my, ulong op) {
 //		else if (s & m || n & m) ++cnt;
 //		else if (s & m || n & m) ++cnt;
 //	}
+	return 0;
 }
 
 int evaluation() {
@@ -145,6 +146,7 @@ void print_board() {
 	int mobility;
 	get_mobility(mobility);
 
+	printf("--------------------------------------------\n");
 	char h = (turn == BLACK ? 'A' : 'a');
 	printf("+ ");
 	for_n(j, 8) printf("%c ", (char)(h + j));
@@ -175,6 +177,7 @@ void print_board() {
 		printf("%d \n", i+1);
 	}
 	printf("+ ");
+	h='1';
 	for_n(j, 8) printf("%c ", (char)(h + j));
 	printf("+ \n");
 
@@ -196,7 +199,7 @@ void print_board() {
 //		}
 //
 //		o << endl;
-	printf("--------------------------------------------\n");
+	
 }
 
 //if we can make move, return true

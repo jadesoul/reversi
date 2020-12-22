@@ -1,6 +1,6 @@
-print '''
+print( '''
 #include "common.h"
-'''
+''')
 
 '''
 #define valid_move_look_2(my, op, pmask, next)
@@ -61,8 +61,8 @@ def gen_valid_move_look_n(n):
     ss=['%-80s\\' % s for s in ss]
     return '\n'.join(ss)+'\n'
     
-for i in xrange(8):
-    print gen_valid_move_look_n(i)
+for i in range(8):
+    print (gen_valid_move_look_n(i))
     
 '''
 //check valid move from grid(x, y), pos(x-1, y-1)
@@ -104,11 +104,11 @@ def gen_valid_move_from_pos(x, y):
     ]
     return '\n'.join(ss)+'\n'
 
-for i in xrange(8):
-    for j in xrange(8):
-        print gen_valid_move_from_pos(i+1, j+1)
+for i in range(8):
+    for j in range(8):
+        print (gen_valid_move_from_pos(i+1, j+1))
 
-print '''typedef int (*valid_move_from_pos_func)(ulong my, ulong op);
+print ('''typedef int (*valid_move_from_pos_func)(ulong my, ulong op);
 
 #define VM(x, y) valid_move_from_pos_ ## x ## y
 
@@ -128,4 +128,4 @@ valid_move_from_pos_func check_valid_move[64]={
 #define op_valid_move(pos)        (is_empty(pos) && check_valid_move[pos](op, my))
 #define valid_move(pos)            my_valid_move(pos)
 
-'''
+''')

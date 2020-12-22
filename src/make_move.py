@@ -1,6 +1,6 @@
-print '''
+print ('''
 #include "common.h"
-'''
+''')
 
 '''
 mask_t         eat_mask;//holding the bits for fliping
@@ -127,8 +127,8 @@ def gen_make_move_look_n(n):
     ss=['%-80s\\' % s for s in ss]
     return '\n'.join(ss)+'\n'
     
-for i in xrange(8):
-    print gen_make_move_look_n(i)
+for i in range(8):
+    print (gen_make_move_look_n(i))
     
 '''
 //make move from grid(x, y), pos(x-1, y-1)
@@ -171,11 +171,11 @@ def gen_valid_move_from_pos(x, y):
     ]
     return '\n'.join(ss)+'\n'
 
-for i in xrange(8):
-    for j in xrange(8):
-        print gen_valid_move_from_pos(i+1, j+1)
+for i in range(8):
+    for j in range(8):
+        print (gen_valid_move_from_pos(i+1, j+1))
 
-print '''typedef ulong (* make_move_from_pos_func)(ulong my, ulong op);
+print( '''typedef ulong (* make_move_from_pos_func)(ulong my, ulong op);
 
 #define MM(x, y) make_move_from_pos_ ## x ## y
 
@@ -190,4 +190,4 @@ make_move_from_pos_func try_make_move[64]={
     MM(8,1), MM(8,2), MM(8,3), MM(8,4), MM(8,5), MM(8,6), MM(8,7), MM(8,8),
 };
 
-'''
+''')

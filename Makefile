@@ -12,7 +12,10 @@ install:
 	@cd pyreversi; python setup.py build_ext --inplace
 
 clean:
-	@rm -rf build lib bin pyreversi/engine.so pyreversi/build pyreversi/engine.c
+	@rm -rf build lib bin pyreversi/engine.*so pyreversi/build pyreversi/engine.c pyreversi/__pycache__/
 
 server: all
 	cd pyreversi; bash start_server.sh
+
+test: all
+	cd bin; ./reversi

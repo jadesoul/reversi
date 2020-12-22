@@ -17,12 +17,23 @@ void test_game() {
 }
 
 void test_undo() {
+	print_board();
+
 	search();
-//	undo_move();
+	print_board();
 	search();
-	int m;
-	get_mobility(m);
-	printf("%d\n", m);
+	print_board();
+
+	printf("now undo \n");
+	undo_move(sequence[played_cnt-1]);
+	print_board();
+
+	printf("now undo \n");
+	undo_move(sequence[played_cnt-1]);
+	print_board();
+
+	search();
+	print_board();
 }
 
 void test_search() {
@@ -33,7 +44,7 @@ void test_search() {
 		if (rand_play(60-i)) {
 			int win;
 
-//			print_board();
+			print_board();
 
 			win=mtd(0, i);
 	//		win=negamax(i, 0);
@@ -61,12 +72,12 @@ int test() {
 int main() {
 	init_board();
 
-//	init_valid_move_byte_table();
-//	test_undo();
-	test_depening();
+	// init_valid_move_byte_table();
+	// test_undo();
+	// test_depening();
 
-//	test_game();
-//	test_search();
+	// test_game();
+	test_search();
 
 	return 0;
 }
