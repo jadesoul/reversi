@@ -107,12 +107,12 @@ int evaluation() {
 	if (op==0) return 65;
 	if (my==0) return -65;
 	if (em==0) return non_iterative_popcount_64(my) - non_iterative_popcount_64(op);
-	if (played_cnt<=10) {//opening
+	if (played_cnt<=10) {	//opening
 		int m1, m2;
 		get_my_mobility(m1);
 		get_op_mobility(m2);
 		return m1-m2;
-	} else {//miidle game
+	} else {	//middle game
 //		return get_stable(my, op)-get_stable(op, my);
 //		int a=non_iterative_popcount_32((my >> 56) | ((my & 0xFF) << 8));
 //		int b=non_iterative_popcount_32((op >> 56) | ((op & 0xFF) << 8));
@@ -160,7 +160,7 @@ void print_board() {
 
 			int c=get_color(p);
 			if (c == EMPTY)
-				if (valid_move(p)) printf("*");
+				if (valid_move(p)) printf(turn==BLACK ? "*" : "@");
 				else printf("\033[0;35m.\033[0m");
 			else if (c == BLACK)
 				printf("\033[0;31mX\033[0m");
@@ -170,7 +170,7 @@ void print_board() {
 				printf("*");
 
 			int p_east=TO_EAST(p);
-			if (last_pos==p) printf("\033[0;34m]\033[0m");
+			if (last_pos==p) printf("\033[0;36m]\033[0m");
 			else if (j<7 && last_pos==p_east) printf("\033[0;36m[\033[0m");
 			else printf(" ");
 		}
@@ -273,6 +273,8 @@ int undo_move(int pos) {
 	return 1;
 }
 
+// TODO: found a bug: if one side has no mobility, should pass, and change turn
+// currently , the program will loop forever
 int start_game() {
 	while (! game_over()) {
 		print_board();
@@ -287,6 +289,7 @@ int start_game() {
 	}
 	print_board();
 	int win=evaluation();
+	printf("win=%d \n", turn==BLACK ? win : -win);
 	return turn==BLACK ? win : -win;
 }
 

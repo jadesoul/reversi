@@ -27,14 +27,14 @@ typedef uint64_t ulong;
 //棋盘边长
 #define LEN				8
 //总棋格数
-#define SIZE			64// (LEN * LEN)
+#define SIZE			64	// (LEN * LEN)
 
 //棋子的颜色状态
-#define DRAW			0//平局
-#define BLACK			0//黑子
-#define WHITE			1//白子
-#define EMPTY			2//空格
-#define PASS			SIZE//代表无子可下
+#define DRAW			0	//平局
+#define BLACK			0	//黑子
+#define WHITE			1	//白子
+#define EMPTY			2	//空格
+#define PASS			SIZE	//代表无子可下
 
 #define COLOR(turn) 	((turn)==BLACK?"BLACK":"WHITE")
 
@@ -59,11 +59,11 @@ typedef uint64_t ulong;
 #define I(pos)			((pos) / LEN)
 #define J(pos)			((pos) % LEN)
 
-//给定二维坐标（从1开始），获取一维坐标，（从0开始）
+//给定二维坐标（从1开始），获取一维坐标（从0开始）
 #define GRID(x, y)		POS((x-1), (y-1))
 
 //定义棋盘上的各个位置符号
-#define A1				GRID(1, 1)
+#define A1				GRID(1, 1) // 0
 #define B1				GRID(1, 2)
 #define C1				GRID(1, 3)
 #define D1				GRID(1, 4)
@@ -133,7 +133,7 @@ typedef uint64_t ulong;
 #define E8				GRID(8, 5)
 #define F8				GRID(8, 6)
 #define G8				GRID(8, 7)
-#define H8				GRID(8, 8)
+#define H8				GRID(8, 8) // 63
 
 #define TEXT(pos)		'A'+J(pos), '1'+I(pos)
 
@@ -153,32 +153,32 @@ typedef uint64_t ulong;
 #define TO_WEST(pos)					((pos) + WEST)
 #define TO_EAST(pos)					((pos) + EAST)
 
-#define SOUTH_WEST(pos)					((pos) + SOUTH + WEST)
-#define SOUTH_EAST(pos)					((pos) + SOUTH + EAST)
-#define NORTH_WEST(pos)					((pos) + NORTH + WEST)
-#define NORTH_EAST(pos)					((pos) + NORTH + EAST)
+#define SOUTH_WEST(pos)					((pos) + (SOUTH + WEST))
+#define SOUTH_EAST(pos)					((pos) + (SOUTH + EAST))
+#define NORTH_WEST(pos)					((pos) + (NORTH + WEST))
+#define NORTH_EAST(pos)					((pos) + (NORTH + EAST))
 
-#define SOUTH_SOUTH(pos)				((pos) + 2 * SOUTH)
-#define NORTH_NORTH(pos)				((pos) + 2 * NORTH)
-#define WEST_WEST(pos)					((pos) + 2 * WEST)
-#define EAST_EAST(pos)					((pos) + 2 * EAST)
+#define SOUTH_SOUTH(pos)				((pos) + (SOUTH + SOUTH))
+#define NORTH_NORTH(pos)				((pos) + (NORTH + NORTH))
+#define WEST_WEST(pos)					((pos) + (WEST + WEST))
+#define EAST_EAST(pos)					((pos) + (EAST + EAST))
 
 //pos_mask代表一个下子点对应的64bits,只有对应的位置是1
 #define MASK_EAST(pos_mask)				((pos_mask) << 1)
 #define MASK_WEST(pos_mask)				((pos_mask) >> 1)
-#define MASK_NORTH(pos_mask)			((pos_mask) >> 8)
-#define MASK_SOUTH(pos_mask)			((pos_mask) << 8)
+#define MASK_NORTH(pos_mask)			((pos_mask) >> LEN)
+#define MASK_SOUTH(pos_mask)			((pos_mask) << LEN)
 
-#define MASK_NORTH_EAST(pos_mask)		((pos_mask) >> 7)
-#define MASK_NORTH_WEST(pos_mask)		((pos_mask) >> 9)
-#define MASK_SOUTH_EAST(pos_mask)		((pos_mask) << 9)
-#define MASK_SOUTH_WEST(pos_mask)		((pos_mask) << 7)
+#define MASK_NORTH_EAST(pos_mask)		((pos_mask) >> (LEN-1))
+#define MASK_NORTH_WEST(pos_mask)		((pos_mask) >> (LEN+1))
+#define MASK_SOUTH_EAST(pos_mask)		((pos_mask) << (LEN+1))
+#define MASK_SOUTH_WEST(pos_mask)		((pos_mask) << (LEN-1))
 
 //64bit operations
 #define ONE								0x0000000000000001LU//仅最低位是1
 #define ALLONE							0xFFFFFFFFFFFFFFFFLU//所有的位全是1
 
-#define BIT_EXIST(bits, pos)			( bits & (ONE << pos) )//( (bits >> offset) & 0x01 )
+#define BIT_EXIST(bits, pos)			( bits & (ONE << pos) ) // ( (bits >> pos) & 0x01 )
 #define BIT_NOT_EXIST(bits, pos)		( ! BIT_EXIST(bits, pos) )
 
 #define SET_BIT(bits, pos)				( bits |= (ONE << pos) )
@@ -188,8 +188,13 @@ typedef uint64_t ulong;
 
 #define IS_EMPTY(my, op, pos)			BIT_NOT_EXIST((my | op), pos)
 
-#define OPEN_BLACK						((ONE << D4) | (ONE << E5))
-#define OPEN_WHITE						((ONE << D5) | (ONE << E4))
+// open v1: some app use this version
+// #define OPEN_BLACK						((ONE << D4) | (ONE << E5))
+// #define OPEN_WHITE						((ONE << D5) | (ONE << E4))
+
+// open v2: most openings use this version
+#define OPEN_BLACK						((ONE << D5) | (ONE << E4))
+#define OPEN_WHITE						((ONE << D4) | (ONE << E5))
 
 //utility macros
 #define for_each_pos(p) 				for (int p=A1; p<=H8; ++p)
