@@ -76,8 +76,8 @@ int main() {
 	// test_undo();
 	// test_depening();
 
-	// test_game();
-	test_search();
+	test_game();
+	// test_search();
 
 	return 0;
 }
