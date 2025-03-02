@@ -3,7 +3,7 @@
 /*
  * File: board.h
  * Description:
- *
+ * 
  * Copyright (c) 2010-2015 Jadesoul (Home Page: http://jadesoul.sinaapp.com) <shenglan.wsl@alibaba-inc.com>
  *
  * Author: jadesoul
@@ -15,18 +15,21 @@
 #include "valid_move.h"
 #include "make_move.h"
 
-//global variables
+#include "time.h"
+
+// global variables
 int turn, oppo;
-ulong my, op, em;
+ulong my, op, em;// myself, opponent, empty
 int my_cnt, op_cnt;
-int pass_cnt, empty_cnt, played_cnt;
+int empty_cnt, played_cnt;
+int pass_cnt;
 
 //typedef struct move_t {
-//	int 	turn;//who play//no need for use pass
-//	int 	pos;//play at where// no need for undo_move(pos)
-//	int		win;//how is the play//no need
-//	ulong	eat;//flip which stones, used for unplay
-//	int		total;//total eat cnt
+//	int 	turn;	//who play			//no need for use pass
+//	int 	pos;	//play at where		//no need for undo_move(pos)
+//	int		win;	//how is the play	//no need
+//	ulong	eat;	//flip which stones, used for unplay
+//	int		total;	//total eat cnt
 //} move;
 
 typedef ulong move;
@@ -44,7 +47,7 @@ int	sequence[64];//maintain played move pos
 //#define WHITE_BITS			(turn==WHITE ? my : op)
 
 //swap turn
-#define swap_turn(...)		SWAP(turn, oppo); SWAP64(my, op);
+#define swap_turn(...)		SWAP(turn, oppo); SWAP64(my, op); // SWAP(my_cnt, op_cnt);
 
 //test color at pos
 #define is_my(pos)			(BIT_EXIST(my, pos))
@@ -61,11 +64,11 @@ int	sequence[64];//maintain played move pos
 #define get_color(pos)		(is_my(pos) ? turn : (is_op(pos) ? oppo : EMPTY))
 
 //set color at pos
-#define set_my(pos)			{ SET_BIT(my, pos); CLEAR_BIT(op, pos); }
-#define set_op(pos)			{ SET_BIT(op, pos); CLEAR_BIT(my, pos); }
+#define set_my(pos)			{ SET_BIT(my, pos); CLEAR_BIT(op, pos); }// need CLEAR_BIT(em, pos);
+#define set_op(pos)			{ SET_BIT(op, pos); CLEAR_BIT(my, pos); }// need CLEAR_BIT(em, pos);
 //#define set_black(pos)		{ SET_BIT(BLACK_BITS, pos); CLEAR_BIT(WHITE_BITS, pos); }
 //#define set_white(pos)		{ CLEAR_BIT(BLACK_BITS, pos); SET_BIT(WHITE_BITS, pos); }
-#define set_empty(pos)		{ CLEAR_BIT(my, pos); CLEAR_BIT(op, pos); }
+#define set_empty(pos)		{ CLEAR_BIT(my, pos); CLEAR_BIT(op, pos); }//SET_BIT(em, pos);
 
 //flip color at pos
 //#define flip(pos)			{ if (is_stone(pos)) { FLIP_BIT(my, pos); FLIP_BIT(op, pos); } }
@@ -76,9 +79,9 @@ int	sequence[64];//maintain played move pos
 //get mobility
 #define get_my_mobility(mobility) 	{mobility=0; for (int pos=A1; pos<=H8; ++pos) if (my_valid_move(pos)) ++mobility;}
 #define get_op_mobility(mobility) 	{mobility=0; for (int pos=A1; pos<=H8; ++pos) if (op_valid_move(pos)) ++mobility;}
-#define get_mobility(mobility)		get_my_mobility(mobility)
+#define get_mobility(mobility)		get_my_mobility(mobility) // default as get my mobility
 
-#define pass_move(...) swap_turn()
+#define pass_move(...) { swap_turn(); pass_cnt++; } // need pass_cnt++
 #define unpass_move(...) swap_turn()
 
 #define diff_cnt(...)		(non_iterative_popcount_64(my) - non_iterative_popcount_64(op))
@@ -86,10 +89,10 @@ int	sequence[64];//maintain played move pos
 
 //return the exact score
 //#define get_exact() 		(my_cnt - op_cnt)
-#define get_exact() 		( (op==0) ? 65 : (non_iterative_popcount_64(my) - non_iterative_popcount_64(op)) )
+#define get_exact() 		( (op==0) ? 65 : (non_iterative_popcount_64(my) - non_iterative_popcount_64(op)) ) // why 65 ?
 //#define get_exact() 		0
 
-int get_stable(ulong my, ulong op) {
+int get_stable(ulong my, ulong op) { // TODO
 //	ulong e, se, s, sw, w, nw, n, ne;//in this direction, is the stone in pos linked with edge
 //	int cnt;
 //	for (int pos=A1; pos<=H8; ++pos) {
@@ -122,26 +125,27 @@ int evaluation() {
 }
 
 void init_board() {
-	my=OPEN_BLACK;
-	op=OPEN_WHITE;
-	em=ALLONE ^ (OPEN_BLACK | OPEN_WHITE);
+	my=OPEN_BLACK; // 黑棋
+	op=OPEN_WHITE; // 白棋
+	em=ALLONE ^ (OPEN_BLACK | OPEN_WHITE); // 空格
 
 	my_cnt=2;
 	op_cnt=2;
-	empty_cnt=60;
+
+	played_cnt = my_cnt + op_cnt; // 4
+
+	empty_cnt= LEN * LEN - played_cnt; // 64 - 4 = 60
 	pass_cnt=0;
 
-	turn=BLACK;
+	turn=BLACK; // 黑先
 	oppo=WHITE;
-
-	played_cnt=4;
 }
 
 //for output
 void print_board() {
-	int pointer = played_cnt -1;
-	int last_pos=PASS+1;
-	if (pointer>=4) last_pos=sequence[pointer];
+	int pointer = played_cnt - 1;
+	int last_pos = PASS + 1;
+	if (pointer>=4) last_pos = sequence[pointer];
 
 	int mobility;
 	get_mobility(mobility);
@@ -160,7 +164,7 @@ void print_board() {
 
 			int c=get_color(p);
 			if (c == EMPTY)
-				if (valid_move(p)) printf(turn==BLACK ? "*" : "@");
+				if (valid_move(p)) printf(turn==BLACK ? "*" : "*");
 				else printf("\033[0;35m.\033[0m");
 			else if (c == BLACK)
 				printf("\033[0;31mX\033[0m");
@@ -185,7 +189,7 @@ void print_board() {
 	op_cnt=non_iterative_popcount_64(op);
 	uint black_cnt= turn==BLACK ? my_cnt : op_cnt;
 	uint white_cnt= turn==WHITE ? my_cnt : op_cnt;
-	printf("black=%d white=%d played=%d empty=%d mobility=%d turn=%s \n", black_cnt, white_cnt, played_cnt, empty_cnt, mobility, COLOR(turn));
+	printf("black=%d white=%d played=%d empty=%d mobility=%d pass_cnt=%d turn=%s \n", black_cnt, white_cnt, played_cnt, empty_cnt, mobility, pass_cnt, COLOR(turn));
 
 //	o << "history=";
 //	for_n(i, pointer+1) o<<history[i]<<' ';
@@ -212,13 +216,7 @@ int make_move(int pos) {
 	ulong flip=try_make_move[pos](my, op);
 	if (flip==0) return 0;
 
-	//backup last my/op and last eat_mask
-//	move m = ;
-//	move.turn = turn;
-//	move.pos = pos;
-//	move.win = win;
-//	m.eat = eat;
-//	move.eat = val.total_eat;
+	//backup last my/op and last make move color ?
 	history[played_cnt]=flip;
 	sequence[played_cnt]=pos;
 
@@ -228,14 +226,13 @@ int make_move(int pos) {
 	op ^= flip;
 	em ^= pm;
 
-	//update counters
-//	my_cnt += count1(flip) + 1;
-//	op_cnt -= count1(flip);
 	--empty_cnt;
-//	pass_cnt = 0;
+	
+	//	pass_cnt = 0;
 	++played_cnt;//increment index in history
 
 	swap_turn();
+	pass_cnt = 0; //made a new move, reset pass_cnt
 
 	return 1;
 }
@@ -250,23 +247,14 @@ int undo_move(int pos) {
 
 	++empty_cnt;
 
-//	move* last = &history[played_cnt];//get last move
+	//get last move
 	ulong flip=history[played_cnt];
-//	turn = last->turn;
-//	oppo = OPPO(turn);
-//	int pos = last->pos;
-//	win = last->win;
-//	ulong eat_mask = last->flip;
 
 	//play move
 	ulong pm=1ul << pos;
 	my ^= flip | pm;
 	op ^= flip;
 	em ^= pm;
-
-	//update counters
-//	total[turn] -= last.eat + 1;
-//	total[oppo] += last.eat;
 
 //	pass_cnt = 0;//TODO, should this be stored in Move
 
@@ -275,21 +263,34 @@ int undo_move(int pos) {
 
 // TODO: found a bug: if one side has no mobility, should pass, and change turn
 // currently , the program will loop forever
-int start_game() {
+// FIXED: 2025.03.01 already fix this bug by pass_cnt
+int start_game(int verbose) {
 	while (! game_over()) {
-		print_board();
-		getchar();
+		if (verbose) print_board();
+		// getchar();
+		int valid_cnt = 0;
 		for (int pos=A1; pos<=H8; ++pos) {
 //			printf("pos=%d empty=%d \n", pos, empty_cnt);
-			if (make_move(pos)) {
+			if (valid_move(pos)) {
+				valid_cnt++;
 //				printf("make move from %c%c, played=%d, empty=%d turn=%s \n", TEXT(pos), played_cnt, empty_cnt, COLOR(turn));
-				break;
+				if (verbose) printf("%s is going to make move on %c%c\n", COLOR(turn), TEXT(pos));
+				if (make_move(pos)) {
+					// getchar();
+					break;
+				}
 			}
 		}
+		if (valid_cnt == 0) { // no valid move
+			//pass once
+			if (verbose) printf("no valid move, %s pass\n", COLOR(turn));
+			// getchar();
+			pass_move();
+		}
 	}
-	print_board();
+	if (verbose) print_board();
 	int win=evaluation();
-	printf("win=%d \n", turn==BLACK ? win : -win);
+	if (verbose) printf("win=%d \n", turn==BLACK ? win : -win);
 	return turn==BLACK ? win : -win;
 }
 

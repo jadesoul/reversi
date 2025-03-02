@@ -13,7 +13,16 @@
 
 void test_game() {
 	init_board();
-	start_game();
+	start_game(1);
+}
+
+void bench_mark(int verbose) {
+	int n = 1000000;
+	for (int i=0; i<n; i++) {
+		if (verbose) printf("benchmark: %d / %d \n", i+1, n);
+		init_board();
+		start_game(0);
+	}
 }
 
 void test_undo() {
@@ -64,7 +73,7 @@ int test() {
 	int m;
 	get_mobility(m);
 	printf("%d\n", m);
-	printf("%d\n", start_game());
+	printf("%d\n", start_game(1));
 
 	return 0;
 }
@@ -76,8 +85,9 @@ int main() {
 	// test_undo();
 	// test_depening();
 
-	test_game();
+	// test_game();
 	// test_search();
 
+	bench_mark(0);
 	return 0;
 }

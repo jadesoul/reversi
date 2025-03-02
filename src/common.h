@@ -202,7 +202,7 @@ typedef uint64_t ulong;
 #define for_n(i, n) 					for (uint i=0; i<n; ++i)
 
 //utility functions
-uchar reverse_byte(uchar c) {
+uchar reverse_byte(uchar c) { // why not just use this: c ^= 0xFF
 	c = ( c & 0x55 ) << 1 | ( c & 0xAA ) >> 1;
 	c = ( c & 0x33 ) << 2 | ( c & 0xCC ) >> 2;
 	c = ( c & 0x0F ) << 4 | ( c & 0xF0 ) >> 4;
@@ -260,5 +260,6 @@ uint iterative_popcount_64(ulong x) {
 	return n;
 }
 
+// TODO: if my < xx; then iterative ; other wise non-iterative
 
 #endif /* COMMON_H_ */
