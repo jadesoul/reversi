@@ -18,6 +18,7 @@ lib
 bin
 src/valid_move.h
 src/make_move.h
+src/reversi.c.preprocess.h
 .DS_Store
 .buildpath
 .settings

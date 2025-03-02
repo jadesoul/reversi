@@ -283,8 +283,10 @@ int start_game(int verbose) {
 		}
 		if (valid_cnt == 0) { // no valid move
 			//pass once
-			if (verbose) printf("no valid move, %s pass\n", COLOR(turn));
-			// getchar();
+			if (verbose) {
+				printf("no valid move, %s pass\n", COLOR(turn));
+				getchar();
+			}
 			pass_move();
 		}
 	}
