@@ -15,7 +15,6 @@
 #include "valid_move.h"
 #include "make_move.h"
 
-#include "time.h"
 
 // global variables
 int turn, oppo;
@@ -107,8 +106,8 @@ int get_stable(ulong my, ulong op) { // TODO
 }
 
 int evaluation() {
-	if (op==0) return 65;
-	if (my==0) return -65;
+	if (op==0) return non_iterative_popcount_64(my);
+	if (my==0) return -non_iterative_popcount_64(op);
 	if (em==0) return non_iterative_popcount_64(my) - non_iterative_popcount_64(op);
 	if (played_cnt<=10) {	//opening
 		int m1, m2;
@@ -261,15 +260,41 @@ int undo_move(int pos) {
 	return 1;
 }
 
+// Function to shuffle an array using Fisher-Yates algorithm
+void shuffle(int *array, size_t n) {
+    if (n > 1) {
+        for (size_t i = 0; i < n - 1; i++) {
+            size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
+            int t = array[i];
+            array[i] = array[j];
+            array[j] = t;
+        }
+    }
+}
+
 // TODO: found a bug: if one side has no mobility, should pass, and change turn
 // currently , the program will loop forever
 // FIXED: 2025.03.01 already fix this bug by pass_cnt
-int start_game(int verbose) {
+int start_game(int verbose, int randplay) {
+	// init a pos array
+	// int pos_array[SIZE];
+	// for (int pos=A1; pos<=H8; ++pos) {
+	// 	pos_array[pos]=pos;
+	// }
+
 	while (! game_over()) {
 		if (verbose) print_board();
 		// getchar();
 		int valid_cnt = 0;
-		for (int pos=A1; pos<=H8; ++pos) {
+		// if (randplay) { // shuffle the pos array
+			// shuffle(pos_array, SIZE);
+		// }
+		for (int pos_idx=A1; pos_idx<=H8*3; ++pos_idx) {//try 3x64 times rand play
+			// int pos = pos_array[pos_idx];
+			// int pos = pos_idx;
+			uint pos = randplay ? rand() : pos_idx;
+			pos = pos % SIZE;
+			// int pos = randplay? rand() % SIZE : pos_idx % SIZE;
 //			printf("pos=%d empty=%d \n", pos, empty_cnt);
 			if (valid_move(pos)) {
 				valid_cnt++;
@@ -290,10 +315,24 @@ int start_game(int verbose) {
 			pass_move();
 		}
 	}
-	if (verbose) print_board();
+	if (verbose || played_cnt<64) print_board();
 	int win=evaluation();
 	if (verbose) printf("win=%d \n", turn==BLACK ? win : -win);
 	return turn==BLACK ? win : -win;
 }
+
+//TODO: still has bug, pass cnt == 2 , but white can play
+// + a b c d e f g h +
+// 1 O O O O O O O O 1
+// 2 O O O O O O O O 2
+// 3 O O X X X X O O 3
+// 4 O O X O X O O O 4
+// 5 O O X O X X O O 5
+// 6 O O X O X O X O 6
+// 7 O O X X O X O O 7
+// 8 O *[X]O O O O O 8
+// + 1 2 3 4 5 6 7 8 +
+// black=16 white=47 played=63 empty=1 mobility=1 pass_cnt=2 turn=WHITE
+
 
 #endif /* BOARD_H_ */

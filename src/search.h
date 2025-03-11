@@ -261,7 +261,25 @@ int search() {
 	return 1;
 }
 
-int rand_play(uint n) {
+int fast_play(uint n) { // play on first valid move
+	for_n(i, n) {
+		int made_move=0;
+		for (int pos=A1; pos<=H8; ++pos) {
+			if (make_move(pos)) {
+				if (game_over()) return 0;
+				made_move=1;
+				break;
+			}
+		}
+		if (made_move==0) {
+			pass_move();
+			if (game_over()) return 0;
+		}
+	}
+	return 1;
+}
+
+int rand_play(uint n) { // TODO: need to be fixed as real random play, now first play
 	for_n(i, n) {
 		for (int pos=A1; pos<=H8; ++pos) {
 			if (make_move(pos)) {

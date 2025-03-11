@@ -17,8 +17,12 @@
 #include <memory.h>
 #include <string.h>
 #include <limits.h>
+
 #include <time.h>
+// #include "time.h"
+
 #include <assert.h>
+
 
 typedef uint8_t uchar;
 typedef uint32_t uint;
@@ -261,5 +265,6 @@ uint iterative_popcount_64(ulong x) {
 }
 
 // TODO: if my < xx; then iterative ; other wise non-iterative
+
 
 #endif /* COMMON_H_ */
