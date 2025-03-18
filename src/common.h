@@ -17,12 +17,9 @@
 #include <memory.h>
 #include <string.h>
 #include <limits.h>
-
 #include <time.h>
-// #include "time.h"
-
 #include <assert.h>
-
+#include <unistd.h>
 
 typedef uint8_t uchar;
 typedef uint32_t uint;

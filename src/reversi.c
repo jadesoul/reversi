@@ -11,6 +11,8 @@
 
 #include "search.h"
 
+
+
 void test_game() {
 	init_board();
 	start_game(1, 0);
@@ -30,14 +32,14 @@ void test_opening() {
 	make_move(D6);
 	make_move(F5);
 	make_move(F6); // candiates: b2, d2, b6, f6
-	fast_play(40);
+	fast_play(39);
 	print_board();
 
 	int win=mtd(0, empty_cnt);
 	printf("win=%d \n", win);
 }
 
-void bench_mark(int verbose) {
+void bench_mark(int verbose, int parallel) {//TODO: add parallel mode to speed up by multi-core CPU processors (using fork)
 	int n = 1000000;
 	int total_win=0;
 	int total_full=0;
@@ -79,6 +81,8 @@ void bench_mark(int verbose) {
 		}
 
 		fast_play(40);
+
+		// fork();
 
 		total_win += start_game(0, 1);
 		if (em == 0) total_full++;
@@ -139,7 +143,29 @@ int test() {
 	return 0;
 }
 
-int main() {
+
+int fork_demo() {
+    pid_t pid;
+
+    // 调用 fork() 创建子进程
+    pid = fork();
+
+    if (pid < 0) {
+        // fork() 失败
+        fprintf(stderr, "Fork failed\n");
+        return 1;
+    } else if (pid == 0) {
+        // 子进程
+        printf("This is the child process. PID: %d\n", getpid());
+    } else {
+        // 父进程
+        printf("This is the parent process. PID: %d, Child PID: %d\n", getpid(), pid);
+    }
+
+    return 0;
+}
+
+int main0() {
 	srand((uint) time(NULL)); // init random seed
 
 	// printf("-1 %% 64 = %d\n", ((uint)(-1) % 64));
@@ -152,8 +178,8 @@ int main() {
 
 	// test_game();
 	// test_search();
-	test_opening();
+	// test_opening();
 
-	bench_mark(0);
+	bench_mark(0, 1);
 	return 0;
 }

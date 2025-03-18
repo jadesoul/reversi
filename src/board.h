@@ -46,7 +46,7 @@ int	sequence[64];//maintain played move pos
 //#define WHITE_BITS			(turn==WHITE ? my : op)
 
 //swap turn
-#define swap_turn(...)		SWAP(turn, oppo); SWAP64(my, op); // SWAP(my_cnt, op_cnt);
+#define swap_turn(...)		SWAP(turn, oppo); SWAP64(my, op) // SWAP(my_cnt, op_cnt);
 
 //test color at pos
 #define is_my(pos)			(BIT_EXIST(my, pos))
@@ -81,7 +81,7 @@ int	sequence[64];//maintain played move pos
 #define get_mobility(mobility)		get_my_mobility(mobility) // default as get my mobility
 
 #define pass_move(...) { swap_turn(); pass_cnt++; } // need pass_cnt++
-#define unpass_move(...) swap_turn()
+#define unpass_move(...) { swap_turn(); pass_cnt--; } // need pass_cnt--
 
 #define diff_cnt(...)		(non_iterative_popcount_64(my) - non_iterative_popcount_64(op))
 //#define diff_cnt(...)		(my - op)
@@ -315,7 +315,7 @@ int start_game(int verbose, int randplay) {
 			pass_move();
 		}
 	}
-	if (verbose || played_cnt<64) print_board();
+	// if (verbose || played_cnt<64) print_board();
 	int win=evaluation();
 	if (verbose) printf("win=%d \n", turn==BLACK ? win : -win);
 	return turn==BLACK ? win : -win;

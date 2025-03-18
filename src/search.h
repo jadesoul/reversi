@@ -78,7 +78,7 @@ int negamax(int depth, int pass) {
 		unpass_move();
 	}
 	// 返回最佳估值
-//		log_status("best="<<best_value<<", depth="<<depth);
+	// log_status("best="<<best_value<<", depth="<<depth);
 	return best_value;
 }
 
