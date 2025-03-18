@@ -26,3 +26,4 @@ model
 pyreversi/*.so
 pyreversi/engine.c
 *__pycache__/
+.vscode/settings.json
