@@ -287,7 +287,7 @@ int start_game(int verbose, int randplay) {
 		// getchar();
 		int valid_cnt = 0;
 		// if (randplay) { // shuffle the pos array
-			// shuffle(pos_array, SIZE);
+			// shuffle(pos_array, SIZE); // too slow
 		// }
 		for (int pos_idx=A1; pos_idx<=H8*3; ++pos_idx) {//try 3x64 times rand play
 			// int pos = pos_array[pos_idx];

@@ -140,7 +140,7 @@ int test() {
 }
 
 int main() {
-	srand((uint) time(NULL)); //初始化随机数种子
+	srand((uint) time(NULL)); // init random seed
 
 	// printf("-1 %% 64 = %d\n", ((uint)(-1) % 64));
 
