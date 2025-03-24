@@ -20,6 +20,7 @@
 #include <time.h>
 #include <assert.h>
 #include <unistd.h>
+#include <pthread.h>
 
 typedef uint8_t uchar;
 typedef uint32_t uint;

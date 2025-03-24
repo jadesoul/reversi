@@ -11,11 +11,9 @@
 
 #include "search.h"
 
-
-
 void test_game() {
 	init_board();
-	start_game(1, 0);
+	start_game(1, 1);
 }
 
 void test_opening() {
@@ -32,14 +30,14 @@ void test_opening() {
 	make_move(D6);
 	make_move(F5);
 	make_move(F6); // candiates: b2, d2, b6, f6
-	fast_play(39);
+	fast_play(32);
 	print_board();
 
 	int win=mtd(0, empty_cnt);
 	printf("win=%d \n", win);
 }
 
-void bench_mark(int verbose, int parallel) {//TODO: add parallel mode to speed up by multi-core CPU processors (using fork)
+void bench_mark(int verbose, int randplay, int parallel) {//TODO: add parallel mode to speed up by multi-core CPU processors (using fork)
 	int n = 1000000;
 	int total_win=0;
 	int total_full=0;
@@ -80,11 +78,13 @@ void bench_mark(int verbose, int parallel) {//TODO: add parallel mode to speed u
 			// make_move(G7); // -2
 		}
 
-		fast_play(40);
+		fast_play(20);
 
-		// fork();
+		// fork(); // TODO: it is hard to assign tasks to parallel sub-process
 
-		total_win += start_game(0, 1);
+
+
+		total_win += start_game(0, randplay);
 		if (em == 0) total_full++;
 	}
 	printf("stats: %d / %d = %f; total_full=%d \n", total_win, n, 1.0*total_win/n, total_full);
@@ -131,7 +131,7 @@ void test_search() {
 }
 
 void test_depening() {
-	printf("%d\n", deepening(60));
+	printf("%d\n", deepening(6000));
 }
 
 int test() {
@@ -144,7 +144,7 @@ int test() {
 }
 
 
-int fork_demo() {
+int fork_demo() { // 用fork不行，不太好和子进程交互数据，分配任务
     pid_t pid;
 
     // 调用 fork() 创建子进程
@@ -160,12 +160,51 @@ int fork_demo() {
     } else {
         // 父进程
         printf("This is the parent process. PID: %d, Child PID: %d\n", getpid(), pid);
+		wait(NULL);
     }
 
     return 0;
 }
 
-int main0() {
+
+void* thread_function(void* arg) {
+    int* value = (int*)arg;
+    printf("子线程收到值: %d\n", *value);
+
+    // 修改值并返回
+    *value *= 2;
+    pthread_exit((void*)value);
+}
+
+int pthread_demo() {
+    pthread_t thread_id;
+    int value = 1;
+
+    // 创建子线程
+    if (pthread_create(&thread_id, NULL, thread_function, (void*)&value) != 0) {
+        perror("pthread_create");
+        exit(EXIT_FAILURE);
+    }
+
+    // 等待子线程结束并获取返回值
+    void* thread_return;
+    if (pthread_join(thread_id, &thread_return) != 0) {
+        perror("pthread_join");
+        exit(EXIT_FAILURE);
+    }
+
+    int* result = (int*)thread_return;
+    printf("主线程收到子线程返回的值: %d\n", *result);
+
+    return 0;
+}
+
+void benchmark_parallel() {
+	// parallel need the board should not be global variable, but can be copy to multiple parts to be handle by multiple thread
+	// need revamp the board
+}
+
+int main() {
 	srand((uint) time(NULL)); // init random seed
 
 	// printf("-1 %% 64 = %d\n", ((uint)(-1) % 64));
@@ -174,12 +213,13 @@ int main0() {
 
 	// init_valid_move_byte_table();
 	// test_undo();
-	// test_depening();
+	test_depening();
 
 	// test_game();
 	// test_search();
 	// test_opening();
 
-	bench_mark(0, 1);
+	// bench_mark(0, 0, 1);
+
 	return 0;
 }
