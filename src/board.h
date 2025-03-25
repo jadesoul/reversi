@@ -106,27 +106,34 @@ int get_stable(ulong my, ulong op) { // TODO
 	return 0;
 }
 
+void print_board();
+
 int evaluation() {
-	return 0;
+	// print_board();
+	// getchar();
+	// return 0;
+
 	if (op==0) return non_iterative_popcount_64(my);
 	if (my==0) return -non_iterative_popcount_64(op);
 	if (em==0) return non_iterative_popcount_64(my) - non_iterative_popcount_64(op);
-	if (played_cnt<=40) {	//opening
+	if (played_cnt<=20) {	//opening
 		int m1, m2;
 		get_my_mobility(m1);
 		get_op_mobility(m2);
 		return m1-m2;
-	} else if (played_cnt<=50) {	//middle game 估值很不准
+	} else if (played_cnt<=40) {	//middle game 估值很不准
 //		return get_stable(my, op)-get_stable(op, my);
 //		int a=non_iterative_popcount_32((my >> 56) | ((my & 0xFF) << 8));
 //		int b=non_iterative_popcount_32((op >> 56) | ((op & 0xFF) << 8));
 //		return a-b;
-		int corner = non_iterative_popcount_64(my & 0x8100000000000081UL)-non_iterative_popcount_64(op & 0x8100000000000081UL);
-		return corner;
-	} else if (played_cnt<=60) { // end game
+		// int corner = non_iterative_popcount_64(my & 0x8100000000000081UL)-non_iterative_popcount_64(op & 0x8100000000000081UL);
+		// return corner;
 		int boder_corner = non_iterative_popcount_64(my & 0xFF818181818181FFUL)-non_iterative_popcount_64(op & 0xFF818181818181FFUL);
 		return boder_corner;
-	} else { // 48 - 64
+	} else if (played_cnt<=50) { // end game
+		int boder_corner = non_iterative_popcount_64(my & 0xFF818181818181FFUL)-non_iterative_popcount_64(op & 0xFF818181818181FFUL);
+		return boder_corner;
+	} else { // 60 - 64
 		return non_iterative_popcount_64(my) - non_iterative_popcount_64(op);
 	}
 }

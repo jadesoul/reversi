@@ -131,6 +131,22 @@ void test_search() {
 }
 
 void test_depening() {
+	init_board();
+	make_move(C4);//black make first move can be: F5, E6, D3, C4
+	make_move(C3);
+	make_move(D3);
+	make_move(C5);
+	make_move(B3);
+	make_move(F4);
+	make_move(B5);
+	make_move(B4);
+	make_move(C6);
+	make_move(D6);
+	make_move(F5);
+	make_move(F6); // candiates: b2, d2, b6, f6
+	fast_play(10);
+	print_board();
+
 	printf("%d\n", deepening(6000));
 }
 
@@ -209,7 +225,7 @@ int main() {
 
 	// printf("-1 %% 64 = %d\n", ((uint)(-1) % 64));
 
-	init_board();
+	// init_board();
 
 	// init_valid_move_byte_table();
 	// test_undo();

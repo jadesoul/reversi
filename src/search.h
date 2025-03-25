@@ -244,7 +244,7 @@ int deepening(int seconds) {
 		// 进行常规的MTD(f)算法
 		value = mtd(value, depth);
 		elapsed=TIMER_ELASPED(now);
-		printf("depth=%d seconds=%f value=%d \n", depth, elapsed, value);
+		printf("depth=%d played=%d seconds=%f value=%d \n", depth, (played_cnt+depth), elapsed, value);
 		// 增加搜索深度
 		++depth;
 	// 直到时间用完
@@ -279,7 +279,7 @@ int fast_play(uint n) { // play on first valid move
 	return 1;
 }
 
-int rand_play(uint n) { // TODO: need to be fixed as real random play, now first play
+int rand_play_old(uint n) { // TODO: need to be fixed as real random play, now first play
 	for_n(i, n) {
 		for (int pos=A1; pos<=H8; ++pos) {
 			if (make_move(pos)) {
@@ -290,5 +290,42 @@ int rand_play(uint n) { // TODO: need to be fixed as real random play, now first
 	}
 	return 1;
 }
+
+int rand_play(uint n) {//TODO: to be check and fixed 
+	int verbose  = 0;
+	while (! game_over()) {
+		if (verbose) print_board();
+		// getchar();
+		int valid_cnt = 0;
+		for (int pos_idx=A1; pos_idx<=H8*3; ++pos_idx) {//try 3x64 times rand play
+			uint pos = rand() % SIZE;
+			if (valid_move(pos)) {
+				valid_cnt++;
+//				printf("make move from %c%c, played=%d, empty=%d turn=%s \n", TEXT(pos), played_cnt, empty_cnt, COLOR(turn));
+				if (verbose) printf("%s is going to make move on %c%c\n", COLOR(turn), TEXT(pos));
+				if (make_move(pos)) {
+					if (verbose) {
+						getchar();
+					}
+					break;
+				}
+			}
+		}
+		if (valid_cnt == 0) { // no valid move
+			//pass once
+			if (verbose) {
+				printf("no valid move, %s pass\n", COLOR(turn));
+				getchar();
+			}
+			pass_move();
+		}
+	}
+	// if (verbose || played_cnt<64) print_board();
+	int win=evaluation();
+	if (verbose) printf("win=%d \n", turn==BLACK ? win : -win);
+	return turn==BLACK ? win : -win;
+}
+
+
 
 #endif /* SEARCH_H_ */
