@@ -87,7 +87,8 @@ int alpha_beta(int alpha, int beta, int depth, int pass){
 	int best_value = INT32_MIN;
 	// 如果到达预定的搜索深度
 	if (depth <= 0) {
-		// 直接给出估值
+		// 深度搜索完了，不用再展开了，直接给出估值
+		search_leafs_eval++;
 		return evaluation();
 	}
 	// 尝试每个下棋位置
@@ -101,6 +102,7 @@ int alpha_beta(int alpha, int beta, int depth, int pass){
 			// 如果这步棋引发剪枝
 			if (value >= beta) {
 				// 停止对当前局面的搜索，立即返回
+				search_cut_branchs++;
 				return value;
 			}
 			// 如果这步棋更好
@@ -119,16 +121,18 @@ int alpha_beta(int alpha, int beta, int depth, int pass){
 		// 如果上一步棋也是弃着，表明对局结束
 		if (pass) {
 			// 计算出盘面的精确比分
+			search_leafs_exact++;// TODO: use exact_cnt
 			return get_exact();
 		}
 		// 否则这步棋弃着
 		pass_move();
 		// 递归搜索，并标明该步弃着
-		best_value = -alpha_beta(-beta, -alpha, depth, 1);
+		best_value = -alpha_beta(-beta, -alpha, depth, 1); //换对手走棋，是不是应该不是负号了
 		// 恢复原来的局面
 		unpass_move();
 	}
 	// 返回最佳估值
+	search_nodes++;
 	return best_value;
 }
 
@@ -190,7 +194,7 @@ int pvs(int alpha, int beta, int depth, int pass){
 		// 如果上一步也是弃着，表明对局结束
 		if (pass) {
 			// 计算出盘面的精确比分
-//			if (op==0) print_board();
+			// if (op==0) print_board();
 			return get_exact();
 		}
 		// 否则这步棋弃着
@@ -240,25 +244,26 @@ int deepening(int seconds) {
 	// 初始搜索深度
 	int depth = 1;
 	float elapsed;
+	ulong total_evals=0;
 	do {
 		// 进行常规的MTD(f)算法
+		search_nodes = 0;
+		search_leafs_eval = 0;
+		search_leafs_exact = 0;
+		search_cut_branchs = 0;
 		value = mtd(value, depth);
 		elapsed=TIMER_ELASPED(now);
-		printf("depth=%d played=%d seconds=%f value=%d \n", depth, (played_cnt+depth), elapsed, value);
+		total_evals+=search_leafs_eval;
+		float total_speed = 1.0*total_evals/elapsed;
+		// printf("depth=%d played=%d nodes=%d evals=%d exacts=%d cuts=%d eval seconds=%f value=%d \n", 
+		// 	depth, (played_cnt+depth), search_nodes, search_leafs_eval, search_leafs_exact, search_cut_branchs, elapsed, value);
+		printf("depth=%d final=%d nodes=%llu evals=%llu cuts=%llu tevals=%llu seconds=%0.5f speed=%0.1f value=%d \n", 
+			depth, (played_cnt+depth), search_nodes, search_leafs_eval, search_cut_branchs, total_evals, elapsed, total_speed, value);
 		// 增加搜索深度
 		++depth;
 	// 直到时间用完
 	} while (elapsed < seconds && depth<=empty_cnt) ;
 	return value;
-}
-
-int search() {
-	for (int pos=A1; pos<=H8; ++pos) {
-		if (make_move(pos)) {
-			break;
-		}
-	}
-	return 1;
 }
 
 int fast_play(uint n) { // play on first valid move

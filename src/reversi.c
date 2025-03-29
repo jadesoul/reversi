@@ -93,58 +93,216 @@ void bench_mark(int verbose, int randplay, int parallel) {//TODO: add parallel m
 void test_undo() {
 	print_board();
 
-	search();
+	fast_play(1);
 	print_board();
-	search();
-	print_board();
-
-	printf("now undo \n");
-	undo_move(sequence[played_cnt-1]);
+	fast_play(1);
 	print_board();
 
 	printf("now undo \n");
 	undo_move(sequence[played_cnt-1]);
 	print_board();
 
-	search();
+	printf("now undo \n");
+	undo_move(sequence[played_cnt-1]);
+	print_board();
+
+	fast_play(1);
 	print_board();
 }
 
-void test_search() {
+void test_search_best_ending(int verbose) { // DONE: use search to find best ending move
+	int MAX_DEPTH=10;
+	int EMPTY_MOVE=50;
+	int INIT_MOVE=60-EMPTY_MOVE;
+	int DEFAULT_BEST_WIN=-99;
+
+	init_board();
+	rand_play(INIT_MOVE);
+	printf("init board ...\n");
+	print_board();
+
+	while (1) {
+		int my_win;
+		int op_win;
+		int best_win=DEFAULT_BEST_WIN;
+		int best_pos;
+		float elapsed;
+		int depth;
+
+		printf("listing valid move ...\n");
+		int valid_cnt=0;
+		int valid_moves[64];//maximum 64 valid moves
+		for (int pos=A1; pos<=H8; ++pos) {
+			if (valid_move(pos)) {
+				valid_moves[valid_cnt]=pos;
+				valid_cnt++;
+				if (verbose) printf("-- valid move %d: %c%c \n", valid_cnt, TEXT(pos));
+			}
+		}
+		if (valid_cnt==0) {
+			pass_move();
+			print_board();
+			if (game_over()) break;
+			continue;
+		}
+
+		printf("search each valid move ...\n");
+		for_n(i, valid_cnt) {
+			int pos=valid_moves[i];
+			if (make_move(pos)) {
+				if (verbose) printf("trying to make move %d of %d: %c%c \n", (i+1), valid_cnt, TEXT(pos));
+				TIMER_START(now);
+
+				depth = empty_cnt; 
+				if (depth>MAX_DEPTH) depth=MAX_DEPTH; // too slow if too depth, do some cut
+
+				search_nodes = 0;
+				search_leafs_eval = 0;
+				search_leafs_exact = 0;
+				search_cut_branchs = 0;
+
+				if (verbose) {
+					print_board();
+					printf("start searching ...\n");
+				}
+
+				op_win= mtd(0, depth);
+				
+				// win=negamax(depth, 0);
+				// win=alpha_beta(-64, 64, depth, 0);
+				// win=pvs(-64, 64, depth, 0);
+
+				// printf("black win=%d \n", (turn==BLACK ? win : -win));
+
+				my_win = - op_win; //for oppo is win, for my is -win
+
+				elapsed=TIMER_ELASPED(now);
+				float speed = 1.0*search_leafs_eval/elapsed;
+				if (verbose) {
+					printf("depth=%d final=%d nodes=%llu evals=%llu exacts=%llu cuts=%llu seconds=%0.5f speed=%0.1f op_win=%d\n", 
+						depth, (played_cnt+depth), search_nodes, search_leafs_eval, search_leafs_exact, search_cut_branchs, elapsed, speed, op_win);
+		
+					printf("candidate pos: %c%c my_win=%d \n", TEXT(pos), my_win);
+				}
+				if (my_win>=best_win) {
+					if (verbose) printf("-- best_win: %d -> %d best_pos: %c%c \n", best_win, my_win, TEXT(pos));
+					best_win=my_win;
+					best_pos=pos;
+				}
+
+				// getchar();
+
+				undo_move(pos);
+			}
+		}
+		
+		assert(best_win != DEFAULT_BEST_WIN);// must have at least one best pos
+		// finally make move at best move
+		printf("finally %s make move at best move %c%c with best win %d ...\n", COLOR(turn), TEXT(best_pos), best_win);
+		make_move(best_pos);
+		print_board();
+		if (game_over()) break;
+	}
+	
+	// print_board();
+	int win=evaluation();
+	printf("=== game over === \n");
+	printf("finally, empty_cnt=%d, black win=%d \n", empty_cnt, (turn==BLACK ? win : -win));
+}
+
+
+void test_search_forward() {
+	int MAX_DEPTH=14;
+	int INIT_MOVE=60-20;
+	init_board();
+	rand_play(INIT_MOVE);
+
+	for_n(j, 60) {
+		TIMER_START(now);
+		int moves = 0;
+		int win;
+		float elapsed;
+		int depth;
+		if (rand_play(1)) {
+			print_board();
+			
+			moves++; // from 1 to 60
+			depth = 60 - moves; // from 59 to 0
+			if (depth>MAX_DEPTH) depth=MAX_DEPTH; // too slow if too depth, do some cut
+
+			search_nodes = 0;
+			search_leafs_eval = 0;
+			search_leafs_exact = 0;
+			search_cut_branchs = 0;
+			printf("start searching ...\n");
+			win=mtd(0, depth);
+			// win=negamax(depth, 0);
+			// win=alpha_beta(-64, 64, depth, 0);
+			// win=pvs(-64, 64, depth, 0);
+
+			print_board();
+			elapsed=TIMER_ELASPED(now);
+			float speed = 1.0*search_leafs_eval/elapsed;
+			printf("depth=%d final=%d nodes=%llu evals=%llu exacts=%llu cuts=%llu seconds=%0.5f speed=%0.1f win=%d\n", 
+				depth, (played_cnt+depth), search_nodes, search_leafs_eval, search_leafs_exact, search_cut_branchs, elapsed, speed, (turn==BLACK?win:-win));
+
+			getchar();
+		}
+	}
+}
+
+void test_search_backward() {
 	for_n(j, 60) {
 		init_board();
 		TIMER_START(now);
 		int i=j+1;
+		int win;
+		float elapsed;
 		if (rand_play(60-i)) {
-			int win;
-
 			print_board();
-
+			
+			search_nodes = 0;
+			search_leafs_eval = 0;
+			search_leafs_exact = 0;
+			search_cut_branchs = 0;
+			printf("start searching ...\n");
 			win=mtd(0, i);
 	//		win=negamax(i, 0);
 	//		win=alpha_beta(-64, 64, i, 0);
 //			win=pvs(-64, 64, i, 0);
 
-			printf("%d levels, using %f seconds, win=%d \n", i, TIMER_ELASPED(now), (turn==BLACK?win:-win));
+			print_board();
+			elapsed=TIMER_ELASPED(now);
+			float speed = 1.0*search_leafs_eval/elapsed;
+			printf("depth=%d final=%d nodes=%llu evals=%llu exacts=%llu cuts=%llu seconds=%0.5f speed=%0.1f win=%d\n", 
+				i, (played_cnt+i), search_nodes, search_leafs_eval, search_leafs_exact, search_cut_branchs, elapsed, speed, (turn==BLACK?win:-win));
+
+			getchar();
 		}
 	}
 }
 
+void test_search() {
+	// test_search_forward();
+	test_search_best_ending(0);
+}
+
+
 void test_depening() {
 	init_board();
-	make_move(C4);//black make first move can be: F5, E6, D3, C4
-	make_move(C3);
-	make_move(D3);
-	make_move(C5);
-	make_move(B3);
-	make_move(F4);
-	make_move(B5);
-	make_move(B4);
-	make_move(C6);
-	make_move(D6);
-	make_move(F5);
-	make_move(F6); // candiates: b2, d2, b6, f6
-	fast_play(10);
+	// make_move(C4);//black make first move can be: F5, E6, D3, C4
+	// make_move(C3);
+	// make_move(D3);
+	// make_move(C5);
+	// make_move(B3);
+	// make_move(F4);
+	// make_move(B5);
+	// make_move(B4);
+	// make_move(C6);
+	// make_move(D6);
+	// make_move(F5);
+	// make_move(F6); // candiates: b2, d2, b6, f6
+	// rand_play(10);
 	print_board();
 
 	printf("%d\n", deepening(6000));
@@ -229,10 +387,10 @@ int main() {
 
 	// init_valid_move_byte_table();
 	// test_undo();
-	test_depening();
+	// test_depening();
 
 	// test_game();
-	// test_search();
+	test_search();
 	// test_opening();
 
 	// bench_mark(0, 0, 1);

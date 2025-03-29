@@ -21,6 +21,7 @@ ulong my, op, em;// myself, opponent, empty
 int my_cnt, op_cnt;
 int empty_cnt, played_cnt;
 int pass_cnt;
+ulong search_nodes, search_leafs_eval, search_leafs_exact, search_cut_branchs;// total search board state in alpha_beta, mtd, etc.
 
 //typedef struct move_t {
 //	int 	turn;	//who play			//no need for use pass
@@ -166,9 +167,11 @@ void print_board() {
 
 	printf("--------------------------------------------\n");
 	char h = (turn == BLACK ? 'A' : 'a');
-	printf("+ ");
+	// printf("+ ");
+	printf("  ");
 	for_n(j, 8) printf("%c ", (char)(h + j));
-	printf("+ \n");
+	// printf("+ \n");
+	printf("  \n");
 	for_n(i, 8)
 	{
 		printf("%d ", i+1);
@@ -178,12 +181,21 @@ void print_board() {
 
 			int c=get_color(p);
 			if (c == EMPTY)
-				if (valid_move(p)) printf(turn==BLACK ? "*" : "*");
-				else printf("\033[0;35m.\033[0m");
+				// if (valid_move(p)) printf(turn==BLACK ? "*" : "*");
+				// if (valid_move(p)) printf(turn==BLACK ? "\033[0;32m.\033[0m" : ".");
+				// if (valid_move(p)) printf("\033[0;32m.\033[0m");
+				if (valid_move(p)) printf(".");
+
+				// else printf("\033[0;35m.\033[0m");
+				else printf(" ");
 			else if (c == BLACK)
-				printf("\033[0;31mX\033[0m");
+				// printf("\033[0;31m▪\033[0m");
+				// printf("\033[0;31m●\033[0m");
+				printf("●");
 			else if (c == WHITE)
-				printf("\033[0;33mO\033[0m");
+				// printf("\033[0;33mO\033[0m");
+				// printf("\033[0;33m○\033[0m");
+				printf("○");
 			else
 				printf("*");
 
@@ -194,10 +206,12 @@ void print_board() {
 		}
 		printf("%d \n", i+1);
 	}
-	printf("+ ");
+	// printf("+ ");
+	printf("  ");
 	h='1';
 	for_n(j, 8) printf("%c ", (char)(h + j));
-	printf("+ \n");
+	// printf("+ \n");
+	printf("  \n");
 
 	my_cnt=non_iterative_popcount_64(my);
 	op_cnt=non_iterative_popcount_64(op);
